@@ -47,7 +47,7 @@ const DOCS: Record<string, LegalDoc> = {
     <article class="legal">
       <div class="page narrow">
         <a routerLink="/" class="back">← Volver al inicio</a>
-        <p class="eyebrow">Legal · actualizado {{ doc().updated }}</p>
+        <p class="pill">Legal · actualizado {{ doc().updated }}</p>
         <h1>{{ doc().title }}</h1>
         <p class="intro">{{ doc().intro }}</p>
         @for (s of doc().sections; track s.h; let i = $index) {
@@ -63,15 +63,15 @@ const DOCS: Record<string, LegalDoc> = {
     </article>
   `,
   styles: `
-    .legal { padding: 140px 0 110px; }
+    .legal { padding: 150px 0 110px; }
     .narrow { max-width: 820px; }
     .back { display: block; width: fit-content; margin-bottom: 30px; font-size: 0.9rem; font-weight: 650; color: var(--muted); transition: color 200ms ease, translate 400ms var(--ease-out); }
-    @media (hover: hover) and (pointer: fine) { .back:hover { color: var(--mint-deep); translate: -4px 0; } }
-    h1 { margin-top: 18px; font-size: clamp(2.8rem, 7vw, 5rem); }
+    @media (hover: hover) and (pointer: fine) { .back:hover { color: var(--royal); translate: -4px 0; } }
+    h1 { margin-top: 22px; font-size: clamp(2.8rem, 7vw, 5rem); }
     .intro { margin-top: 24px; font-size: 1.12rem; color: var(--ink-2); }
     section { margin-top: 40px; padding-top: 26px; border-top: 1px solid var(--line); }
-    h2 { display: flex; gap: 14px; align-items: baseline; font-size: 1.8rem; }
-    h2 span { font-family: var(--font-body); font-size: 0.8rem; font-weight: 700; color: var(--mint-deep); }
+    h2 { display: flex; gap: 14px; align-items: baseline; font-size: 1.8rem; font-weight: 500; }
+    h2 span { font-family: var(--font-body); font-size: 0.8rem; font-weight: 700; color: var(--royal); }
     section p { margin-top: 12px; color: var(--ink-2); }
     .note { margin-top: 56px; padding: 16px 18px; border-radius: var(--radius-s); border: 1px dashed var(--line-2); font-size: 0.88rem; color: var(--muted); }
   `,

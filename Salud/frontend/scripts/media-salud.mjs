@@ -6,6 +6,8 @@ import sharp from 'sharp';
 
 const APPS = {
   'salud-marfil': {
+    'hero-sonrisa': 20130737,
+    'doctora': 4173251,
     'hero-paciente': 3881161,
     'consulta-sonrisa': 3845553,
     'consulta-dr': 14052564,
@@ -55,6 +57,16 @@ for (const [app, fotos] of Object.entries(APPS)) {
     await sharp(src).resize({ width: 820, withoutEnlargement: true }).webp({ quality: 72 }).toFile(path.join(out, `${name}-sm.webp`));
     console.log(app, name);
   }
+}
+
+// Avatares redondos de pacientes para la portada de Marfil (recorte automático a la cara)
+{
+  const AVATARES = { 'avatar-1': 6627574, 'avatar-2': 3845553, 'avatar-3': 3881161, 'avatar-4': 20130737 };
+  for (const [name, id] of Object.entries(AVATARES)) {
+    const src = await bajar(id);
+    await sharp(src).resize(96, 96, { fit: 'cover', position: sharp.strategy.attention }).webp({ quality: 78 }).toFile(path.resolve(`projects/salud-marfil/public/media/${name}.webp`));
+  }
+  console.log('avatares listos');
 }
 
 // Máscara de los dientes para el simulador de blanqueamiento de Marfil. En la foto los labios son rojos y los

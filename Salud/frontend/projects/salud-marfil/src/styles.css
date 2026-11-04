@@ -1,47 +1,66 @@
-@import '@fontsource-variable/fraunces/wght.css';
-@import '@fontsource-variable/fraunces/wght-italic.css';
+@import '@fontsource-variable/outfit/wght.css';
 @import '@fontsource-variable/plus-jakarta-sans/wght.css';
 
 /* ===== Marfil · tokens =====
-   Clínica dental: fondo marfil (el color del diente sano), tinta azul noche y un solo acento,
-   menta clínica. El amarillo "diente" solo aparece en el simulador de blanqueamiento. */
+   Clínica dental moderna: azul rey, azul noche y azul hielo, con blanco de esmalte. Objetos 3D brillantes,
+   vidrio esmerilado y palabras gigantes recortadas al fondo (referencias de Bruno: publicidad dental). */
 :root {
-  --ivory: oklch(97.4% 0.011 88);
-  --ivory-2: oklch(94.2% 0.016 86);
-  --ivory-3: oklch(90.5% 0.02 84);
-  --ink: oklch(24% 0.035 258);
-  --ink-2: oklch(38% 0.035 258);
-  --muted: oklch(53% 0.03 258);
-  --line: color-mix(in oklch, var(--ink) 12%, transparent);
-  --line-2: color-mix(in oklch, var(--ink) 24%, transparent);
-  --mint: oklch(63% 0.1 172);
-  --mint-deep: oklch(45% 0.08 175);
-  --mint-soft: oklch(93% 0.035 172);
-  --night: oklch(19% 0.04 258);
-  --stain: oklch(78% 0.11 82);
-  --white: oklch(99.5% 0.003 88);
-  --ok: oklch(60% 0.13 150);
-  --closed: oklch(58% 0.14 30);
+  --ice: oklch(96.6% 0.016 245);
+  --ice-2: oklch(93% 0.028 245);
+  --ice-3: oklch(88% 0.045 248);
+  --white: oklch(99.4% 0.003 245);
+  --royal: oklch(50% 0.2 263);
+  --royal-2: oklch(58% 0.18 258);
+  --sky: oklch(80% 0.09 238);
+  --navy: oklch(25% 0.08 264);
+  --navy-2: oklch(31% 0.1 264);
+  --night: oklch(18% 0.05 264);
+  --ink: oklch(23% 0.05 264);
+  --ink-2: oklch(40% 0.04 262);
+  --muted: oklch(56% 0.035 258);
+  --line: color-mix(in oklch, var(--navy) 12%, transparent);
+  --line-2: color-mix(in oklch, var(--navy) 22%, transparent);
+  --glass: oklch(99% 0.005 245 / 0.62);
+  --glass-dark: oklch(30% 0.1 264 / 0.55);
+  --stain: oklch(80% 0.11 82);
+  --ok: oklch(66% 0.15 155);
+  --closed: oklch(60% 0.17 25);
 
-  --font-display: 'Fraunces Variable', 'Fraunces', Georgia, serif;
+  --font-display: 'Outfit Variable', 'Outfit', system-ui, sans-serif;
   --font-body: 'Plus Jakarta Sans Variable', 'Plus Jakarta Sans', system-ui, sans-serif;
 
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
-  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
 
-  --radius-s: 10px;
-  --radius-m: 18px;
-  --radius-l: 28px;
-  --shadow-s: 0 1px 2px oklch(24% 0.035 258 / 0.06), 0 2px 8px oklch(24% 0.035 258 / 0.05);
-  --shadow-m: 0 2px 6px oklch(24% 0.035 258 / 0.06), 0 18px 40px -12px oklch(24% 0.035 258 / 0.18);
+  /* Escala de movimiento de transitions.dev (se usa por nombre según el tipo de movimiento) */
+  --duration-stagger: 40ms;
+  --duration-micro: 80ms;
+  --duration-quick: 150ms;
+  --duration-fast: 250ms;
+  --duration-medium: 350ms;
+  --duration-slow: 400ms;
+  --duration-very-slow: 500ms;
+  --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --ease-bounce-strong: cubic-bezier(0.34, 3.85, 0.64, 1);
+  --blur-small: 2px;
+  --blur-medium: 3px;
+  --blur-large: 8px;
+
+  --radius-s: 12px;
+  --radius-m: 20px;
+  --radius-l: 30px;
+  --radius-xl: 44px;
+  --shadow-s: 0 1px 2px oklch(25% 0.08 264 / 0.06), 0 4px 14px oklch(25% 0.08 264 / 0.06);
+  --shadow-m: 0 2px 6px oklch(25% 0.08 264 / 0.06), 0 24px 50px -18px oklch(25% 0.08 264 / 0.28);
+  --shadow-blue: 0 18px 40px -14px oklch(50% 0.2 263 / 0.55);
 
   --page: 1280px;
   --gutter: clamp(16px, 4.5vw, 56px);
-  --section: clamp(88px, 12vw, 170px);
+  --section: clamp(90px, 12vw, 170px);
+  --z-stage: 6;
   --z-header: 50;
-  --z-overlay: 90;
   --z-intro: 200;
 }
 
@@ -54,7 +73,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   overflow-x: clip;
-  background: var(--ivory);
+  background: var(--ice);
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -69,7 +88,7 @@ html.lenis body {
 
 body {
   margin: 0;
-  background: var(--ivory);
+  background: var(--ice);
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 1.0625rem;
@@ -80,7 +99,8 @@ body {
 }
 
 img,
-svg {
+svg,
+canvas {
   display: block;
   max-width: 100%;
 }
@@ -116,11 +136,17 @@ h3,
 h4 {
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 420;
-  line-height: 1.04;
-  letter-spacing: -0.02em;
-  font-variation-settings: 'SOFT' 60, 'WONK' 0;
+  font-weight: 300;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
   text-wrap: balance;
+}
+
+/* Como en los anuncios de referencia: el título en fino y la palabra clave en negritas */
+h1 b,
+h2 b,
+h3 b {
+  font-weight: 700;
 }
 
 p {
@@ -128,20 +154,15 @@ p {
   text-wrap: pretty;
 }
 
-em {
-  font-style: italic;
-  font-variation-settings: 'SOFT' 100, 'WONK' 1;
-}
-
 ::selection {
-  background: var(--mint-soft);
-  color: var(--ink);
+  background: var(--royal);
+  color: var(--white);
 }
 
 :focus-visible {
-  outline: 2px solid var(--mint);
+  outline: 2px solid var(--royal);
   outline-offset: 3px;
-  border-radius: 4px;
+  border-radius: 6px;
 }
 
 .page {
@@ -155,121 +176,219 @@ em {
   padding: var(--section) 0;
 }
 
-/* Etiqueta pequeña sobre los títulos */
-.eyebrow {
+.pill {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  width: fit-content;
+  padding: 7px 14px;
+  border-radius: 999px;
   font-size: 0.78rem;
   font-weight: 650;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--mint-deep);
+  color: var(--royal);
+  background: var(--white);
+  box-shadow: var(--shadow-s);
 }
 
-.eyebrow::before {
-  content: '';
-  width: 18px;
-  height: 2px;
-  border-radius: 2px;
-  background: currentColor;
+.pill.dark {
+  color: var(--sky);
+  background: oklch(40% 0.12 264 / 0.4);
+  box-shadow: inset 0 0 0 1px oklch(70% 0.1 250 / 0.25);
 }
 
 .h2 {
-  font-size: clamp(2.3rem, 5.6vw, 4.4rem);
+  font-size: clamp(2.4rem, 5.6vw, 4.6rem);
 }
 
 .lead {
-  font-size: clamp(1.05rem, 1.6vw, 1.2rem);
+  font-size: clamp(1.04rem, 1.5vw, 1.18rem);
   color: var(--ink-2);
-  max-width: 54ch;
+  max-width: 52ch;
 }
 
-/* Botones */
+/* Palabra gigante recortada de fondo (como "resultado" en la referencia del cepillo) */
+.giant {
+  position: absolute;
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 0.8;
+  letter-spacing: -0.06em;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ===== Botones ===== */
 .btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   min-height: 52px;
-  padding: 0 24px;
+  padding: 0 26px;
   border-radius: 999px;
   font-weight: 650;
-  font-size: 0.98rem;
-  background: var(--ink);
-  color: var(--ivory);
-  transition: background-color 220ms ease, color 220ms ease, scale 160ms var(--ease-out), box-shadow 220ms ease;
+  font-size: 0.96rem;
+  background: var(--royal);
+  color: var(--white);
+  box-shadow: var(--shadow-blue);
+  overflow: hidden;
+  isolation: isolate;
+  transition: scale 160ms var(--ease-out), box-shadow 300ms ease, color 300ms ease;
+}
+
+/* Al pasar el cursor, una gota de azul noche crece desde donde entró el mouse (--mx/--my los pone shared/magnetic.ts) */
+.btn::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: var(--mx, 50%);
+  top: var(--my, 50%);
+  width: 0;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  translate: -50% -50%;
+  background: var(--navy);
+  transition: width 500ms var(--ease-smooth-out);
 }
 
 .btn:active {
   scale: 0.96;
 }
 
-.btn.mint {
-  background: var(--mint);
-  color: var(--night);
+.btn.light {
+  background: var(--white);
+  color: var(--navy);
+  box-shadow: var(--shadow-s);
 }
 
 .btn.ghost {
   background: transparent;
-  color: var(--ink);
+  color: var(--navy);
   box-shadow: inset 0 0 0 1.5px var(--line-2);
 }
 
-.btn .icon {
-  transition: translate 300ms var(--ease-out);
+.btn.on-dark {
+  background: var(--white);
+  color: var(--navy);
+}
+
+.btn.on-dark::before {
+  background: var(--sky);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .btn:hover {
-    background: var(--mint-deep);
+  .btn:hover::before {
+    width: 250%;
+  }
+  .btn.ghost:hover,
+  .btn.light:hover {
     color: var(--white);
   }
-  .btn.mint:hover {
-    background: var(--ink);
-    color: var(--ivory);
-  }
-  .btn.ghost:hover {
-    background: var(--ink);
-    color: var(--ivory);
-    box-shadow: none;
-  }
-  .btn:hover .icon {
-    translate: 3px 0;
+  .btn.on-dark:hover {
+    color: var(--navy);
   }
 }
 
-.status-pill {
+/* ===== transitions.dev: "Learn more hover" (la flecha se estira al pasar el cursor) ===== */
+.t-learn-chevron {
   display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 14px 7px 12px;
-  border-radius: 999px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  background: var(--white);
-  box-shadow: var(--shadow-s);
+  transition: transform 350ms var(--ease-smooth-out);
 }
 
-.status-pill i {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--closed);
+.t-learn-arm {
+  transform-box: view-box;
+  transform-origin: 10px 8px;
+  vector-effect: non-scaling-stroke;
+  transition: transform 350ms var(--ease-smooth-out);
 }
 
-.status-pill.open i {
-  background: var(--ok);
-  box-shadow: 0 0 0 0 color-mix(in oklch, var(--ok) 50%, transparent);
-  animation: pulse 2.4s var(--ease-out) infinite;
+.t-learn-line {
+  transform-box: view-box;
+  transform-origin: 10px 8px;
+  scale: 0 1;
+  transition: scale 350ms var(--ease-smooth-out);
 }
 
-@keyframes pulse {
-  70% {
-    box-shadow: 0 0 0 8px transparent;
+@media (hover: hover) and (pointer: fine) {
+  .t-learn:hover .t-learn-chevron {
+    transform: translateX(3px);
   }
-  100% {
-    box-shadow: 0 0 0 0 transparent;
+  .t-learn:hover .t-learn-arm-top {
+    transform: rotate(8deg);
+  }
+  .t-learn:hover .t-learn-arm-bot {
+    transform: rotate(-8deg);
+  }
+  .t-learn:hover .t-learn-line {
+    scale: 1 1;
+  }
+}
+
+/* ===== transitions.dev: "Card hover tilt" (inclinación 3D con brillo que sigue al cursor; shared/tilt.ts) ===== */
+.t-tilt {
+  --tilt-perspective: 1000px;
+  touch-action: pan-y;
+}
+
+.t-tilt-card {
+  position: relative;
+  transform: perspective(var(--tilt-perspective)) rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
+  transform-style: preserve-3d;
+  transition: transform 1000ms var(--ease-smooth-out);
+  will-change: transform;
+}
+
+.t-tilt-card.is-tilting {
+  transition: transform 400ms var(--ease-smooth-out);
+}
+
+.t-tilt-glare {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(circle 95px at var(--tilt-gx, 50%) var(--tilt-gy, 50%), rgba(255, 255, 255, 0.48), rgba(255, 255, 255, 0.06) 52%, rgba(255, 255, 255, 0) 84%),
+    radial-gradient(circle 220px at var(--tilt-gx, 50%) var(--tilt-gy, 50%), rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 78%);
+  transition: opacity 300ms var(--ease-smooth-out);
+}
+
+.t-tilt.is-hover .t-tilt-glare {
+  opacity: 0.4;
+}
+
+/* ===== transitions.dev: "Texts reveal" (líneas que suben con desenfoque, en escalera) ===== */
+.t-reveal > * {
+  animation: t-text-in 500ms var(--ease-smooth-out) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+@keyframes t-text-in {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+    filter: blur(var(--blur-medium));
+  }
+}
+
+/* ===== transitions.dev: "Number pop-in" (cada dígito entra con desenfoque) ===== */
+.t-pop {
+  display: inline-block;
+  animation: t-pop 400ms var(--ease-smooth-out) both;
+}
+
+@keyframes t-pop {
+  from {
+    opacity: 0;
+    translate: 0 0.35em;
+    filter: blur(var(--blur-small));
   }
 }
 
@@ -290,24 +409,52 @@ em {
 @keyframes reveal-up {
   from {
     opacity: 0;
-    translate: 0 26px;
+    translate: 0 30px;
+    filter: blur(var(--blur-small));
   }
   to {
     opacity: 1;
     translate: none;
+    filter: none;
   }
 }
 
 @keyframes reveal-photo {
   from {
     opacity: 1;
-    clip-path: inset(18% 18% 18% 18% round 40px);
-    scale: 1.06;
+    clip-path: inset(20% 20% 20% 20% round 60px);
+    scale: 1.08;
   }
   to {
     opacity: 1;
     clip-path: inset(0 0 0 0 round 0px);
     scale: 1;
+  }
+}
+
+/* ===== Transición entre páginas (View Transitions): un círculo azul se abre desde donde se hizo clic ===== */
+::view-transition-old(root) {
+  animation: vt-old 500ms var(--ease-in-out) both;
+}
+
+::view-transition-new(root) {
+  animation: vt-new 700ms var(--ease-in-out) both;
+}
+
+@keyframes vt-old {
+  to {
+    opacity: 0.3;
+    scale: 0.96;
+    filter: blur(4px);
+  }
+}
+
+@keyframes vt-new {
+  from {
+    clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 50%));
+  }
+  to {
+    clip-path: circle(150% at var(--vt-x, 50%) var(--vt-y, 50%));
   }
 }
 
@@ -325,6 +472,10 @@ em {
 
 .reduce-motion.js [data-reveal] {
   opacity: 1;
+}
+
+.reduce-motion .t-tilt-card {
+  transform: none !important;
 }
 
 .visually-hidden {

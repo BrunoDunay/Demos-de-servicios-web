@@ -1,36 +1,42 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, afterNextRender, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, afterNextRender, inject, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Clinic, openStatus } from '../core/clinic';
 import { Motion } from '../core/motion';
 import { Icon } from '../shared/icon';
 import { Logo } from '../shared/logo';
+import { Magnetic } from '../shared/magnetic';
 
 const LINKS = [
   { id: 'tratamientos', label: 'Tratamientos' },
-  { id: 'simulador', label: 'Simulador' },
+  { id: 'simulador', label: 'Blanqueamiento' },
   { id: 'equipo', label: 'Equipo' },
   { id: 'precios', label: 'Precios' },
   { id: 'visitanos', label: 'Visítanos' },
 ];
 
+/**
+ * Barra flotante de vidrio. Al pasar el cursor por los enlaces, una píldora blanca se desliza
+ * debajo del enlace (transitions.dev "Tabs sliding"). En celular, menú a pantalla completa.
+ */
 @Component({
   selector: 'app-header',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, Logo, Icon],
-  host: { '[class.hidden]': 'hidden()', '[class.solid]': 'solid()' },
+  imports: [RouterLink, Logo, Icon, Magnetic],
+  host: { '[class.hidden]': 'hidden()', '[class.scrolled]': 'scrolled()' },
   template: `
-    <div class="bar page">
+    <div class="bar">
       <a routerLink="/" class="brand" aria-label="Marfil, inicio"><app-logo /></a>
-      <nav aria-label="Secciones">
+      <nav aria-label="Secciones" #nav (pointerleave)="hover(null)">
+        <span class="hl" #hl aria-hidden="true"></span>
         @for (l of links; track l.id) {
-          <button type="button" (click)="clinic.go(l.id)">{{ l.label }}</button>
+          <button type="button" (click)="clinic.go(l.id)" (pointerenter)="hover($event.currentTarget)" (focus)="hover($event.currentTarget)">{{ l.label }}</button>
         }
       </nav>
       <div class="end">
         @if (status(); as s) {
-          <span class="status-pill" [class.open]="s.open"><i></i>{{ s.open ? 'Abierto' : 'Cerrado' }}</span>
+          <span class="status" [class.open]="s.open"><i></i>{{ s.open ? 'Abierto' : 'Cerrado' }}</span>
         }
-        <button type="button" class="btn cta" (click)="clinic.book()">Agendar cita</button>
+        <button type="button" class="btn cta" magnetic (click)="clinic.book()">Agendar cita</button>
         <button type="button" class="menu-btn" (click)="toggle()" [attr.aria-expanded]="open()" aria-controls="menu" aria-label="Menú">
           <span></span><span></span>
         </button>
@@ -40,62 +46,70 @@ const LINKS = [
       <div id="menu" class="sheet" [class.closing]="closing()">
         <nav aria-label="Menú">
           @for (l of links; track l.id; let i = $index) {
-            <button type="button" [style.--i]="i" (click)="goTo(l.id)">{{ l.label }}<app-icon name="arrow-right" [size]="22" /></button>
+            <button type="button" [style.--i]="i" (click)="goTo(l.id)"><small>0{{ i + 1 }}</small>{{ l.label }}<app-icon name="arrow-up-right" [size]="22" /></button>
           }
         </nav>
         @if (status(); as s) {
-          <p class="sheet-status"><span class="status-pill" [class.open]="s.open"><i></i>{{ s.text }}</span></p>
+          <p class="sheet-status"><span class="status" [class.open]="s.open"><i></i>{{ s.text }}</span></p>
         }
-        <button type="button" class="btn mint" (click)="goTo('agenda')">Agendar cita <app-icon name="calendar" [size]="18" /></button>
+        <button type="button" class="btn" (click)="goTo('agenda')">Agendar cita <app-icon name="calendar" [size]="18" /></button>
       </div>
     }
   `,
   styles: `
-    :host { position: fixed; inset: 0 0 auto; z-index: var(--z-header); transition: translate 420ms var(--ease-out), background-color 300ms ease, box-shadow 300ms ease; }
-    :host(.solid) { background: color-mix(in oklch, var(--ivory) 88%, transparent); backdrop-filter: blur(14px) saturate(1.3); box-shadow: 0 1px 0 var(--line); }
-    :host(.hidden) { translate: 0 -100%; }
-    .bar { display: flex; align-items: center; justify-content: space-between; gap: 20px; height: 74px; }
+    :host { position: fixed; left: 0; right: 0; top: 14px; z-index: var(--z-header); padding: 0 var(--gutter); transition: translate 450ms var(--ease-smooth-out); pointer-events: none; }
+    :host(.hidden) { translate: 0 -130%; }
+    .bar { pointer-events: auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; max-width: calc(var(--page) - var(--gutter) * 2 + 24px); margin: 0 auto; padding: 8px 8px 8px 10px; border-radius: 999px; background: var(--glass); backdrop-filter: blur(18px) saturate(1.6); box-shadow: inset 0 0 0 1px oklch(100% 0 0 / 0.6), var(--shadow-s); transition: box-shadow 300ms ease, background-color 300ms ease; }
+    :host(.scrolled) .bar { background: oklch(99% 0.005 245 / 0.8); box-shadow: inset 0 0 0 1px oklch(100% 0 0 / 0.7), var(--shadow-m); }
     .brand { position: relative; z-index: 2; transition: scale 160ms var(--ease-out); }
     .brand:active { scale: 0.96; }
-    nav { display: flex; gap: 4px; }
-    nav button { position: relative; padding: 10px 14px; font-size: 0.93rem; font-weight: 560; color: var(--ink-2); border-radius: 999px; transition: color 200ms ease, background-color 200ms ease, scale 160ms var(--ease-out); }
+    nav { position: relative; display: flex; gap: 2px; }
+    nav button { position: relative; z-index: 1; padding: 10px 16px; font-size: 0.92rem; font-weight: 600; color: var(--ink-2); border-radius: 999px; transition: color var(--duration-fast) var(--ease-smooth-out), scale 160ms var(--ease-out); }
     nav button:active { scale: 0.95; }
-    @media (hover: hover) and (pointer: fine) { nav button:hover { color: var(--ink); background: var(--ivory-2); } }
-    .end { display: flex; align-items: center; gap: 12px; }
+    .hl { position: absolute; top: 0; left: 0; height: 100%; width: 0; border-radius: 999px; background: var(--white); box-shadow: var(--shadow-s); opacity: 0; transition: transform var(--duration-fast) var(--ease-smooth-out), width var(--duration-fast) var(--ease-smooth-out), opacity 200ms ease; pointer-events: none; }
+    nav.on .hl { opacity: 1; }
+    @media (hover: hover) and (pointer: fine) { nav button:hover { color: var(--royal); } }
+    .end { display: flex; align-items: center; gap: 10px; }
+    .status { display: inline-flex; align-items: center; gap: 7px; padding: 8px 12px; border-radius: 999px; font-size: 0.8rem; font-weight: 650; color: var(--ink-2); background: var(--white); }
+    .status i { width: 7px; height: 7px; border-radius: 50%; background: var(--closed); }
+    .status.open i { background: var(--ok); box-shadow: 0 0 0 0 oklch(66% 0.15 155 / 0.5); animation: ping 2.2s var(--ease-out) infinite; }
+    @keyframes ping { 70% { box-shadow: 0 0 0 7px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
     .cta { min-height: 44px; padding: 0 20px; font-size: 0.9rem; }
-    .menu-btn { display: none; position: relative; z-index: 2; width: 46px; height: 46px; border-radius: 50%; background: var(--ink); transition: scale 160ms var(--ease-out); }
+    .menu-btn { display: none; position: relative; z-index: 2; width: 46px; height: 46px; border-radius: 50%; background: var(--navy); transition: scale 160ms var(--ease-out); }
     .menu-btn:active { scale: 0.92; }
-    .menu-btn span { position: absolute; left: 14px; right: 14px; height: 2px; border-radius: 2px; background: var(--ivory); transition: translate 300ms var(--ease-out), rotate 300ms var(--ease-out); }
+    .menu-btn span { position: absolute; left: 14px; right: 14px; height: 2px; border-radius: 2px; background: var(--white); transition: translate 300ms var(--ease-out), rotate 300ms var(--ease-out); }
     .menu-btn span:first-child { top: 19px; }
     .menu-btn span:last-child { top: 26px; }
     .menu-btn[aria-expanded='true'] span:first-child { translate: 0 3.5px; rotate: 45deg; }
     .menu-btn[aria-expanded='true'] span:last-child { translate: 0 -3.5px; rotate: -45deg; }
-    .sheet { position: fixed; inset: 0; z-index: 1; display: flex; flex-direction: column; gap: 26px; padding: 100px var(--gutter) 32px; background: var(--ivory); animation: sheet-in 380ms var(--ease-out) both; }
-    .sheet.closing { animation: sheet-out 220ms ease-in both; }
-    @keyframes sheet-in { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
-    @keyframes sheet-out { from { clip-path: inset(0 0 0 0); } to { clip-path: inset(0 0 100% 0); } }
+    .sheet { pointer-events: auto; position: fixed; inset: 0; z-index: 1; display: flex; flex-direction: column; gap: 24px; padding: 100px var(--gutter) 30px; background: var(--navy); color: var(--white); animation: sheet-in 520ms var(--ease-smooth-out) both; }
+    .sheet.closing { animation: sheet-out 260ms ease-in both; }
+    @keyframes sheet-in { from { clip-path: circle(0 at calc(100% - 40px) 40px); } to { clip-path: circle(150% at calc(100% - 40px) 40px); } }
+    @keyframes sheet-out { from { clip-path: circle(150% at calc(100% - 40px) 40px); } to { clip-path: circle(0 at calc(100% - 40px) 40px); } }
     .sheet nav { flex-direction: column; gap: 0; }
-    .sheet nav button { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-radius: 0; border-bottom: 1px solid var(--line); font-family: var(--font-display); font-size: 2rem; font-weight: 420; color: var(--ink); text-align: left; animation: item-in 520ms var(--ease-expo) both; animation-delay: calc(80ms + var(--i) * 45ms); }
-    @keyframes item-in { from { opacity: 0; translate: 0 18px; } }
+    .sheet nav button { display: flex; align-items: center; gap: 14px; padding: 16px 0; border-radius: 0; border-bottom: 1px solid oklch(100% 0 0 / 0.12); font-family: var(--font-display); font-size: 2.1rem; font-weight: 300; color: var(--white); text-align: left; animation: t-text-in 520ms var(--ease-smooth-out) both; animation-delay: calc(120ms + var(--i) * 50ms); }
+    .sheet nav button small { font-family: var(--font-body); font-size: 0.75rem; font-weight: 600; color: var(--sky); }
+    .sheet nav button .icon { margin-left: auto; color: var(--sky); }
     .sheet .btn { margin-top: auto; }
-    @media (max-width: 1060px) {
-      nav { display: none; }
+    .sheet-status .status { background: oklch(100% 0 0 / 0.1); color: var(--white); }
+    @media (max-width: 1080px) {
+      .bar nav { display: none; }
       .sheet nav { display: flex; }
       .menu-btn { display: block; }
     }
-    @media (max-width: 560px) {
-      .cta, .end > .status-pill { display: none; }
-    }
+    @media (max-width: 560px) { .cta, .end > .status { display: none; } }
   `,
 })
 export class Header {
   protected readonly clinic = inject(Clinic);
   private readonly motion = inject(Motion);
+  private readonly nav = viewChild<ElementRef<HTMLElement>>('nav');
+  private readonly hl = viewChild<ElementRef<HTMLElement>>('hl');
   protected readonly links = LINKS;
   protected readonly open = signal(false);
   protected readonly closing = signal(false);
   protected readonly hidden = signal(false);
-  protected readonly solid = signal(false);
+  protected readonly scrolled = signal(false);
   protected readonly status = signal<{ open: boolean; text: string } | null>(null);
 
   constructor() {
@@ -106,8 +120,8 @@ export class Header {
       let last = scrollY;
       const onScroll = () => {
         const y = scrollY;
-        this.solid.set(y > 30);
-        if (!this.open()) this.hidden.set(y > 400 && y > last + 4 ? true : y < last - 4 ? false : this.hidden());
+        this.scrolled.set(y > 30);
+        if (!this.open()) this.hidden.set(y > 500 && y > last + 4 ? true : y < last - 4 ? false : this.hidden());
         last = y;
       };
       addEventListener('scroll', onScroll, { passive: true });
@@ -116,6 +130,23 @@ export class Header {
         removeEventListener('scroll', onScroll);
       });
     });
+  }
+
+  /** Mueve la píldora debajo del enlace (o la esconde al salir del menú). */
+  protected hover(target: EventTarget | null) {
+    const nav = this.nav()?.nativeElement;
+    const hl = this.hl()?.nativeElement;
+    if (!nav || !hl) return;
+    if (!(target instanceof HTMLElement)) {
+      nav.classList.remove('on');
+      return;
+    }
+    const first = !nav.classList.contains('on');
+    if (first) hl.style.transition = 'opacity 200ms ease';
+    hl.style.width = `${target.offsetWidth}px`;
+    hl.style.transform = `translateX(${target.offsetLeft}px)`;
+    nav.classList.add('on');
+    if (first) requestAnimationFrame(() => (hl.style.transition = ''));
   }
 
   protected toggle() {
@@ -130,11 +161,11 @@ export class Header {
     this.closing.set(true);
     this.open.set(false);
     this.motion.resume();
-    setTimeout(() => this.closing.set(false), 220);
+    setTimeout(() => this.closing.set(false), 260);
   }
 
   protected goTo(id: string) {
     this.close();
-    setTimeout(() => this.clinic.go(id), 60);
+    setTimeout(() => this.clinic.go(id), 80);
   }
 }

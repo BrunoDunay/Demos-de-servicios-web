@@ -3,25 +3,23 @@ import { Meta, Title } from '@angular/platform-browser';
 import { Agenda } from '../sections/agenda';
 import { Hero } from '../sections/hero';
 import { Location } from '../sections/location';
-import { Odontogram } from '../sections/odontogram';
 import { Prices } from '../sections/prices';
-import { Reviews } from '../sections/reviews';
 import { Team } from '../sections/team';
+import { Treatments } from '../sections/treatments';
 import { Visit } from '../sections/visit';
 import { Whitening } from '../sections/whitening';
 
 @Component({
   selector: 'app-home',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Hero, Odontogram, Whitening, Visit, Team, Prices, Reviews, Agenda, Location],
+  imports: [Hero, Treatments, Whitening, Visit, Team, Prices, Agenda, Location],
   template: `
     <app-hero />
-    <app-odontogram />
+    <app-treatments />
     <app-whitening />
     <app-visit />
     <app-team />
     <app-prices />
-    <app-reviews />
     <app-agenda />
     <app-location />
   `,

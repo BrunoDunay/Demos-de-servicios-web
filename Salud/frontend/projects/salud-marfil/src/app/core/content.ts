@@ -174,9 +174,10 @@ export const TEAM = [
     name: 'Dra. Renata Ibarra',
     role: 'Rehabilitación oral y estética',
     text: 'Fundó Marfil en 2014. Especialista por la UAA, hace los diseños de sonrisa, carillas e implantes.',
-    photo: 'consulta-sonrisa',
-    focus: '30% 30%',
+    photo: 'doctora',
+    focus: '50% 18%',
     license: 'Céd. esp. 0000000 (demo)',
+    stats: ['12 años', '3.1k pacientes', '4.9'],
   },
   {
     name: 'Dr. Tomás Lugo',
@@ -185,6 +186,7 @@ export const TEAM = [
     photo: 'consulta-dr',
     focus: '72% 40%',
     license: 'Céd. esp. 0000000 (demo)',
+    stats: ['8 años', '1.2k pacientes', '4.8'],
   },
   {
     name: 'Dra. Paula Méndez',
@@ -193,6 +195,7 @@ export const TEAM = [
     photo: 'ninos',
     focus: '30% 40%',
     license: 'Céd. esp. 0000000 (demo)',
+    stats: ['10 años', '2.4k pacientes', '5.0'],
   },
 ];
 
