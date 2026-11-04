@@ -1,0 +1,339 @@
+@import '@fontsource/anton';
+@import '@fontsource-variable/archivo';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/600.css';
+
+/* ===== Forja · tokens ===== */
+:root {
+  --bg: #0b0b0c;
+  --bg-2: #121214;
+  --bg-3: #1a1a1d;
+  --ink: #f2efe8;
+  --ink-2: #cfcbc2;
+  --muted: #9b988f;
+  --line: rgb(242 239 232 / 12%);
+  --line-2: rgb(242 239 232 / 22%);
+  --ember: #ff5b14;
+  --ember-2: #ff8a3d;
+  --spark: #ffc24b;
+
+  --font-display: 'Anton', Impact, 'Arial Narrow', sans-serif;
+  --font-body: 'Archivo Variable', 'Archivo', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  --container: 1320px;
+  --gutter: clamp(16px, 4vw, 48px);
+  --section: clamp(80px, 11vw, 150px);
+  --cut: 14px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  overflow-x: clip;
+  background: var(--bg);
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+/* Grano de película sobre todo el sitio */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.07;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+img,
+video,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 0.9;
+  letter-spacing: 0.005em;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+}
+
+::selection {
+  background: var(--ember);
+  color: var(--bg);
+}
+
+:focus-visible {
+  outline: 2px solid var(--ember);
+  outline-offset: 3px;
+}
+
+.container {
+  width: min(var(--container), 100% - var(--gutter) * 2);
+  margin-inline: auto;
+}
+
+.section {
+  padding-block: var(--section);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.tag::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  background: var(--ember);
+}
+
+.title-xl {
+  font-size: clamp(3.2rem, 8.4vw, 8.4rem);
+}
+
+.title-lg {
+  font-size: clamp(2.6rem, 6vw, 5.6rem);
+}
+
+.lead {
+  color: var(--ink-2);
+  font-size: 1.08rem;
+  max-width: 540px;
+}
+
+.outline {
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--ink);
+}
+
+.ember {
+  color: var(--ember);
+}
+
+.photo-bw {
+  filter: grayscale(1) contrast(1.12) brightness(0.92);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ===== Botones: placas con esquina cortada ===== */
+.btn {
+  --btn-bg: var(--ember);
+  --btn-fg: var(--bg);
+  --btn-fill: var(--bg);
+  --btn-fill-fg: var(--ember);
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 54px;
+  padding: 0 26px;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-family: var(--font-body);
+  font-weight: 750;
+  font-size: 0.86rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  clip-path: polygon(0 0, calc(100% - var(--cut)) 0, 100% var(--cut), 100% 100%, 0 100%);
+  isolation: isolate;
+  overflow: hidden;
+  transition:
+    color 300ms var(--ease-out),
+    transform 200ms var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--btn-fill);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 500ms var(--ease-expo);
+}
+
+.btn .arrow {
+  display: inline-flex;
+  transition: transform 400ms var(--ease-expo);
+}
+
+.btn-ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--ink);
+  --btn-fill: var(--ink);
+  --btn-fill-fg: var(--bg);
+  box-shadow: inset 0 0 0 1.5px var(--line-2);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    color: var(--btn-fill-fg);
+  }
+
+  .btn:hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .btn:hover .arrow {
+    transform: translateX(5px);
+  }
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+/* ===== Revelado al hacer scroll (ver shared/reveal.ts) ===== */
+.js [data-reveal] {
+  opacity: 0;
+}
+
+.js [data-reveal].is-in {
+  animation: reveal-up 900ms var(--ease-expo) var(--d, 0ms) both;
+}
+
+.js [data-reveal='left'].is-in {
+  animation-name: reveal-left;
+}
+
+.js [data-reveal='right'].is-in {
+  animation-name: reveal-right;
+}
+
+.js [data-reveal='clip'].is-in {
+  animation-name: reveal-clip;
+  animation-duration: 1100ms;
+}
+
+@keyframes reveal-up {
+  from { opacity: 0; translate: 0 40px; }
+  to { opacity: 1; translate: none; }
+}
+
+@keyframes reveal-left {
+  from { opacity: 0; translate: -50px 0; }
+  to { opacity: 1; translate: none; }
+}
+
+@keyframes reveal-right {
+  from { opacity: 0; translate: 50px 0; }
+  to { opacity: 1; translate: none; }
+}
+
+@keyframes reveal-clip {
+  from { opacity: 1; clip-path: inset(0 0 100% 0); }
+  to { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+
+/* Botón "Reducir movimiento" del pie de página: agrega .reduce-motion a <html> */
+.reduce-motion {
+  scroll-behavior: auto;
+}
+
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 1ms !important;
+}
+
+.reduce-motion.js [data-reveal] {
+  opacity: 1;
+}
+
+/* Cursor propio (shared/pointer.ts): se oculta el del sistema, salvo en campos de texto */
+@media (hover: hover) and (pointer: fine) {
+  html.has-cursor,
+  html.has-cursor * {
+    cursor: none !important;
+  }
+
+  html.has-cursor :is(input, textarea, select) {
+    cursor: text !important;
+  }
+}

@@ -1,0 +1,350 @@
+@import '@fontsource-variable/bricolage-grotesque';
+@import '@fontsource-variable/dm-sans';
+
+/* ===== Brío · tokens ===== */
+:root {
+  --bg: #f7f5f0;
+  --bg-2: #efece4;
+  --surface: #ffffff;
+  --ink: #12131a;
+  --ink-2: #2a2c36;
+  --muted: #5c6070;
+  --line: #e4e0d6;
+  --brand: #2f4bff;
+  --brand-ink: #1c33d6;
+  --brand-soft: #e6e9ff;
+  --lime: #d9ff4a;
+  --lime-ink: #a8cc12;
+  --ok: #16a34a;
+
+  --font-display: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-body: 'DM Sans Variable', 'DM Sans', system-ui, sans-serif;
+
+  --radius-sm: 12px;
+  --radius: 20px;
+  --radius-lg: 32px;
+  --shadow-sm: 0 1px 2px rgb(18 19 26 / 6%), 0 2px 8px rgb(18 19 26 / 5%);
+  --shadow: 0 10px 30px -12px rgb(18 19 26 / 22%);
+  --shadow-lg: 0 30px 60px -24px rgb(31 45 160 / 35%);
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  --container: 1200px;
+  --gutter: clamp(16px, 4vw, 40px);
+  --section: clamp(64px, 8.5vw, 112px);
+}
+
+/* ===== Base ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+}
+
+html {
+  overflow-x: clip;
+}
+
+img,
+video,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  margin: 0;
+  font-weight: 750;
+}
+
+p {
+  margin: 0;
+}
+
+::selection {
+  background: var(--lime);
+  color: var(--ink);
+}
+
+:focus-visible {
+  outline: 3px solid var(--brand);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+.container {
+  width: min(var(--container), 100% - var(--gutter) * 2);
+  margin-inline: auto;
+}
+
+.section {
+  padding-block: var(--section);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brand);
+}
+
+.eyebrow::before {
+  content: '';
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+}
+
+.section-title {
+  font-size: clamp(2.2rem, 5.2vw, 3.75rem);
+  margin-top: 14px;
+}
+
+.section-lead {
+  margin-top: 16px;
+  max-width: 560px;
+  color: var(--muted);
+  font-size: 1.0625rem;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ===== Botones ===== */
+.btn {
+  --btn-bg: var(--ink);
+  --btn-fg: #fff;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 24px;
+  border-radius: 999px;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font-weight: 650;
+  font-size: 0.975rem;
+  letter-spacing: -0.005em;
+  overflow: hidden;
+  isolation: isolate;
+  transition:
+    transform 200ms var(--ease-out),
+    box-shadow 260ms var(--ease-out),
+    background-color 200ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn .btn-icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-right: -12px;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 16%);
+  transition: transform 300ms var(--ease-back), background-color 200ms ease;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(110deg, transparent 30%, rgb(255 255 255 / 35%) 50%, transparent 70%);
+  transform: translateX(-120%);
+}
+
+.btn-primary {
+  --btn-bg: var(--brand);
+  box-shadow: 0 10px 24px -10px rgb(47 75 255 / 65%);
+}
+
+.btn-lime {
+  --btn-bg: var(--lime);
+  --btn-fg: var(--ink);
+}
+
+.btn-lime .btn-icon {
+  background: rgb(18 19 26 / 10%);
+}
+
+.btn-ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--ink);
+  box-shadow: inset 0 0 0 1.5px var(--line);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn-ghost:hover {
+    box-shadow: inset 0 0 0 1.5px var(--ink);
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .btn-primary:hover {
+    background: var(--brand-ink);
+    box-shadow: 0 16px 30px -12px rgb(47 75 255 / 70%);
+  }
+
+  .btn:hover .btn-icon {
+    transform: translateX(4px) rotate(-45deg);
+  }
+
+  .btn:hover::after {
+    transform: translateX(120%);
+    transition: transform 700ms var(--ease-out);
+  }
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+/* ===== Chips ===== */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--line);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+/* ===== Revelado al hacer scroll =====
+   Solo se ocultan si hay JS (clase .js en <html>), así el contenido prerenderizado siempre se ve. */
+/* Se anima con translate/scale (propiedades independientes de transform) y con @keyframes,
+   así no choca con las transiciones de hover de cada componente. */
+.js [data-reveal] {
+  opacity: 0;
+}
+
+.js [data-reveal].is-in {
+  animation: reveal-up 900ms var(--ease-out) var(--d, 0ms) both;
+}
+
+.js [data-reveal='left'].is-in {
+  animation-name: reveal-left;
+}
+
+.js [data-reveal='right'].is-in {
+  animation-name: reveal-right;
+}
+
+.js [data-reveal='scale'].is-in {
+  animation-name: reveal-scale;
+}
+
+@keyframes reveal-up {
+  from { opacity: 0; translate: 0 28px; }
+  to { opacity: 1; translate: none; }
+}
+
+@keyframes reveal-left {
+  from { opacity: 0; translate: -36px 0; }
+  to { opacity: 1; translate: none; }
+}
+
+@keyframes reveal-right {
+  from { opacity: 0; translate: 36px 0; }
+  to { opacity: 1; translate: none; }
+}
+
+@keyframes reveal-scale {
+  from { opacity: 0; scale: 0.94; }
+  to { opacity: 1; scale: none; }
+}
+
+/* Botón "Reducir movimiento" del pie de página: agrega .reduce-motion a <html> */
+.reduce-motion {
+  scroll-behavior: auto;
+}
+
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 1ms !important;
+}
+
+.reduce-motion.js [data-reveal] {
+  opacity: 1;
+}
+
+/* ===== Tacto (pulido con apple-design y emil-design-eng) =====
+   Carruseles que se arrastran con el mouse (shared/drag-scroll.ts). */
+@media (hover: hover) and (pointer: fine) {
+  .drag-scroll { cursor: grab; }
+}
+.drag-scroll.is-dragging { cursor: grabbing; user-select: none; }
+.drag-scroll.is-dragging * { pointer-events: none; }
+.is-dragging { will-change: transform; }

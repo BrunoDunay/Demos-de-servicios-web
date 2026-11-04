@@ -1,0 +1,95 @@
+{
+  "images": [
+    {
+      "name": "hero",
+      "width": 1400,
+      "height": 933
+    },
+    {
+      "name": "sonrisa",
+      "width": 1000,
+      "height": 667
+    },
+    {
+      "name": "coach-remo",
+      "width": 1000,
+      "height": 1500
+    },
+    {
+      "name": "cardio",
+      "width": 1000,
+      "height": 1500
+    },
+    {
+      "name": "equipo",
+      "width": 1000,
+      "height": 1778
+    },
+    {
+      "name": "comunidad",
+      "width": 1000,
+      "height": 667
+    },
+    {
+      "name": "recepcion",
+      "width": 1400,
+      "height": 935
+    },
+    {
+      "name": "sala",
+      "width": 1400,
+      "height": 935
+    },
+    {
+      "name": "caminadora",
+      "width": 1000,
+      "height": 665
+    },
+    {
+      "name": "clase-grupal",
+      "width": 1000,
+      "height": 667
+    },
+    {
+      "name": "estiramiento",
+      "width": 1000,
+      "height": 667
+    },
+    {
+      "name": "airbike",
+      "width": 1000,
+      "height": 1500
+    },
+    {
+      "name": "pesas",
+      "width": 1000,
+      "height": 667
+    },
+    {
+      "name": "funcional",
+      "width": 1000,
+      "height": 667
+    },
+    {
+      "name": "asesoria",
+      "width": 1000,
+      "height": 1334
+    },
+    {
+      "name": "coach-ana",
+      "width": 800,
+      "height": 1200
+    },
+    {
+      "name": "coach-luis",
+      "width": 800,
+      "height": 533
+    },
+    {
+      "name": "coach-sofia",
+      "width": 800,
+      "height": 1200
+    }
+  ],
+  "videos": []
+}

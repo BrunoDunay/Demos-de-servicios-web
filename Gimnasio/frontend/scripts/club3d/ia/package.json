@@ -1,0 +1,9 @@
+{
+  "name": "club3d-ia",
+  "private": true,
+  "description": "Herramientas de IA para preparar el recorrido del club (ampliación, profundidad y siluetas). Se instala aparte para no cargar el build de Vercel.",
+  "type": "module",
+  "dependencies": {
+    "@huggingface/transformers": "3.7.5"
+  }
+}

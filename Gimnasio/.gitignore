@@ -1,0 +1,12 @@
+# Material privado o de terceros que no va al repositorio público
+CONTEXTO.md
+referencias/
+precios de referencia/
+ideas/
+.claude/
+skills-lock.json
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini

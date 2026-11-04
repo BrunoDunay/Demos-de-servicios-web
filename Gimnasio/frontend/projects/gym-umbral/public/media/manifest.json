@@ -1,0 +1,405 @@
+{
+  "images": [
+    {
+      "name": "reformer-sala",
+      "width": 922,
+      "height": 922
+    },
+    {
+      "name": "mat-studio",
+      "width": 1045,
+      "height": 1200
+    },
+    {
+      "name": "fuerza-sala",
+      "width": 1080,
+      "height": 1350
+    },
+    {
+      "name": "vestidores",
+      "width": 736,
+      "height": 981
+    },
+    {
+      "name": "senaletica",
+      "width": 1080,
+      "height": 1616
+    },
+    {
+      "name": "privado",
+      "width": 474,
+      "height": 711
+    },
+    {
+      "name": "tocador",
+      "width": 867,
+      "height": 1156
+    },
+    {
+      "name": "reformer-1",
+      "width": 1600,
+      "height": 2400
+    },
+    {
+      "name": "reformer-clase",
+      "width": 1600,
+      "height": 1068
+    },
+    {
+      "name": "reformer-arcos",
+      "width": 1600,
+      "height": 1066
+    },
+    {
+      "name": "ride-1",
+      "width": 1600,
+      "height": 2400
+    },
+    {
+      "name": "ride-2",
+      "width": 1400,
+      "height": 934
+    },
+    {
+      "name": "ride-3",
+      "width": 1400,
+      "height": 2100
+    },
+    {
+      "name": "ride-detalle",
+      "width": 1200,
+      "height": 1800
+    },
+    {
+      "name": "ride-grupo",
+      "width": 1400,
+      "height": 1749
+    },
+    {
+      "name": "club",
+      "width": 1600,
+      "height": 1200
+    },
+    {
+      "name": "mancuernas",
+      "width": 1400,
+      "height": 2100
+    },
+    {
+      "name": "sauna",
+      "width": 1400,
+      "height": 1801
+    },
+    {
+      "name": "detalle-pesas",
+      "width": 1200,
+      "height": 1800
+    },
+    {
+      "name": "niebla",
+      "width": 1600,
+      "height": 1066
+    },
+    {
+      "name": "fuerza-1",
+      "width": 1600,
+      "height": 2400
+    },
+    {
+      "name": "vista",
+      "width": 1600,
+      "height": 1200
+    },
+    {
+      "name": "barra",
+      "width": 1600,
+      "height": 1062
+    },
+    {
+      "name": "atmosfera",
+      "width": 1400,
+      "height": 2096
+    },
+    {
+      "name": "toallas",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "name": "spa",
+      "width": 1200,
+      "height": 1799
+    },
+    {
+      "name": "velas",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "name": "coach-renata",
+      "width": 1000,
+      "height": 1500
+    },
+    {
+      "name": "coach-ines",
+      "width": 1000,
+      "height": 1500
+    },
+    {
+      "name": "coach-paula",
+      "width": 1000,
+      "height": 1500
+    },
+    {
+      "name": "coach-emilio",
+      "width": 1000,
+      "height": 1499
+    },
+    {
+      "name": "socia-valeria",
+      "width": 700,
+      "height": 1050
+    },
+    {
+      "name": "socio-jorge",
+      "width": 700,
+      "height": 875
+    },
+    {
+      "name": "socia-sofia",
+      "width": 700,
+      "height": 1050
+    },
+    {
+      "name": "socio-andres",
+      "width": 700,
+      "height": 1050
+    },
+    {
+      "name": "socia-mar",
+      "width": 700,
+      "height": 1049
+    },
+    {
+      "name": "socio-dani",
+      "width": 700,
+      "height": 467
+    },
+    {
+      "name": "reformer-warm",
+      "width": 1400,
+      "height": 2100
+    },
+    {
+      "name": "reformer-flow",
+      "width": 1400,
+      "height": 2100
+    },
+    {
+      "name": "reformer-dark",
+      "width": 1400,
+      "height": 2100
+    },
+    {
+      "name": "lockers-madera",
+      "width": 1400,
+      "height": 933
+    },
+    {
+      "name": "lockers-banca",
+      "width": 1400,
+      "height": 2100
+    },
+    {
+      "name": "lockers-spa",
+      "width": 1200,
+      "height": 1800
+    },
+    {
+      "name": "locker-digital",
+      "width": 1000,
+      "height": 667
+    },
+    {
+      "name": "ride-led",
+      "width": 1800,
+      "height": 1200
+    },
+    {
+      "name": "ride-rojo",
+      "width": 1200,
+      "height": 1800
+    },
+    {
+      "name": "ride-sombra",
+      "width": 1200,
+      "height": 1800
+    },
+    {
+      "name": "ride-luz",
+      "width": 1200,
+      "height": 1800
+    },
+    {
+      "name": "ride-ritmo",
+      "width": 1200,
+      "height": 1800
+    },
+    {
+      "name": "gym-oscuro",
+      "width": 1800,
+      "height": 1200
+    },
+    {
+      "name": "gym-sala",
+      "width": 1400,
+      "height": 1750
+    },
+    {
+      "name": "gym-pasillo",
+      "width": 1200,
+      "height": 2131
+    },
+    {
+      "name": "gym-ventanal",
+      "width": 1200,
+      "height": 2131
+    },
+    {
+      "name": "gym-cardio",
+      "width": 1470,
+      "height": 980
+    },
+    {
+      "name": "vestidor-lockers",
+      "width": 1400,
+      "height": 1050
+    },
+    {
+      "name": "spa-privado",
+      "width": 1800,
+      "height": 1440
+    },
+    {
+      "name": "recepcion",
+      "width": 1470,
+      "height": 980
+    },
+    {
+      "name": "vestidor-umbral",
+      "width": 1470,
+      "height": 980
+    },
+    {
+      "name": "regaderas",
+      "width": 1400,
+      "height": 1610
+    },
+    {
+      "name": "fachada",
+      "width": 1470,
+      "height": 980
+    },
+    {
+      "name": "merch-chamarra",
+      "width": 900,
+      "height": 1201
+    },
+    {
+      "name": "merch-playera",
+      "width": 900,
+      "height": 1181
+    },
+    {
+      "name": "merch-gorra",
+      "width": 900,
+      "height": 856
+    },
+    {
+      "name": "merch-caminando",
+      "width": 600,
+      "height": 2002
+    },
+    {
+      "name": "merch-active",
+      "width": 1100,
+      "height": 1788
+    }
+  ],
+  "videos": [
+    {
+      "name": "hero",
+      "kb": 370
+    },
+    {
+      "name": "fuerza",
+      "kb": 286
+    },
+    {
+      "name": "pesas",
+      "kb": 436
+    },
+    {
+      "name": "v-reformer",
+      "kb": 394,
+      "cached": true
+    },
+    {
+      "name": "v-fuerza",
+      "kb": 113,
+      "cached": true
+    },
+    {
+      "name": "v-fuerza-2",
+      "kb": 135,
+      "cached": true
+    },
+    {
+      "name": "v-piedras",
+      "kb": 320,
+      "cached": true
+    },
+    {
+      "name": "v-pila",
+      "kb": 174,
+      "cached": true
+    },
+    {
+      "name": "v-pilates",
+      "kb": 964,
+      "cached": true
+    },
+    {
+      "name": "v-sauna",
+      "kb": 374,
+      "cached": true
+    },
+    {
+      "name": "h-reformer",
+      "kb": 694,
+      "cached": true
+    },
+    {
+      "name": "h-mancuernas",
+      "kb": 511,
+      "cached": true
+    },
+    {
+      "name": "h-vapor",
+      "kb": 554,
+      "cached": true
+    },
+    {
+      "name": "v-rack",
+      "kb": 616
+    },
+    {
+      "name": "v-suelo",
+      "kb": 843
+    },
+    {
+      "name": "v-edit",
+      "kb": 225
+    }
+  ]
+}

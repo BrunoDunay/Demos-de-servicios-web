@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://demo-gym-umbral.vercel.app/</loc><priority>1.0</priority></url>
+  <url><loc>https://demo-gym-umbral.vercel.app/disciplinas</loc><priority>0.8</priority></url>
+  <url><loc>https://demo-gym-umbral.vercel.app/club</loc><priority>0.8</priority></url>
+  <url><loc>https://demo-gym-umbral.vercel.app/membresias</loc><priority>0.8</priority></url>
+  <url><loc>https://demo-gym-umbral.vercel.app/contacto</loc><priority>0.7</priority></url>
+  <url><loc>https://demo-gym-umbral.vercel.app/aviso-de-privacidad</loc><priority>0.3</priority></url>
+  <url><loc>https://demo-gym-umbral.vercel.app/terminos</loc><priority>0.3</priority></url>
+</urlset>

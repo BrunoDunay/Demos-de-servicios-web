@@ -1,0 +1,159 @@
+{
+  "images": [
+    {
+      "name": "magnesia",
+      "width": 1400,
+      "height": 930
+    },
+    {
+      "name": "cajon",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "name": "salto",
+      "width": 1000,
+      "height": 1500
+    },
+    {
+      "name": "peso-muerto",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "name": "wod",
+      "width": 1400,
+      "height": 933
+    },
+    {
+      "name": "cuerda",
+      "width": 1000,
+      "height": 1500
+    },
+    {
+      "name": "cuerdas",
+      "width": 1200,
+      "height": 797
+    },
+    {
+      "name": "balones",
+      "width": 1200,
+      "height": 1800
+    },
+    {
+      "name": "discos",
+      "width": 1000,
+      "height": 667
+    },
+    {
+      "name": "wallball",
+      "width": 1000,
+      "height": 1506
+    },
+    {
+      "name": "barra",
+      "width": 1400,
+      "height": 933
+    },
+    {
+      "name": "placas",
+      "width": 1000,
+      "height": 667
+    },
+    {
+      "name": "dobles",
+      "width": 1000,
+      "height": 1500
+    },
+    {
+      "name": "ropes",
+      "width": 1000,
+      "height": 1500
+    },
+    {
+      "name": "intensidad",
+      "width": 1000,
+      "height": 667
+    },
+    {
+      "name": "agarre",
+      "width": 1000,
+      "height": 667
+    },
+    {
+      "name": "gimnastica",
+      "width": 1000,
+      "height": 664
+    },
+    {
+      "name": "cardio",
+      "width": 1000,
+      "height": 1500
+    },
+    {
+      "name": "mancuernas",
+      "width": 1000,
+      "height": 1500
+    },
+    {
+      "name": "cuerda-saltar",
+      "width": 1000,
+      "height": 1500
+    },
+    {
+      "name": "sentadilla",
+      "width": 1200,
+      "height": 797
+    },
+    {
+      "name": "back-squat",
+      "width": 1000,
+      "height": 1506
+    },
+    {
+      "name": "fuerte",
+      "width": 1000,
+      "height": 667
+    },
+    {
+      "name": "coach-andrea",
+      "width": 900,
+      "height": 1350
+    },
+    {
+      "name": "coach-diego",
+      "width": 900,
+      "height": 1350
+    },
+    {
+      "name": "coach-marco",
+      "width": 900,
+      "height": 600
+    },
+    {
+      "name": "coach-vale",
+      "width": 900,
+      "height": 1350
+    },
+    {
+      "name": "box-interior",
+      "width": 675,
+      "height": 1200
+    },
+    {
+      "name": "box-noche",
+      "width": 736,
+      "height": 981
+    }
+  ],
+  "videos": [
+    {
+      "name": "hero",
+      "kb": 440
+    },
+    {
+      "name": "suelo",
+      "kb": 1069
+    }
+  ]
+}

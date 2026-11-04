@@ -1,0 +1,1195 @@
+{
+  "_nota": "Objetos con hover por vista. box = recuadro [u0, v0, u1, v1] y points = puntos sobre el objeto (0 a 1 sobre la foto). Si existe la máscara pintada por Bruno se usa dentro del recuadro; si no, SAM recorta el objeto a partir de los puntos.",
+  "v-entrada1": [
+    {
+      "name": "Recepción",
+      "detail": "Tu nombre, tu toalla y tu locker listos al llegar.",
+      "box": [
+        0.22,
+        0.62,
+        0.79,
+        0.97
+      ],
+      "points": [
+        [
+          0.5,
+          0.78
+        ],
+        [
+          0.3,
+          0.8
+        ],
+        [
+          0.7,
+          0.8
+        ]
+      ]
+    },
+    {
+      "name": "Lounge",
+      "detail": "Sillones para esperar tu clase con un café.",
+      "box": [
+        0.86,
+        0.63,
+        1,
+        0.87
+      ],
+      "points": [
+        [
+          0.92,
+          0.72
+        ],
+        [
+          0.88,
+          0.76
+        ]
+      ]
+    },
+    {
+      "name": "Amenidades de autor",
+      "detail": "Cremas, aceites y toallas de algodón turco.",
+      "box": [
+        0.71,
+        0.27,
+        0.86,
+        0.74
+      ],
+      "points": [
+        [
+          0.78,
+          0.45
+        ],
+        [
+          0.78,
+          0.53
+        ]
+      ]
+    },
+    {
+      "name": "Olivo de bienvenida",
+      "detail": "Un árbol vivo en plena recepción.",
+      "box": [
+        0,
+        0.05,
+        0.17,
+        0.82
+      ],
+      "points": [
+        [
+          0.05,
+          0.3
+        ],
+        [
+          0.07,
+          0.2
+        ],
+        [
+          0.05,
+          0.75
+        ]
+      ]
+    }
+  ],
+  "v-entrada2": [
+    {
+      "name": "Check-in",
+      "detail": "Entras con tu código en segundos.",
+      "box": [
+        0,
+        0.57,
+        0.48,
+        0.92
+      ],
+      "points": [
+        [
+          0.2,
+          0.73
+        ],
+        [
+          0.35,
+          0.7
+        ],
+        [
+          0.1,
+          0.8
+        ]
+      ]
+    },
+    {
+      "name": "Mancuernas",
+      "detail": "Pares de 2 a 40 kg siempre en su lugar.",
+      "box": [
+        0.82,
+        0.64,
+        1,
+        1
+      ],
+      "points": [
+        [
+          0.9,
+          0.85
+        ],
+        [
+          0.95,
+          0.75
+        ]
+      ]
+    },
+    {
+      "name": "Estudio de fuerza",
+      "detail": "Racks y plataformas al fondo de la sala.",
+      "box": [
+        0.52,
+        0.35,
+        0.88,
+        0.67
+      ],
+      "points": [
+        [
+          0.71,
+          0.58
+        ],
+        [
+          0.62,
+          0.58
+        ]
+      ]
+    },
+    {
+      "name": "Planta de bienvenida",
+      "detail": "Vegetación en cada rincón del club.",
+      "box": [
+        0,
+        0.18,
+        0.12,
+        0.63
+      ],
+      "points": [
+        [
+          0.05,
+          0.35
+        ],
+        [
+          0.06,
+          0.57
+        ]
+      ]
+    }
+  ],
+  "v-pesas1": [
+    {
+      "name": "Caminadoras",
+      "detail": "Pantalla, inclinación y vista a la ciudad.",
+      "box": [
+        0,
+        0.43,
+        0.36,
+        1
+      ]
+    },
+    {
+      "name": "Pista de sprints",
+      "detail": "15 metros marcados para sled y carreras.",
+      "box": [
+        0.25,
+        0.55,
+        0.74,
+        1
+      ]
+    },
+    {
+      "name": "Banco plano",
+      "detail": "Para press, remo y trabajo de core.",
+      "box": [
+        0.73,
+        0.72,
+        1,
+        0.94
+      ]
+    },
+    {
+      "name": "Planta",
+      "detail": "Vegetación entre estaciones.",
+      "box": [
+        0.6,
+        0.58,
+        0.67,
+        0.69
+      ]
+    }
+  ],
+  "v-pesas2": [
+    {
+      "name": "Rack de mancuernas",
+      "detail": "De 2 a 40 kg, en pares.",
+      "box": [
+        0,
+        0.49,
+        0.18,
+        0.66
+      ]
+    },
+    {
+      "name": "Banco ajustable",
+      "detail": "Siete inclinaciones para cada ejercicio.",
+      "box": [
+        0.21,
+        0.54,
+        0.45,
+        0.71
+      ]
+    },
+    {
+      "name": "Kettlebells",
+      "detail": "Pista funcional para trabajo de potencia.",
+      "box": [
+        0.57,
+        0.57,
+        0.68,
+        0.7
+      ]
+    },
+    {
+      "name": "Caminadoras",
+      "detail": "Cardio frente al jardín interior.",
+      "box": [
+        0.66,
+        0.42,
+        1,
+        0.7
+      ]
+    },
+    {
+      "name": "Mancuernas de 16 kg",
+      "detail": "Listas en el tapete de estiramiento.",
+      "box": [
+        0.08,
+        0.76,
+        0.27,
+        0.89
+      ]
+    },
+    {
+      "name": "Rodillo y botella",
+      "detail": "Para soltar músculo al terminar.",
+      "box": [
+        0.46,
+        0.71,
+        0.6,
+        0.86
+      ]
+    }
+  ],
+  "v-pesas3": [
+    {
+      "name": "Rack de mancuernas",
+      "detail": "Hexagonales, de goma, en pares.",
+      "box": [
+        0,
+        0.43,
+        0.26,
+        0.6
+      ]
+    },
+    {
+      "name": "Bancos",
+      "detail": "Planos y ajustables, siempre limpios.",
+      "box": [
+        0.08,
+        0.52,
+        0.5,
+        0.67
+      ]
+    },
+    {
+      "name": "Rack de sentadilla",
+      "detail": "Con barra olímpica y seguros.",
+      "box": [
+        0.78,
+        0.26,
+        1,
+        0.6
+      ]
+    }
+  ],
+  "v-pesas4": [
+    {
+      "name": "Banco",
+      "detail": "Banco ajustable junto a las mancuernas.",
+      "box": [
+        0.18,
+        0.72,
+        0.56,
+        1
+      ],
+      "points": [
+        [
+          0.36,
+          0.8
+        ],
+        [
+          0.3,
+          0.87
+        ]
+      ]
+    },
+    {
+      "name": "Mancuernas",
+      "detail": "Pares de goma a la mano.",
+      "box": [
+        0,
+        0.55,
+        0.3,
+        0.72
+      ],
+      "points": [
+        [
+          0.05,
+          0.62
+        ],
+        [
+          0.2,
+          0.6
+        ]
+      ]
+    },
+    {
+      "name": "Plataforma de levantamiento",
+      "detail": "Barra olímpica y discos de goma.",
+      "box": [
+        0.42,
+        0.5,
+        1,
+        0.62
+      ],
+      "points": [
+        [
+          0.5,
+          0.545
+        ],
+        [
+          0.95,
+          0.56
+        ],
+        [
+          0.7,
+          0.545
+        ]
+      ]
+    },
+    {
+      "name": "Cajón pliométrico",
+      "detail": "Saltos y step-ups.",
+      "box": [
+        0.82,
+        0.65,
+        1,
+        0.89
+      ],
+      "points": [
+        [
+          0.92,
+          0.79
+        ]
+      ]
+    },
+    {
+      "name": "Rack con anillas",
+      "detail": "Dominadas, fondos y gimnasia.",
+      "box": [
+        0.7,
+        0.23,
+        1,
+        0.57
+      ],
+      "points": [
+        [
+          0.8,
+          0.45
+        ],
+        [
+          0.76,
+          0.3
+        ]
+      ]
+    }
+  ],
+  "v-fuerza1": [
+    {
+      "name": "Rack con espejo de luz",
+      "detail": "Cada estación con su propio rack.",
+      "box": [
+        0.03,
+        0.12,
+        0.23,
+        0.79
+      ],
+      "points": [
+        [
+          0.1,
+          0.44
+        ],
+        [
+          0.1,
+          0.48
+        ],
+        [
+          0.19,
+          0.4
+        ]
+      ]
+    },
+    {
+      "name": "Banco de press",
+      "detail": "Ajustable y anclado al rack.",
+      "box": [
+        0.07,
+        0.61,
+        0.34,
+        0.76
+      ],
+      "points": [
+        [
+          0.2,
+          0.65
+        ],
+        [
+          0.29,
+          0.72
+        ]
+      ]
+    },
+    {
+      "name": "Estación gemela",
+      "detail": "Seis racks para grupos de ocho.",
+      "box": [
+        0.77,
+        0.12,
+        0.97,
+        0.79
+      ],
+      "points": [
+        [
+          0.86,
+          0.44
+        ],
+        [
+          0.88,
+          0.48
+        ],
+        [
+          0.78,
+          0.35
+        ]
+      ]
+    },
+    {
+      "name": "Banco de press",
+      "detail": "Mismo equipo en cada estación.",
+      "box": [
+        0.66,
+        0.61,
+        0.93,
+        0.76
+      ],
+      "points": [
+        [
+          0.78,
+          0.66
+        ],
+        [
+          0.68,
+          0.7
+        ]
+      ]
+    },
+    {
+      "name": "Mancuernas",
+      "detail": "A un paso de cada estación.",
+      "box": [
+        0.19,
+        0.73,
+        0.29,
+        0.81
+      ],
+      "points": [
+        [
+          0.24,
+          0.78
+        ]
+      ]
+    }
+  ],
+  "v-fuerza2": [
+    {
+      "name": "Sled",
+      "detail": "Empuje y arrastre sobre pasto sintético.",
+      "box": [
+        0,
+        0.48,
+        0.55,
+        0.88
+      ]
+    },
+    {
+      "name": "Cajón pliométrico",
+      "detail": "Saltos de 50 a 75 cm, con toalla y agua.",
+      "box": [
+        0.68,
+        0.48,
+        1,
+        0.77
+      ]
+    },
+    {
+      "name": "Cuerdas de batalla",
+      "detail": "Acondicionamiento en intervalos.",
+      "box": [
+        0.62,
+        0.76,
+        1,
+        1
+      ]
+    }
+  ],
+  "v-fuerza3": [
+    {
+      "name": "Banco ajustable",
+      "detail": "Press inclinado, remo y core.",
+      "box": [
+        0,
+        0.59,
+        0.44,
+        0.88
+      ],
+      "points": [
+        [
+          0.2,
+          0.63
+        ],
+        [
+          0.3,
+          0.62
+        ],
+        [
+          0.25,
+          0.78
+        ]
+      ]
+    },
+    {
+      "name": "Rack de mancuernas",
+      "detail": "Pares de 6 a 22 kg a la mano.",
+      "box": [
+        0,
+        0.37,
+        0.34,
+        0.64
+      ],
+      "points": [
+        [
+          0.1,
+          0.45
+        ],
+        [
+          0.2,
+          0.52
+        ],
+        [
+          0.25,
+          0.57
+        ]
+      ]
+    },
+    {
+      "name": "Cajón Umbral",
+      "detail": "Step-ups y saltos controlados.",
+      "box": [
+        0.31,
+        0.44,
+        0.51,
+        0.58
+      ],
+      "points": [
+        [
+          0.4,
+          0.5
+        ]
+      ]
+    },
+    {
+      "name": "Fitball",
+      "detail": "Estabilidad y movilidad.",
+      "box": [
+        0.49,
+        0.41,
+        0.65,
+        0.55
+      ],
+      "points": [
+        [
+          0.57,
+          0.48
+        ]
+      ]
+    },
+    {
+      "name": "Mancuernas de 10 kg",
+      "detail": "Las más pedidas de la sala.",
+      "box": [
+        0.44,
+        0.81,
+        0.79,
+        1
+      ],
+      "points": [
+        [
+          0.5,
+          0.9
+        ],
+        [
+          0.68,
+          0.89
+        ]
+      ]
+    },
+    {
+      "name": "Tapete",
+      "detail": "Para estirar al terminar.",
+      "box": [
+        0.3,
+        0.62,
+        1,
+        0.84
+      ],
+      "points": [
+        [
+          0.75,
+          0.72
+        ],
+        [
+          0.6,
+          0.68
+        ]
+      ]
+    }
+  ],
+  "v-fuerza4": [
+    {
+      "name": "Caminadoras",
+      "detail": "Calentamiento frente a la ciudad.",
+      "box": [
+        0,
+        0.48,
+        0.43,
+        0.72
+      ],
+      "points": [
+        [
+          0.25,
+          0.66
+        ],
+        [
+          0.15,
+          0.63
+        ],
+        [
+          0.1,
+          0.56
+        ]
+      ]
+    },
+    {
+      "name": "Banco de cuero",
+      "detail": "Con rodillo para femorales y espalda baja.",
+      "box": [
+        0,
+        0.72,
+        0.31,
+        1
+      ],
+      "points": [
+        [
+          0.15,
+          0.85
+        ],
+        [
+          0.1,
+          0.92
+        ],
+        [
+          0.14,
+          0.79
+        ]
+      ]
+    },
+    {
+      "name": "Discos",
+      "detail": "Calibrados de 1.25 a 25 kg.",
+      "box": [
+        0.79,
+        0.49,
+        1,
+        0.74
+      ],
+      "points": [
+        [
+          0.88,
+          0.66
+        ],
+        [
+          0.95,
+          0.6
+        ]
+      ]
+    },
+    {
+      "name": "Banco",
+      "detail": "Banco plano junto a los discos.",
+      "box": [
+        0.79,
+        0.74,
+        1,
+        0.99
+      ],
+      "points": [
+        [
+          0.95,
+          0.8
+        ],
+        [
+          0.92,
+          0.94
+        ]
+      ]
+    },
+    {
+      "name": "Olivo",
+      "detail": "Vegetación entre estaciones.",
+      "box": [
+        0.54,
+        0.34,
+        0.67,
+        0.61
+      ],
+      "points": [
+        [
+          0.6,
+          0.45
+        ],
+        [
+          0.61,
+          0.59
+        ]
+      ]
+    }
+  ],
+  "v-vest1": [
+    {
+      "name": "Banca central",
+      "detail": "Tapizada, con luz a ras de piso.",
+      "box": [
+        0.34,
+        0.67,
+        0.79,
+        0.97
+      ],
+      "points": [
+        [
+          0.56,
+          0.85
+        ],
+        [
+          0.4,
+          0.8
+        ],
+        [
+          0.72,
+          0.82
+        ]
+      ]
+    },
+    {
+      "name": "Maleta Umbral",
+      "detail": "Parte del kit de bienvenida.",
+      "box": [
+        0.48,
+        0.59,
+        0.66,
+        0.77
+      ],
+      "points": [
+        [
+          0.57,
+          0.68
+        ]
+      ]
+    },
+    {
+      "name": "Lockers con código",
+      "detail": "Sin llaves: entras con tu número.",
+      "box": [
+        0.7,
+        0,
+        1,
+        0.9
+      ],
+      "points": [
+        [
+          0.85,
+          0.4
+        ],
+        [
+          0.95,
+          0.45
+        ],
+        [
+          0.78,
+          0.35
+        ]
+      ]
+    },
+    {
+      "name": "Tocadores",
+      "detail": "Espejos con luz y secadora profesional.",
+      "box": [
+        0,
+        0.38,
+        0.25,
+        0.71
+      ],
+      "points": [
+        [
+          0.12,
+          0.58
+        ],
+        [
+          0.05,
+          0.35
+        ]
+      ]
+    },
+    {
+      "name": "Taburete",
+      "detail": "Para arreglarte con calma.",
+      "box": [
+        0.56,
+        0.51,
+        0.64,
+        0.63
+      ],
+      "points": [
+        [
+          0.6,
+          0.58
+        ]
+      ]
+    }
+  ],
+  "v-vest2": [
+    {
+      "name": "Taburetes",
+      "detail": "Para arreglarte con calma.",
+      "box": [
+        0.07,
+        0.64,
+        0.37,
+        0.94
+      ],
+      "points": [
+        [
+          0.09,
+          0.82
+        ],
+        [
+          0.19,
+          0.77
+        ],
+        [
+          0.27,
+          0.73
+        ],
+        [
+          0.33,
+          0.69
+        ]
+      ]
+    },
+    {
+      "name": "Tocador de piedra",
+      "detail": "Espejos, apliques y amenidades.",
+      "box": [
+        0.06,
+        0.52,
+        0.36,
+        0.61
+      ],
+      "points": [
+        [
+          0.2,
+          0.59
+        ],
+        [
+          0.28,
+          0.58
+        ]
+      ]
+    },
+    {
+      "name": "Lockers de madera",
+      "detail": "Amplios, con cerradura digital.",
+      "box": [
+        0.64,
+        0.3,
+        0.95,
+        0.69
+      ],
+      "points": [
+        [
+          0.72,
+          0.45
+        ],
+        [
+          0.83,
+          0.45
+        ],
+        [
+          0.76,
+          0.6
+        ]
+      ]
+    },
+    {
+      "name": "Banca",
+      "detail": "Banca con luz bajo el asiento.",
+      "box": [
+        0.84,
+        0.64,
+        1,
+        0.89
+      ],
+      "points": [
+        [
+          0.9,
+          0.75
+        ],
+        [
+          0.95,
+          0.8
+        ]
+      ]
+    },
+    {
+      "name": "Espejos con luz",
+      "detail": "Apliques cálidos a cada lado.",
+      "box": [
+        0.09,
+        0.31,
+        0.3,
+        0.56
+      ],
+      "points": [
+        [
+          0.15,
+          0.44
+        ],
+        [
+          0.26,
+          0.45
+        ]
+      ]
+    }
+  ],
+  "v-regaderas": [
+    {
+      "name": "Lounge de recovery",
+      "detail": "Sillones para descansar entre sesiones.",
+      "box": [
+        0.71,
+        0.69,
+        1,
+        1
+      ],
+      "points": [
+        [
+          0.82,
+          0.76
+        ],
+        [
+          0.92,
+          0.89
+        ]
+      ]
+    },
+    {
+      "name": "Lámpara de latón",
+      "detail": "Luz baja para relajarte.",
+      "box": [
+        0.87,
+        0.72,
+        0.99,
+        0.86
+      ],
+      "points": [
+        [
+          0.94,
+          0.73
+        ],
+        [
+          0.93,
+          0.78
+        ]
+      ]
+    },
+    {
+      "name": "Suite privada",
+      "detail": "Reserva tu turno de 30 minutos.",
+      "box": [
+        0.09,
+        0.13,
+        0.28,
+        1
+      ],
+      "points": [
+        [
+          0.17,
+          0.35
+        ],
+        [
+          0.17,
+          0.6
+        ]
+      ]
+    },
+    {
+      "name": "Olivo",
+      "detail": "Vegetación junto al lounge.",
+      "box": [
+        0.8,
+        0.34,
+        0.95,
+        0.67
+      ],
+      "points": [
+        [
+          0.88,
+          0.5
+        ],
+        [
+          0.9,
+          0.6
+        ]
+      ]
+    }
+  ],
+  "v-spa": [
+    {
+      "name": "Tina de agua fría",
+      "detail": "12 °C para recuperar músculo.",
+      "box": [
+        0,
+        0.52,
+        0.45,
+        0.73
+      ],
+      "points": [
+        [
+          0.2,
+          0.6
+        ],
+        [
+          0.1,
+          0.62
+        ],
+        [
+          0.33,
+          0.62
+        ]
+      ]
+    },
+    {
+      "name": "Sauna de madera",
+      "detail": "Calor seco a 60 °C.",
+      "box": [
+        0.3,
+        0.2,
+        0.5,
+        0.61
+      ],
+      "points": [
+        [
+          0.4,
+          0.32
+        ],
+        [
+          0.4,
+          0.5
+        ]
+      ]
+    },
+    {
+      "name": "Regadera de vapor",
+      "detail": "Eucalipto y vapor después del sauna.",
+      "box": [
+        0.55,
+        0.2,
+        0.71,
+        0.61
+      ],
+      "points": [
+        [
+          0.63,
+          0.32
+        ],
+        [
+          0.6,
+          0.5
+        ]
+      ]
+    },
+    {
+      "name": "Toallas tibias",
+      "detail": "Algodón turco recién salido del calentador.",
+      "box": [
+        0.7,
+        0.67,
+        1,
+        0.96
+      ],
+      "points": [
+        [
+          0.8,
+          0.7
+        ],
+        [
+          0.85,
+          0.82
+        ],
+        [
+          0.75,
+          0.75
+        ]
+      ]
+    },
+    {
+      "name": "Escalones de luz",
+      "detail": "Bajada iluminada a la tina.",
+      "box": [
+        0.27,
+        0.61,
+        0.45,
+        0.91
+      ],
+      "points": [
+        [
+          0.37,
+          0.66
+        ],
+        [
+          0.33,
+          0.8
+        ]
+      ]
+    }
+  ]
+}
