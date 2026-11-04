@@ -1,0 +1,104 @@
+{
+  "images": [
+    {
+      "name": "hero",
+      "width": 1920,
+      "height": 1282
+    },
+    {
+      "name": "casa-alberca",
+      "width": 1200,
+      "height": 801
+    },
+    {
+      "name": "casa-terraza",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "name": "casa-negra",
+      "width": 1200,
+      "height": 801
+    },
+    {
+      "name": "casa-blanca",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "name": "casa-familiar",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "name": "casa-jardin",
+      "width": 1200,
+      "height": 815
+    },
+    {
+      "name": "depas",
+      "width": 1200,
+      "height": 857
+    },
+    {
+      "name": "fachada",
+      "width": 1000,
+      "height": 1509
+    },
+    {
+      "name": "sala",
+      "width": 1200,
+      "height": 801
+    },
+    {
+      "name": "sala-2",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "name": "sala-3",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "name": "cocina",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "name": "cocina-isla",
+      "width": 1200,
+      "height": 675
+    },
+    {
+      "name": "recamara",
+      "width": 1000,
+      "height": 1270
+    },
+    {
+      "name": "bano",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "name": "llaves",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "name": "pareja",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "name": "asesora-carla",
+      "width": 800,
+      "height": 1120
+    },
+    {
+      "name": "asesora-ivonne",
+      "width": 800,
+      "height": 800
+    }
+  ]
+}
