@@ -7,6 +7,8 @@ de Aguascalientes en el CRM: unos 2,100 negocios, casi 9 de cada 10 sin web). Fi
 - Claro: https://demo-salud-claro.vercel.app (Vercel `demo-salud-claro`). Consultorio de la psicóloga Valeria Ríos.
 - Repo: `BrunoDunay/Demos-de-servicios-web` (todas las demos), carpeta `Salud/`. Push a `main` publica; cada proyecto
   de Vercel solo se vuelve a compilar si cambió su carpeta.
+- Vercel: `prj_jRbyjQ5aNorG0KxcoNB8DDtOPUpY` (Marfil) y `prj_0MOWmxcBjiGk6KSceBneLvfL8fzR` (Claro). Raíz `Salud/frontend`,
+  `npm ci`, `npx ng build salud-<demo>`, salida `dist/salud-<demo>/browser`, Node 24. Protección solo en vistas previas.
 
 ## Estructura
 
