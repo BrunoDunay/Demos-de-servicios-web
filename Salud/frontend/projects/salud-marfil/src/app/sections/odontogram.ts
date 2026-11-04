@@ -42,8 +42,8 @@ function arch(list: number[], cy: number, upper: boolean): ToothShape[] {
   });
 }
 
-const UPPER = arch(ALL_TEETH.upper, 214, true);
-const LOWER = arch(ALL_TEETH.lower, 236, false);
+const UPPER = arch(ALL_TEETH.upper, 220, true);
+const LOWER = arch(ALL_TEETH.lower, 226, false);
 
 /**
  * Tratamientos como odontograma: eliges un tratamiento y se encienden los dientes donde se hace,
@@ -70,9 +70,9 @@ const LOWER = arch(ALL_TEETH.lower, 236, false);
 
         <div class="board">
           <figure class="chart" data-reveal="photo" [class.kids]="active().id === 'ninos'">
-            <svg viewBox="0 0 600 450" role="img" [attr.aria-label]="'Odontograma: ' + active().name">
-              <text class="side" x="20" y="226">Derecha</text>
-              <text class="side" x="580" y="226" text-anchor="end">Izquierda</text>
+            <svg viewBox="0 20 600 420" role="img" [attr.aria-label]="'Odontograma: ' + active().name">
+              <text class="side" x="20" y="227">Derecha</text>
+              <text class="side" x="580" y="227" text-anchor="end">Izquierda</text>
               <line class="mid" x1="300" y1="30" x2="300" y2="420" />
               @for (t of teeth; track t.n) {
                 <g class="tooth" [class.on]="lit().has(t.n)" [class.picked]="picked() === t.n" [style.--o]="t.order"
@@ -207,7 +207,7 @@ export class Odontogram {
   }
 
   protected labelY(t: ToothShape) {
-    const cy = t.y < 225 ? 214 : 236;
+    const cy = t.y < 223 ? 220 : 226;
     return cy + (t.y - cy) * 1.2 + 4;
   }
 }
