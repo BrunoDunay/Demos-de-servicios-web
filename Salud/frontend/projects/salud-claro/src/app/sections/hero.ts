@@ -1,67 +1,114 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, afterNextRender, effect, inject, viewChild } from '@angular/core';
+import { LEAF, scribble, spiral, torn } from '../core/doodles';
 import { Practice } from '../core/practice';
-import { Motion, prefersReducedMotion, useGsap } from '../core/motion';
-import { Icon } from '../shared/icon';
+import { Motion, hasFinePointer, prefersReducedMotion, useGsap } from '../core/motion';
+import { Arrow, Magnetic } from '../shared/magnetic';
+
+const KNOT = scribble(120, 110, 95, 80, 36, 21);
+const CALM = spiral(120, 110, 82, 3.6, 140);
 
 /**
- * Portada: el bosque entre niebla. Tres capas de niebla se mueven solas, despacio; al bajar se apartan
- * hacia los lados y la foto se aclara (pasa de desenfocada a nítida). Es la idea del sitio: hablar aclara.
+ * Portada en collage. A la izquierda "HABLAR AYUDA." en letras condensadas y "empezar también" a mano con
+ * una flecha dibujada. A la derecha, la foto de perfil en papel rasgado con cinta, hojas de acuarela y una
+ * nota pegada. Sobre la cabeza se dibuja una maraña que, al bajar, se desenreda en espiral.
  */
 @Component({
   selector: 'app-hero',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Icon],
+  imports: [Arrow, Magnetic],
   template: `
     <section class="hero" #root>
-      <div class="scene" aria-hidden="true">
-        <img class="forest" src="media/bosque.webp" srcset="media/bosque-sm.webp 820w, media/bosque.webp 1800w" sizes="100vw" alt="" width="1800" height="1200" fetchpriority="high" />
-        <div class="fog f1"></div>
-        <div class="fog f2"></div>
-        <div class="fog f3"></div>
-      </div>
-      <div class="page copy">
-        <p class="kicker">Psicoterapia en Aguascalientes y en línea · Valeria Ríos</p>
-        <h1 class="title">Hablar ayuda. <em>Empezar también.</em></h1>
-        <p class="lead">Terapia para adultos, parejas y adolescentes. Un espacio tranquilo, sin juicios, para entender lo que te pasa y salir con herramientas, no solo con desahogo.</p>
-        <div class="actions">
-          <button type="button" class="btn" (click)="practice.book()">Agenda tu primera sesión <app-icon name="arrow-right" [size]="18" /></button>
-          <button type="button" class="btn ghost" (click)="practice.go('respira')"><app-icon name="wind" [size]="18" /> Respira un minuto</button>
+      <div class="page grid">
+        <div class="copy">
+          <p class="kicker">Psicoterapia · Aguascalientes y en línea</p>
+          <h1 class="title"><span class="l1">Hablar</span><span class="l2">ayuda.</span></h1>
+          <p class="note hand">
+            empezar también
+            <svg class="arrow" viewBox="0 0 90 70" aria-hidden="true"><path d="M6 8 C 30 4, 64 14, 70 50 M58 40 L 70 52 L 80 38" /></svg>
+          </p>
+          <p class="lead">Terapia para adultos, parejas y adolescentes con Valeria Ríos. Un espacio tranquilo, sin juicios, para entender lo que te pasa y salir con herramientas, no solo con desahogo.</p>
+          <div class="actions">
+            <button type="button" class="btn t-learn" magnetic (click)="practice.book()">Agenda tu primera sesión <app-arrow /></button>
+            <button type="button" class="btn ghost" magnetic (click)="practice.go('respira')">Respira un minuto</button>
+          </div>
+        </div>
+
+        <div class="collage" #collage>
+          <div class="paper back" data-depth="0.4" [style.clip-path]="tornBack"></div>
+          <figure class="photo" data-depth="0.8">
+            <span class="tape t1"></span><span class="tape t2"></span>
+            <div class="torn" [style.clip-path]="tornPhoto">
+              <img src="media/perfil.webp" srcset="media/perfil-sm.webp 820w, media/perfil.webp 1800w" sizes="(max-width: 900px) 90vw, 44vw" alt="Mujer de perfil con los ojos cerrados, en calma" width="1800" height="1200" fetchpriority="high" />
+            </div>
+            <svg class="knot" viewBox="0 0 240 220" aria-hidden="true"><path [attr.d]="knot" /></svg>
+          </figure>
+          <svg class="leaves" viewBox="-10 -40 200 120" data-depth="1.3" aria-hidden="true">
+            <path [attr.d]="leaf" transform="translate(10 40) rotate(-30)" />
+            <path [attr.d]="leaf" transform="translate(40 50) rotate(-60) scale(1.2)" />
+            <path [attr.d]="leaf" transform="translate(70 46) rotate(-10) scale(0.9)" />
+            <path class="stem" d="M0 70 C 40 52, 80 40, 140 10" />
+          </svg>
+          <div class="sticky" data-depth="1.6">
+            <span class="tape t3"></span>
+            <p class="hand">primera sesión<br /><b>$600</b></p>
+            <small>sin compromiso de seguir</small>
+          </div>
         </div>
       </div>
-      <p class="scroll-hint" aria-hidden="true">Baja despacio <app-icon name="arrow-down" [size]="16" /></p>
     </section>
   `,
   styles: `
-    .hero { position: relative; min-height: max(100svh, 640px); display: grid; align-items: end; padding: 140px 0 clamp(70px, 10vh, 120px); overflow: hidden; isolation: isolate; }
-    .scene { position: absolute; inset: 0; z-index: -1; }
-    .forest { position: absolute; inset: -4%; width: 108%; height: 108%; object-fit: cover; filter: blur(6px) saturate(0.75) brightness(1.08); }
-    /* Velo para que el texto se lea sobre la foto */
-    .scene::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, var(--mist) 2%, oklch(96.4% 0.012 140 / 0.72) 38%, oklch(96.4% 0.012 140 / 0.1) 75%); }
-    .fog { position: absolute; width: 140%; height: 70%; left: -20%; border-radius: 50%; background: radial-gradient(closest-side, oklch(97% 0.01 140 / 0.9), transparent); filter: blur(30px); will-change: transform; }
-    .f1 { top: 10%; animation: drift 26s var(--ease-calm) infinite alternate; }
-    .f2 { top: 34%; opacity: 0.8; animation: drift 34s var(--ease-calm) -8s infinite alternate-reverse; }
-    .f3 { top: 52%; opacity: 0.9; animation: drift 30s var(--ease-calm) -14s infinite alternate; }
-    @keyframes drift { from { translate: -8% 0; } to { translate: 8% 2%; } }
-    .copy { display: grid; justify-items: start; gap: 22px; }
-    .kicker { font-size: 0.9rem; font-weight: 560; color: var(--forest-2); }
-    .title { font-size: clamp(3.2rem, 9.4vw, 7.6rem); line-height: 0.95; max-width: 11ch; }
-    .title em { display: block; color: var(--moss); }
-    .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 6px; }
-    .scroll-hint { position: absolute; right: var(--gutter); bottom: 34px; display: inline-flex; align-items: center; gap: 8px; font-size: 0.82rem; color: var(--muted); }
-    .scroll-hint .icon { animation: bob 2.6s var(--ease-calm) infinite; }
-    @keyframes bob { 50% { translate: 0 5px; } }
-    @media (max-width: 700px) { .scroll-hint { display: none; } }
+    .hero { position: relative; padding: 128px 0 clamp(70px, 9vw, 120px); overflow: hidden; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 4vw, 60px); align-items: center; }
+    .copy { position: relative; display: grid; justify-items: start; gap: 18px; }
+    .title { display: grid; font-size: clamp(5rem, 14.5vw, 12rem); text-transform: uppercase; line-height: 0.82; letter-spacing: -0.03em; font-stretch: 75%; font-weight: 800; }
+    .l1 { color: var(--ink); }
+    .l2 { color: var(--peach); }
+    .note { position: relative; margin: -6px 0 26px 34%; font-size: clamp(1.8rem, 3.2vw, 2.6rem); color: var(--sage-deep); rotate: -4deg; }
+    .arrow { position: absolute; left: -58px; top: 18px; width: 54px; overflow: visible; fill: none; stroke: var(--sage-deep); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; transform: scaleX(-1); }
+    .actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .collage { position: relative; aspect-ratio: 1 / 1.05; }
+    .paper.back { position: absolute; inset: 6% 2% 10% 12%; background: var(--dusty-soft); rotate: -5deg; }
+    .photo { position: absolute; inset: 0 8% 14% 0; margin: 0; rotate: 2deg; filter: drop-shadow(0 18px 24px oklch(27% 0.055 255 / 0.22)); }
+    .torn { position: absolute; inset: 0; overflow: hidden; background: var(--dusty); }
+    /* Foto en blanco y negro entonada en azul, como el collage de referencia */
+    .torn img { width: 100%; height: 100%; object-fit: cover; object-position: 70% 100%; scale: 1.45; transform-origin: 66% 92%; filter: grayscale(1) contrast(1.08) brightness(1.06); mix-blend-mode: multiply; }
+    .t1 { top: -10px; left: 12%; rotate: -8deg; }
+    .t2 { top: -6px; right: 10%; rotate: 6deg; }
+    .knot { position: absolute; left: 24%; top: -1%; width: 40%; overflow: visible; }
+    .knot path { fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; }
+    .leaves { position: absolute; left: -6%; bottom: 2%; width: 42%; overflow: visible; transform-origin: 0 100%; animation: sway 6s var(--ease-calm) infinite alternate; }
+    .leaves path { fill: var(--dusty); opacity: 0.55; mix-blend-mode: multiply; }
+    .leaves path:nth-child(2) { fill: var(--navy); opacity: 0.45; }
+    .leaves .stem { fill: none; stroke: var(--navy); stroke-width: 1.6; opacity: 0.6; }
+    @keyframes sway { to { rotate: 4deg; } }
+    .sticky { position: absolute; right: 0; bottom: 0; display: grid; gap: 2px; padding: 22px 22px 18px; width: 200px; background: var(--peach-soft); rotate: -3deg; box-shadow: var(--shadow-paper); }
+    .sticky .hand { font-size: 1.6rem; color: var(--ink); }
+    .sticky b { font-family: var(--font-display); font-stretch: 75%; font-size: 2.6rem; font-weight: 800; color: var(--peach-deep); }
+    .sticky small { font-size: 0.78rem; color: var(--ink-2); }
+    .t3 { top: -12px; left: 50%; translate: -50% 0; rotate: -4deg; width: 70px; }
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .hero { padding-top: 104px; }
+      .collage { max-width: 520px; width: 100%; justify-self: center; }
+      .note { margin-left: 22%; }
+    }
   `,
 })
 export class Hero {
   protected readonly practice = inject(Practice);
   private readonly motion = inject(Motion);
   private readonly root = viewChild.required<ElementRef<HTMLElement>>('root');
+  private readonly collage = viewChild.required<ElementRef<HTMLElement>>('collage');
+  protected readonly knot = KNOT;
+  protected readonly leaf = LEAF;
+  protected readonly tornPhoto = torn(3, 2.2);
+  protected readonly tornBack = torn(9, 3);
   private played = false;
 
   constructor() {
     const destroyRef = inject(DestroyRef);
-    afterNextRender(() => this.clearOnScroll(destroyRef));
+    afterNextRender(() => this.wire(destroyRef));
     effect(() => {
       if (this.motion.introDone() && !this.played) {
         this.played = true;
@@ -73,25 +120,52 @@ export class Hero {
   private enter() {
     if (prefersReducedMotion()) return;
     const root = this.root().nativeElement;
-    const { gsap, SplitText } = useGsap();
-    const split = SplitText.create(root.querySelector('.title')!, { type: 'words' });
+    const { gsap } = useGsap();
+    const knot = root.querySelector<SVGPathElement>('.knot path')!;
+    const arrow = root.querySelector<SVGPathElement>('.arrow path')!;
+    const len = knot.getTotalLength();
+    const alen = arrow.getTotalLength();
+    gsap.set(knot, { strokeDasharray: len, strokeDashoffset: len });
+    gsap.set(arrow, { strokeDasharray: alen, strokeDashoffset: alen });
     gsap.timeline()
-      .from(split.words, { opacity: 0, filter: 'blur(12px)', y: 14, duration: 1.4, ease: 'sine.out', stagger: 0.09 })
-      .from(root.querySelectorAll('.kicker, .lead, .actions'), { opacity: 0, filter: 'blur(8px)', y: 10, duration: 1.2, ease: 'sine.out', stagger: 0.12 }, 0.4);
+      .from(root.querySelectorAll('.l1, .l2'), { yPercent: 100, opacity: 0, rotate: 3, duration: 1.1, ease: 'expo.out', stagger: 0.1 })
+      .from(root.querySelectorAll('.kicker, .lead, .actions'), { y: 16, opacity: 0, duration: 0.9, ease: 'expo.out', stagger: 0.08 }, 0.3)
+      .from(root.querySelector('.note'), { clipPath: 'inset(0 100% 0 0)', duration: 0.9, ease: 'power2.out' }, 0.6)
+      .to(arrow, { strokeDashoffset: 0, duration: 0.6, ease: 'power2.out' }, 1.2)
+      .from(root.querySelector('.paper.back'), { scale: 0.8, opacity: 0, rotate: -14, duration: 1.1, ease: 'expo.out' }, 0.1)
+      .from(root.querySelector('.photo'), { y: 60, opacity: 0, rotate: 8, duration: 1.2, ease: 'expo.out' }, 0.2)
+      .from(root.querySelectorAll('.tape'), { scaleX: 0, opacity: 0, duration: 0.5, ease: 'back.out(2)', stagger: 0.1 }, 0.9)
+      .from(root.querySelector('.sticky'), { y: 40, rotate: 12, opacity: 0, duration: 1, ease: 'back.out(1.4)' }, 1)
+      .from(root.querySelector('.leaves'), { scale: 0.6, opacity: 0, duration: 1.1, ease: 'expo.out' }, 0.8)
+      .to(knot, { strokeDashoffset: 0, duration: 1.4, ease: 'power2.inOut' }, 0.9)
+      .call(() => knot.style.removeProperty('stroke-dasharray'));
   }
 
-  /** Al bajar, la niebla se aparta y la foto se enfoca. */
-  private clearOnScroll(destroyRef: DestroyRef) {
+  /** Al bajar, la maraña se desenreda en espiral; las piezas del collage se mueven con el cursor. */
+  private wire(destroyRef: DestroyRef) {
     if (prefersReducedMotion()) return;
-    const root = this.root().nativeElement;
     const { gsap } = useGsap();
-    const tl = gsap.timeline({ scrollTrigger: { trigger: root, start: 'top top', end: 'bottom 30%', scrub: 0.8 } });
-    tl.to(root.querySelector('.forest'), { filter: 'blur(0px) saturate(1) brightness(1)', yPercent: 6, ease: 'none' }, 0)
-      .to(root.querySelector('.f1'), { xPercent: -45, opacity: 0, ease: 'none' }, 0)
-      .to(root.querySelector('.f2'), { xPercent: 45, opacity: 0, ease: 'none' }, 0)
-      .to(root.querySelector('.f3'), { xPercent: -30, opacity: 0, ease: 'none' }, 0)
-      .to(root.querySelector('.copy'), { yPercent: -12, ease: 'none' }, 0);
+    const root = this.root().nativeElement;
+    const knot = root.querySelector<SVGPathElement>('.knot path')!;
+    const tl = gsap.timeline({ scrollTrigger: { trigger: root, start: 'top top', end: 'bottom 35%', scrub: 0.8 } });
+    tl.to(knot, { morphSVG: CALM, ease: 'none' }, 0).to(root.querySelector('.knot'), { rotate: 180, ease: 'none' }, 0);
+
+    const pieces = Array.from(this.collage().nativeElement.querySelectorAll<HTMLElement>('[data-depth]')).map((el) => ({
+      d: Number(el.dataset['depth']),
+      x: gsap.quickTo(el, 'x', { duration: 0.9, ease: 'power3.out' }),
+      y: gsap.quickTo(el, 'y', { duration: 0.9, ease: 'power3.out' }),
+    }));
+    const move = (e: PointerEvent) => {
+      const nx = e.clientX / innerWidth - 0.5;
+      const ny = e.clientY / innerHeight - 0.5;
+      pieces.forEach((p) => {
+        p.x(nx * 22 * p.d);
+        p.y(ny * 18 * p.d);
+      });
+    };
+    if (hasFinePointer()) addEventListener('pointermove', move, { passive: true });
     destroyRef.onDestroy(() => {
+      removeEventListener('pointermove', move);
       tl.scrollTrigger?.kill();
       tl.kill();
     });

@@ -1,10 +1,14 @@
 import { ChangeDetectionStrategy, Component, ElementRef, afterNextRender, inject, signal, viewChild } from '@angular/core';
+import { scribble, spiral } from '../core/doodles';
 import { Motion, prefersReducedMotion, useGsap } from '../core/motion';
 
+const KNOT = scribble(150, 150, 120, 110, 40, 11);
+const CALM = spiral(150, 150, 118, 4.2, 160);
+
 /**
- * Intro (~2.4 s): pantalla de niebla. Aparece "Respira." al ritmo de una inhalación, el círculo del logo
- * crece como un pulmón y la niebla se abre hacia los lados dejando ver el bosque de la portada.
- * Viene en el HTML prerenderizado; si el JS no carga, una animación CSS la retira.
+ * Intro (~3 s), la historia del sitio en corto: sobre papel crema se dibuja rápido una maraña (la ansiedad),
+ * se queda quieta un instante y se desenreda en una espiral tranquila (MorphSVG). Aparece "respira." escrito
+ * a mano y la hoja sube con la orilla rasgada dejando ver la portada.
  */
 @Component({
   selector: 'app-intro',
@@ -12,32 +16,22 @@ import { Motion, prefersReducedMotion, useGsap } from '../core/motion';
   template: `
     @if (visible()) {
       <div class="intro" #root aria-hidden="true">
-        <div class="half l"></div>
-        <div class="half r"></div>
-        <div class="center">
-          <svg class="mark" viewBox="0 0 32 32">
-            <path class="ring" pathLength="1" d="M24.5 8.5A11 11 0 1 0 27 16" />
-            <circle class="sun" cx="25.5" cy="11.8" r="2.4" />
-          </svg>
-          <p class="word">Respira.</p>
-        </div>
+        <svg class="draw" viewBox="0 0 300 300"><path class="knot" [attr.d]="knot" /></svg>
+        <p class="word hand">respira.</p>
+        <p class="sub">Claro · psicología</p>
         <button type="button" class="skip" (click)="skip()" tabindex="-1">Saltar</button>
       </div>
     }
   `,
   styles: `
-    .intro { position: fixed; inset: 0; z-index: var(--z-intro); color: var(--forest); animation: fallback-out 600ms ease 5s forwards; }
+    .intro { position: fixed; inset: 0; z-index: var(--z-intro); display: grid; place-content: center; justify-items: center; gap: 6px; background: var(--paper); color: var(--ink); animation: fallback-out 600ms ease 5s forwards; }
     .intro.is-running { animation: none; }
     @keyframes fallback-out { to { opacity: 0; visibility: hidden; } }
-    .half { position: absolute; top: -10%; bottom: -10%; width: 62%; background: radial-gradient(120% 70% at 50% 50%, var(--mist) 55%, oklch(96.4% 0.012 140 / 0.85) 75%, transparent 100%); filter: blur(10px); }
-    .half.l { left: -6%; }
-    .half.r { right: -6%; }
-    .center { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 18px; }
-    .mark { width: 64px; height: 64px; overflow: visible; }
-    .ring { fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
-    .sun { fill: var(--amber); transform-origin: 25.5px 11.8px; scale: 0; }
-    .word { font-family: var(--font-display); font-style: italic; font-size: clamp(2.6rem, 8vw, 4.4rem); line-height: 1; opacity: 0; }
-    .skip { position: absolute; right: var(--gutter); top: 22px; padding: 8px 0; font-size: 0.78rem; font-weight: 560; opacity: 0.7; transition: scale 160ms var(--ease-out); }
+    .draw { width: min(52vmin, 340px); overflow: visible; }
+    .knot { fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+    .word { font-size: clamp(3rem, 9vw, 5rem); color: var(--peach-deep); clip-path: inset(0 100% 0 0); }
+    .sub { font-size: 0.74rem; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; color: var(--sage-deep); opacity: 0; }
+    .skip { position: absolute; right: var(--gutter); top: 22px; padding: 8px 0; font-size: 0.78rem; font-weight: 650; letter-spacing: 0.16em; text-transform: uppercase; opacity: 0.6; transition: scale 160ms var(--ease-out); }
     .skip:active { scale: 0.95; }
   `,
 })
@@ -45,6 +39,7 @@ export class Intro {
   private readonly motion = inject(Motion);
   private readonly root = viewChild<ElementRef<HTMLElement>>('root');
   protected readonly visible = signal(true);
+  protected readonly knot = KNOT;
   private timeline?: gsap.core.Timeline;
 
   constructor() {
@@ -58,25 +53,31 @@ export class Intro {
     root.classList.add('is-running');
     this.motion.stop();
     if (prefersReducedMotion()) {
-      gsap.to(root, { autoAlpha: 0, duration: 0.4, delay: 0.2, onComplete: () => this.finish() });
+      gsap.to(root, { autoAlpha: 0, duration: 0.4, delay: 0.3, onComplete: () => this.finish() });
       return;
     }
     const q = gsap.utils.selector(root);
+    const path = root.querySelector<SVGPathElement>('.knot')!;
+    const len = path.getTotalLength();
+    gsap.set(path, { strokeDasharray: len, strokeDashoffset: len });
     const tl = gsap.timeline({ onComplete: () => this.finish() });
     this.timeline = tl;
-    // Una inhalación (1.4 s): el anillo se dibuja y crece, aparece la palabra
-    tl.to(q('.ring'), { strokeDashoffset: 0, duration: 1.3, ease: 'sine.inOut' }, 0.1)
-      .to(q('.mark'), { scale: 1.25, duration: 1.4, ease: 'sine.inOut' }, 0.1)
-      .to(q('.sun'), { scale: 1, duration: 0.6, ease: 'back.out(2)' }, 1)
-      .fromTo(q('.word'), { opacity: 0, filter: 'blur(10px)', y: 8 }, { opacity: 1, filter: 'blur(0px)', y: 0, duration: 1.1, ease: 'sine.out' }, 0.3)
-      // Exhalación: todo se calma y la niebla se abre
-      .to(q('.mark'), { scale: 1, duration: 1, ease: 'sine.inOut' }, 1.6)
-      .addLabel('open', 1.8)
+    tl.to(path, { strokeDashoffset: 0, duration: 1.1, ease: 'power2.inOut' })
+      .to(q('.draw'), { rotate: 8, duration: 0.25, ease: 'power1.inOut', yoyo: true, repeat: 1 }, 0.9)
+      // Se desenreda: la maraña se vuelve espiral
+      .to(path, { morphSVG: CALM, strokeDasharray: 'none', duration: 1.1, ease: 'power3.inOut' }, 1.3)
+      .to(q('.draw'), { rotate: -90, scale: 0.8, duration: 1.1, ease: 'power3.inOut' }, 1.3)
+      .to(q('.word'), { clipPath: 'inset(0 0% 0 0)', duration: 0.8, ease: 'power2.out' }, 1.7)
+      .to(q('.sub'), { opacity: 1, duration: 0.5 }, 2)
+      .addLabel('open', 2.75)
       .call(() => this.motion.introDone.set(true), [], 'open')
-      .to(q('.center'), { opacity: 0, filter: 'blur(8px)', duration: 0.6, ease: 'sine.in' }, 'open')
-      .to(q('.half.l'), { xPercent: -95, duration: 1.2, ease: 'power2.inOut' }, 'open')
-      .to(q('.half.r'), { xPercent: 95, duration: 1.2, ease: 'power2.inOut' }, 'open')
-      .to(q('.half'), { opacity: 0, duration: 0.9, ease: 'sine.in' }, 'open+=0.4');
+      // La hoja sube con la orilla de abajo rasgada
+      .fromTo(
+        root,
+        { clipPath: 'polygon(0 0, 100% 0, 100% 104%, 92% 101%, 84% 105%, 75% 100%, 66% 104%, 58% 99%, 50% 103%, 41% 100%, 33% 105%, 25% 100%, 16% 104%, 8% 100%, 0 103%)' },
+        { clipPath: 'polygon(0 0, 100% 0, 100% -2%, 92% -5%, 84% -1%, 75% -6%, 66% -2%, 58% -7%, 50% -3%, 41% -6%, 33% -1%, 25% -6%, 16% -2%, 8% -6%, 0 -3%)', duration: 1, ease: 'power3.inOut' },
+        'open',
+      );
   }
 
   protected skip() {

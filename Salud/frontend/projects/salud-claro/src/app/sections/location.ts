@@ -4,7 +4,11 @@ import { fmtHour } from '../core/practice';
 import { Icon } from '../shared/icon';
 import { Reveal } from '../shared/reveal';
 
-/** Dónde está el consultorio (mapa dibujado, sin cargar Google Maps), horario con el día de hoy marcado y preguntas frecuentes. */
+/**
+ * El consultorio: mapa dibujado a mano (sin cargar Google Maps), horario en tarjeta de fichero con el día
+ * de hoy marcado, preguntas frecuentes con el acordeón de transitions.dev y el aviso de crisis con la
+ * Línea de la Vida (dato real).
+ */
 @Component({
   selector: 'app-location',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -13,60 +17,59 @@ import { Reveal } from '../shared/reveal';
     <section class="section" id="consultorio">
       <div class="page grid">
         <div class="where">
-          <p class="eyebrow" data-reveal>El consultorio</p>
-          <h2 class="h2" data-reveal [revealDelay]="80">Un lugar <em>tranquilo</em>, cerca de todo.</h2>
-          <figure class="map" data-reveal [revealDelay]="120" aria-label="Mapa de ubicación">
-            <svg viewBox="0 0 400 260" aria-hidden="true">
-              <rect width="400" height="260" class="ground" />
-              <path class="park" d="M260 150h110v90H260z" />
-              <path class="street big" d="M-10 96 L410 70" />
-              <path class="street" d="M120 -10 L150 270" />
-              <path class="street" d="M250 -10 L238 270" />
-              <path class="street" d="M-10 200 L410 186" />
-              <path class="street thin" d="M40 -10 L60 270" />
-              <path class="street thin" d="M330 -10 L340 140" />
-              <text x="20" y="88" class="label">Héroe de Nacozari</text>
-              <text x="268" y="200" class="label">Parque</text>
-              <g class="pin" transform="translate(196 136)">
-                <circle r="26" class="halo" />
-                <path d="M0 14c-6-6-12-11-12-18a12 12 0 0 1 24 0c0 7-6 12-12 18z" />
-                <circle cy="-4" r="4.5" class="dot" />
+          <p class="kicker" data-reveal>El consultorio</p>
+          <h2 class="h2" data-reveal [revealDelay]="80">Un lugar <span class="sage">tranquilo</span>, cerca de todo.</h2>
+          <figure class="map" data-reveal [revealDelay]="120">
+            <span class="tape"></span>
+            <svg viewBox="0 0 400 270" aria-label="Mapa dibujado del consultorio">
+              <path class="park" d="M262 160 C 300 150, 360 158, 380 176 L 384 250 C 340 258, 290 254, 262 246 Z" />
+              <path class="street big" d="M-10 98 C 120 88, 260 84, 410 70" />
+              <path class="street" d="M122 -10 C 128 80, 140 180, 150 280" />
+              <path class="street" d="M250 -10 C 246 90, 242 180, 236 280" />
+              <path class="street" d="M-10 206 C 120 200, 260 196, 410 188" />
+              <text x="22" y="84" class="label">Héroe de Nacozari</text>
+              <text x="282" y="214" class="label">parque</text>
+              <path class="route" d="M30 250 C 80 230, 110 214, 140 210 S 180 160, 196 140" />
+              <g class="pin" transform="translate(196 132)">
+                <path d="M0 16 C-7 9-13 3-13-5 a13 13 0 0 1 26 0 c0 8-6 14-13 21z" />
+                <circle cy="-5" r="4.5" />
               </g>
+              <text x="210" y="124" class="here">¡aquí!</text>
             </svg>
-            <figcaption>
-              <app-icon name="pin" [size]="18" />
-              <span>{{ address }}<br />{{ city }}</span>
-            </figcaption>
+            <figcaption><app-icon name="pin" [size]="16" /> {{ address }}, {{ city }}</figcaption>
           </figure>
-          <p class="parking" data-reveal><app-icon name="lock" [size]="16" /> Entrada discreta y sin sala de espera compartida: las sesiones se agendan con espacio entre una y otra.</p>
+          <p class="private" data-reveal><app-icon name="lock" [size]="16" /> Entrada discreta y sin sala de espera compartida: las sesiones se agendan con espacio entre una y otra.</p>
         </div>
 
         <div class="side">
           <div class="hours" data-reveal>
-            <h3>Horario de sesiones</h3>
+            <h3>Horario</h3>
             <ul>
               @for (d of week; track d.i) {
                 <li [class.today]="today() === d.i">
-                  <span>{{ d.name }}@if (today() === d.i) { <small>hoy</small> }</span>
+                  <span>{{ d.name }}@if (today() === d.i) { <small class="hand">hoy</small> }</span>
                   <span>{{ d.text }}</span>
                 </li>
               }
             </ul>
           </div>
           <div class="faq" data-reveal [revealDelay]="100">
-            <h3>Preguntas frecuentes</h3>
-            @for (f of faq; track f.q) {
-              <details>
-                <summary>{{ f.q }}<app-icon name="plus" [size]="18" /></summary>
-                <p>{{ f.a }}</p>
-              </details>
+            <h3>Preguntas</h3>
+            @for (f of faq; track f.q; let i = $index) {
+              <div class="acc" [attr.data-open]="open() === i">
+                <button type="button" class="acc-head" (click)="open.set(open() === i ? -1 : i)" [attr.aria-expanded]="open() === i">
+                  {{ f.q }}
+                  <svg class="chev" width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m4 6 4 4 4-4" /></svg>
+                </button>
+                <div class="acc-panel"><div class="acc-inner"><p>{{ f.a }}</p></div></div>
+              </div>
             }
           </div>
         </div>
       </div>
       <aside class="page" data-reveal>
         <div class="crisis">
-          <span class="icon-wrap"><app-icon name="life-buoy" [size]="26" /></span>
+          <span class="ico"><app-icon name="life-buoy" [size]="26" /></span>
           <div>
             <b>Si estás en crisis o pensando en hacerte daño, no esperes a una cita.</b>
             <p>Llama a la Línea de la Vida: <strong>800 911 2000</strong> (gratis, las 24 horas, en todo el país) o al <strong>911</strong>.</p>
@@ -78,41 +81,41 @@ import { Reveal } from '../shared/reveal';
   styles: `
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 5vw, 80px); }
     .where { display: grid; align-content: start; gap: 18px; }
-    .map { position: relative; margin: 8px 0 0; border-radius: var(--radius-l); overflow: hidden; box-shadow: var(--shadow-s); }
-    .map svg { width: 100%; height: auto; }
-    .ground { fill: var(--mist-2); }
-    .park { fill: oklch(86% 0.06 150); }
-    .street { fill: none; stroke: var(--paper); stroke-width: 12; stroke-linecap: round; }
-    .street.big { stroke-width: 20; }
-    .street.thin { stroke-width: 7; }
-    .label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; fill: var(--muted); }
-    .pin path { fill: var(--forest); }
-    .pin .dot { fill: var(--amber); }
-    .halo { fill: var(--amber); opacity: 0.25; transform-origin: 0 0; animation: halo 2.6s var(--ease-out) infinite; }
-    @keyframes halo { from { scale: 0.3; opacity: 0.5; } to { scale: 1.4; opacity: 0; } }
-    figcaption { position: absolute; left: 14px; bottom: 14px; right: 14px; display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: 14px; background: oklch(99% 0 0 / 0.9); backdrop-filter: blur(8px); font-size: 0.9rem; font-weight: 600; line-height: 1.4; }
-    figcaption .icon { color: var(--moss); margin-top: 1px; }
-    .parking { display: flex; gap: 8px; align-items: flex-start; font-size: 0.9rem; color: var(--forest-2); }
-    .parking .icon { margin-top: 4px; color: var(--moss); }
+    .map { position: relative; margin: 10px 0 0; padding: 14px; background: var(--card); box-shadow: var(--shadow-lift); rotate: -1.2deg; }
+    .map .tape { top: -12px; left: 18%; rotate: -6deg; }
+    .map svg { width: 100%; height: auto; background: var(--paper); }
+    .park { fill: var(--sage-soft); stroke: var(--sage); stroke-width: 1.5; stroke-dasharray: 4 5; }
+    .street { fill: none; stroke: var(--ink); stroke-width: 1.6; stroke-linecap: round; opacity: 0.5; }
+    .street.big { stroke-width: 2.6; opacity: 0.7; }
+    .label { font-family: var(--font-hand); font-size: 17px; font-weight: 600; fill: var(--ink-2); }
+    .route { fill: none; stroke: var(--peach-deep); stroke-width: 2.4; stroke-dasharray: 6 7; stroke-linecap: round; }
+    .pin path { fill: var(--peach-deep); }
+    .pin circle { fill: var(--card); }
+    .here { font-family: var(--font-hand); font-size: 24px; font-weight: 700; fill: var(--peach-deep); }
+    figcaption { display: flex; gap: 8px; align-items: center; padding-top: 12px; font-size: 0.9rem; font-weight: 600; }
+    .private { display: flex; gap: 8px; align-items: flex-start; font-size: 0.92rem; color: var(--ink-2); }
+    .private .icon { margin-top: 4px; color: var(--sage-deep); }
     .side { display: grid; gap: 40px; align-content: start; }
-    h3 { font-size: 1.8rem; margin-bottom: 14px; }
-    .hours ul { list-style: none; margin: 0; padding: 0; }
-    .hours li { display: flex; justify-content: space-between; padding: 11px 12px; border-radius: 10px; font-variant-numeric: tabular-nums; }
-    .hours li:nth-child(odd) { background: var(--mist-2); }
-    .hours li.today { background: var(--forest); color: var(--mist); font-weight: 650; }
-    .hours small { margin-left: 8px; padding: 2px 8px; border-radius: 999px; background: var(--amber); color: var(--deep); font-size: 0.72rem; font-weight: 700; }
-    details { border-bottom: 1px solid var(--line); }
-    summary { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 18px 0; font-weight: 650; cursor: pointer; list-style: none; transition: color 200ms ease; }
-    summary::-webkit-details-marker { display: none; }
-    summary .icon { flex: none; transition: rotate 300ms var(--ease-out); }
-    details[open] summary .icon { rotate: 45deg; }
-    @media (hover: hover) and (pointer: fine) { summary:hover { color: var(--moss); } }
-    details p { padding: 0 0 18px; color: var(--forest-2); animation: open 400ms var(--ease-out); }
-    @keyframes open { from { opacity: 0; translate: 0 -6px; } }
-    .crisis { display: flex; gap: 18px; align-items: flex-start; margin-top: clamp(56px, 8vw, 100px); padding-top: 28px; border-top: 1px solid var(--line); }
+    h3 { margin-bottom: 14px; font-size: 2.4rem; text-transform: uppercase; }
+    .hours ul { list-style: none; margin: 0; padding: 10px 18px; background: var(--card); box-shadow: var(--shadow-paper); background-image: linear-gradient(oklch(62% 0.12 25 / 0.4), oklch(62% 0.12 25 / 0.4)); background-size: 100% 1.5px; background-position: 0 2px; background-repeat: no-repeat; }
+    .hours li { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid oklch(64% 0.065 245 / 0.2); font-variant-numeric: tabular-nums; }
+    .hours li:last-child { border-bottom: 0; }
+    .hours li.today { font-weight: 700; background: linear-gradient(transparent 55%, var(--peach-soft) 55%, var(--peach-soft) 90%, transparent 90%); }
+    .hours small { margin-left: 8px; font-size: 1.3rem; color: var(--peach-deep); }
+    .acc { border-bottom: 1.5px dashed var(--line-2); }
+    .acc-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; width: 100%; padding: 16px 0; font-weight: 650; text-align: left; transition: color 200ms ease; }
+    @media (hover: hover) and (pointer: fine) { .acc-head:hover { color: var(--peach-deep); } }
+    .chev { flex: none; transition: transform var(--duration-fast) var(--ease-smooth-out); }
+    .acc[data-open='true'] .chev { transform: scaleY(-1); }
+    .acc-panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--duration-fast) var(--ease-smooth-out); }
+    .acc[data-open='true'] .acc-panel { grid-template-rows: 1fr; }
+    .acc-inner { overflow: hidden; opacity: 0; filter: blur(var(--blur-small)); transition: opacity var(--duration-fast) var(--ease-smooth-out), filter var(--duration-fast) var(--ease-smooth-out); }
+    .acc[data-open='true'] .acc-inner { opacity: 1; filter: none; }
+    .acc-inner p { padding: 0 0 16px; color: var(--ink-2); }
+    .crisis { display: flex; gap: 18px; align-items: flex-start; margin-top: clamp(56px, 8vw, 100px); padding: 24px 26px; background: var(--peach-soft); box-shadow: var(--shadow-paper); rotate: -0.6deg; }
     .crisis > div { display: grid; gap: 4px; }
-    .crisis b { font-size: 1.1rem; font-weight: 600; }
-    .icon-wrap { flex: none; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--amber-soft); color: var(--amber-deep); }
+    .crisis b { font-size: 1.1rem; }
+    .ico { flex: none; display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; background: var(--card); color: var(--peach-deep); }
     @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
   `,
 })
@@ -121,8 +124,8 @@ export class Location {
   protected readonly address = PRACTICE.address;
   protected readonly city = PRACTICE.city;
   protected readonly today = signal(-1);
-  // Lunes primero
-  protected readonly week = [1, 2, 3, 4, 5, 6, 0].map((i) => ({ i, name: DAY_NAMES[i], text: HOURS[i] ? `${fmtHour(HOURS[i]![0])} – ${fmtHour(HOURS[i]![1])}` : 'Cerrado' }));
+  protected readonly open = signal(0);
+  protected readonly week = [1, 2, 3, 4, 5, 6, 0].map((i) => ({ i, name: DAY_NAMES[i], text: HOURS[i] ? `${fmtHour(HOURS[i]![0])} – ${fmtHour(HOURS[i]![1])}` : 'Sin sesiones' }));
 
   constructor() {
     afterNextRender(() => this.today.set(new Date().getDay()));

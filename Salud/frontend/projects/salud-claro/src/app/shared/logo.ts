@@ -1,27 +1,29 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { spiral } from '../core/doodles';
 
-/** Logo de Claro: un círculo abierto (el claro del bosque) con un punto de luz, y el nombre en itálica. */
+const MARK = spiral(16, 16, 13, 2.6, 60);
+
+/** Logo de Claro: una espiral a mano (la mente en calma) y "claro" en letras condensadas. */
 @Component({
   selector: 'app-logo',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
-      <path class="ring" d="M24.5 8.5A11 11 0 1 0 27 16" />
-      <circle class="sun" cx="25.5" cy="11.8" r="2.4" />
-    </svg>
+    <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><path [attr.d]="mark" /><circle cx="16" cy="16" r="2.2" /></svg>
     @if (word()) {
-      <span class="word">Claro</span>
+      <span class="word">claro<small>psicología</small></span>
     }
   `,
   styles: `
     :host { display: inline-flex; align-items: center; gap: 10px; color: inherit; }
-    .mark { width: 30px; height: 30px; flex: none; overflow: visible; }
-    .ring { fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
-    .sun { fill: var(--amber); transition: translate 600ms var(--ease-out); }
-    .word { font-family: var(--font-display); font-style: italic; font-size: 1.7rem; font-weight: 400; letter-spacing: -0.01em; line-height: 1; }
-    @media (hover: hover) and (pointer: fine) { :host(:hover) .sun { translate: -1px 1.5px; } }
+    .mark { width: 34px; height: 34px; overflow: visible; transition: rotate 900ms var(--ease-smooth-out); }
+    .mark path { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+    .mark circle { fill: var(--peach); }
+    .word { display: grid; font-family: var(--font-display); font-stretch: 75%; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.02em; line-height: 0.82; text-transform: uppercase; }
+    .word small { font-family: var(--font-hand); font-stretch: 100%; font-size: 0.95rem; font-weight: 600; text-transform: none; letter-spacing: 0; color: var(--sage-deep); }
+    @media (hover: hover) and (pointer: fine) { :host(:hover) .mark { rotate: -200deg; } }
   `,
 })
 export class Logo {
   readonly word = input(true);
+  protected readonly mark = MARK;
 }

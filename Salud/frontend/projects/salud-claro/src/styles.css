@@ -1,43 +1,64 @@
-@import '@fontsource-variable/newsreader/wght.css';
-@import '@fontsource-variable/newsreader/wght-italic.css';
-@import '@fontsource-variable/onest/wght.css';
+@import '@fontsource-variable/bricolage-grotesque/wdth.css';
+@import '@fontsource-variable/caveat/wght.css';
+@import '@fontsource-variable/figtree/wght.css';
 
 /* ===== Claro · tokens =====
-   Un claro en el bosque: papel verde niebla, tinta verde bosque y un solo acento cálido, ámbar,
-   como la luz que entra entre los árboles. Nada de blanco clínico. */
+   Collage editorial (referencias de Bruno): papel crema, tinta azul marino, verde salvia, azul empolvado
+   y un acento durazno. Letras condensadas grandes, notas a mano, papel rasgado y cinta adhesiva.
+   La historia del sitio: la maraña de la ansiedad que se desenreda en una espiral tranquila. */
 :root {
-  --mist: oklch(96.4% 0.012 140);
-  --mist-2: oklch(93.2% 0.018 140);
-  --mist-3: oklch(89% 0.024 142);
-  --forest: oklch(26% 0.03 165);
-  --forest-2: oklch(38% 0.035 160);
-  --muted: oklch(52% 0.03 155);
-  --moss: oklch(50% 0.06 150);
-  --deep: oklch(21% 0.028 168);
-  --line: color-mix(in oklch, var(--forest) 13%, transparent);
-  --line-2: color-mix(in oklch, var(--forest) 25%, transparent);
-  --amber: oklch(77% 0.12 72);
-  --amber-deep: oklch(58% 0.12 62);
-  --amber-soft: oklch(94% 0.04 80);
-  --paper: oklch(98.6% 0.006 100);
+  --paper: oklch(95.6% 0.016 82);
+  --paper-2: oklch(92.4% 0.022 80);
+  --paper-3: oklch(88% 0.03 78);
+  --card: oklch(98.4% 0.008 85);
+  --ink: oklch(27% 0.055 255);
+  --ink-2: oklch(40% 0.05 255);
+  --muted: oklch(55% 0.035 250);
+  --sage: oklch(62% 0.045 145);
+  --sage-deep: oklch(42% 0.04 150);
+  --sage-soft: oklch(88% 0.03 140);
+  --dusty: oklch(64% 0.065 245);
+  --dusty-soft: oklch(87% 0.03 245);
+  --navy: oklch(30% 0.07 255);
+  --peach: oklch(78% 0.095 52);
+  --peach-deep: oklch(62% 0.12 45);
+  --peach-soft: oklch(91% 0.04 60);
+  --tape: oklch(90% 0.04 85 / 0.72);
+  --gold: oklch(74% 0.1 85);
+  --line: color-mix(in oklch, var(--ink) 13%, transparent);
+  --line-2: color-mix(in oklch, var(--ink) 25%, transparent);
 
-  --font-display: 'Newsreader Variable', 'Newsreader', Georgia, serif;
-  --font-body: 'Onest Variable', 'Onest', system-ui, sans-serif;
+  --font-display: 'Bricolage Grotesque Variable', 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-hand: 'Caveat Variable', 'Caveat', 'Comic Sans MS', cursive;
+  --font-body: 'Figtree Variable', 'Figtree', system-ui, sans-serif;
 
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-calm: cubic-bezier(0.45, 0, 0.25, 1);
 
-  --radius-s: 12px;
-  --radius-m: 20px;
-  --radius-l: 32px;
-  --shadow-s: 0 1px 2px oklch(26% 0.03 165 / 0.06), 0 4px 14px oklch(26% 0.03 165 / 0.05);
-  --shadow-m: 0 2px 6px oklch(26% 0.03 165 / 0.06), 0 22px 44px -16px oklch(26% 0.03 165 / 0.22);
+  /* Escala de movimiento de transitions.dev */
+  --duration-stagger: 40ms;
+  --duration-quick: 150ms;
+  --duration-fast: 250ms;
+  --duration-medium: 350ms;
+  --duration-slow: 400ms;
+  --duration-very-slow: 500ms;
+  --ease-smooth-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --ease-bounce-strong: cubic-bezier(0.34, 3.85, 0.64, 1);
+  --blur-small: 2px;
+  --blur-medium: 3px;
 
-  --page: 1240px;
+  --radius-s: 8px;
+  --radius-m: 16px;
+  --radius-l: 26px;
+  --shadow-paper: 0 1px 1px oklch(27% 0.055 255 / 0.06), 0 10px 24px -10px oklch(27% 0.055 255 / 0.25);
+  --shadow-lift: 0 2px 4px oklch(27% 0.055 255 / 0.06), 0 30px 50px -20px oklch(27% 0.055 255 / 0.35);
+
+  --page: 1260px;
   --gutter: clamp(16px, 4.5vw, 56px);
-  --section: clamp(90px, 12vw, 180px);
+  --section: clamp(90px, 12vw, 170px);
   --z-header: 50;
   --z-intro: 200;
 }
@@ -51,7 +72,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   overflow-x: clip;
-  background: var(--mist);
+  background: var(--paper);
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -66,14 +87,18 @@ html.lenis body {
 
 body {
   margin: 0;
-  background: var(--mist);
-  color: var(--forest);
+  color: var(--ink);
   font-family: var(--font-body);
   font-size: 1.0625rem;
-  font-weight: 400;
-  line-height: 1.65;
+  font-weight: 420;
+  line-height: 1.62;
   -webkit-font-smoothing: antialiased;
   overflow-x: clip;
+  /* Grano de papel muy sutil */
+  background:
+    radial-gradient(circle at 20% 10%, oklch(97% 0.02 85 / 0.8), transparent 40%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.25 0 0 0 0 0.2 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+    var(--paper);
 }
 
 img,
@@ -113,9 +138,10 @@ h3,
 h4 {
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 380;
-  line-height: 1.04;
-  letter-spacing: -0.015em;
+  font-stretch: 78%;
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
   text-wrap: balance;
 }
 
@@ -124,18 +150,14 @@ p {
   text-wrap: pretty;
 }
 
-em {
-  font-style: italic;
-}
-
 ::selection {
-  background: var(--amber-soft);
-  color: var(--forest);
+  background: var(--peach-soft);
+  color: var(--ink);
 }
 
 :focus-visible {
-  outline: 2px solid var(--amber-deep);
-  outline-offset: 3px;
+  outline: 2px dashed var(--peach-deep);
+  outline-offset: 4px;
   border-radius: 4px;
 }
 
@@ -150,32 +172,66 @@ em {
   padding: var(--section) 0;
 }
 
-.eyebrow {
-  font-size: 0.82rem;
-  font-weight: 560;
-  letter-spacing: 0.04em;
-  color: var(--moss);
+/* Nota escrita a mano */
+.hand {
+  font-family: var(--font-hand);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: 0;
 }
 
-.eyebrow::before {
-  content: '— ';
+.kicker {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sage-deep);
 }
 
 .h2 {
-  font-size: clamp(2.4rem, 5.8vw, 4.6rem);
+  font-size: clamp(3rem, 8vw, 6.6rem);
+  text-transform: uppercase;
 }
 
-.h2 em {
-  color: var(--moss);
+.h2 .peach {
+  color: var(--peach);
+}
+
+.h2 .sage {
+  color: var(--sage);
 }
 
 .lead {
-  font-size: clamp(1.05rem, 1.6vw, 1.22rem);
-  color: var(--forest-2);
-  max-width: 54ch;
+  font-size: clamp(1.04rem, 1.5vw, 1.18rem);
+  color: var(--ink-2);
+  max-width: 50ch;
 }
 
+/* Cinta adhesiva (se pega en esquinas de fotos y notas) */
+.tape {
+  position: absolute;
+  width: 92px;
+  height: 26px;
+  background: var(--tape);
+  box-shadow: 0 1px 2px oklch(27% 0.055 255 / 0.1);
+  clip-path: polygon(3% 0, 97% 4%, 100% 50%, 96% 100%, 2% 96%, 0 50%);
+  z-index: 3;
+}
+
+/* Subrayado de marcatexto que se pinta al aparecer */
+.mark {
+  background: linear-gradient(transparent 58%, var(--peach-soft) 58%, var(--peach-soft) 88%, transparent 88%) no-repeat 0 0 / 0% 100%;
+  transition: background-size 900ms var(--ease-smooth-out);
+}
+
+.is-in .mark,
+.mark.is-in {
+  background-size: 100% 100%;
+}
+
+/* ===== Botones ===== */
 .btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -183,87 +239,220 @@ em {
   min-height: 52px;
   padding: 0 26px;
   border-radius: 999px;
-  font-weight: 560;
+  font-weight: 650;
   font-size: 0.98rem;
-  background: var(--forest);
-  color: var(--mist);
-  transition: background-color 260ms ease, color 260ms ease, scale 160ms var(--ease-out);
+  background: var(--ink);
+  color: var(--paper);
+  overflow: hidden;
+  isolation: isolate;
+  transition: scale 160ms var(--ease-out), color 300ms ease;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  left: var(--mx, 50%);
+  top: var(--my, 50%);
+  width: 0;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  translate: -50% -50%;
+  background: var(--peach);
+  transition: width 550ms var(--ease-smooth-out);
 }
 
 .btn:active {
   scale: 0.96;
 }
 
-.btn.amber {
-  background: var(--amber);
-  color: var(--deep);
-}
-
 .btn.ghost {
   background: transparent;
-  color: inherit;
-  box-shadow: inset 0 0 0 1.5px currentColor;
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1.5px var(--ink);
 }
 
-.btn .icon {
-  transition: translate 300ms var(--ease-out);
+.btn.peach {
+  background: var(--peach);
+  color: var(--ink);
+}
+
+.btn.peach::before {
+  background: var(--card);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .btn:hover {
-    background: var(--moss);
+    color: var(--ink);
   }
-  .btn.amber:hover {
-    background: var(--paper);
-  }
-  .btn.ghost:hover {
-    background: var(--forest);
-    color: var(--mist);
-    box-shadow: none;
-  }
-  .btn:hover .icon {
-    translate: 3px 0;
+  .btn:hover::before {
+    width: 260%;
   }
 }
 
-/* ===== Revelado al hacer scroll (shared/reveal.ts) ===== */
+/* ===== transitions.dev: "Learn more hover" ===== */
+.t-learn-chevron {
+  display: inline-flex;
+  transition: transform 350ms var(--ease-smooth-out);
+}
+
+.t-learn-arm {
+  transform-box: view-box;
+  transform-origin: 10px 8px;
+  vector-effect: non-scaling-stroke;
+  transition: transform 350ms var(--ease-smooth-out);
+}
+
+.t-learn-line {
+  transform-box: view-box;
+  transform-origin: 10px 8px;
+  scale: 0 1;
+  transition: scale 350ms var(--ease-smooth-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .t-learn:hover .t-learn-chevron {
+    transform: translateX(3px);
+  }
+  .t-learn:hover .t-learn-arm-top {
+    transform: rotate(8deg);
+  }
+  .t-learn:hover .t-learn-arm-bot {
+    transform: rotate(-8deg);
+  }
+  .t-learn:hover .t-learn-line {
+    scale: 1 1;
+  }
+}
+
+/* ===== transitions.dev: "Card hover tilt" (shared/tilt.ts) ===== */
+.t-tilt {
+  --tilt-perspective: 1000px;
+  touch-action: pan-y;
+}
+
+.t-tilt-card {
+  position: relative;
+  transform: perspective(var(--tilt-perspective)) rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
+  transform-style: preserve-3d;
+  transition: transform 1000ms var(--ease-smooth-out);
+  will-change: transform;
+}
+
+.t-tilt-card.is-tilting {
+  transition: transform 400ms var(--ease-smooth-out);
+}
+
+.t-tilt-glare {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  mix-blend-mode: soft-light;
+  background: radial-gradient(circle 160px at var(--tilt-gx, 50%) var(--tilt-gy, 50%), rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 80%);
+  transition: opacity 300ms var(--ease-smooth-out);
+}
+
+.t-tilt.is-hover .t-tilt-glare {
+  opacity: 0.8;
+}
+
+/* ===== transitions.dev: "Texts reveal" ===== */
+.t-reveal > * {
+  animation: t-text-in 500ms var(--ease-smooth-out) both;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
+
+@keyframes t-text-in {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+    filter: blur(var(--blur-medium));
+  }
+}
+
+.t-pop {
+  display: inline-block;
+  font-style: normal;
+  animation: t-pop 400ms var(--ease-smooth-out) both;
+}
+
+@keyframes t-pop {
+  from {
+    opacity: 0;
+    translate: 0 0.35em;
+    filter: blur(var(--blur-small));
+  }
+}
+
+/* ===== Revelado al hacer scroll: como papel que se pega en el tablero ===== */
 .js [data-reveal] {
   opacity: 0;
 }
 
-/* Aquí todo aparece como saliendo de la niebla: se desenfoca menos y sube poco */
 .js [data-reveal].is-in {
-  animation: reveal-mist 1400ms var(--ease-calm) var(--d, 0ms) both;
+  animation: reveal-paper 1100ms var(--ease-expo) var(--d, 0ms) both;
 }
 
 .js [data-reveal='photo'].is-in {
   animation-name: reveal-photo;
-  animation-duration: 1600ms;
+  animation-duration: 1300ms;
 }
 
-@keyframes reveal-mist {
+@keyframes reveal-paper {
   from {
     opacity: 0;
-    translate: 0 16px;
-    filter: blur(8px);
+    translate: 0 26px;
+    rotate: -1.5deg;
+    filter: blur(var(--blur-small));
   }
   to {
     opacity: 1;
     translate: none;
-    filter: blur(0);
+    rotate: none;
+    filter: none;
   }
 }
 
 @keyframes reveal-photo {
   from {
     opacity: 0;
-    filter: blur(14px) saturate(0.6);
-    scale: 1.05;
+    scale: 1.08;
+    rotate: 2deg;
+    filter: grayscale(1) blur(6px);
   }
   to {
     opacity: 1;
-    filter: none;
     scale: 1;
+    rotate: none;
+    filter: none;
+  }
+}
+
+/* ===== Transición entre páginas: la página nueva sube como una hoja rasgada ===== */
+::view-transition-old(root) {
+  animation: vt-old 650ms var(--ease-in-out) both;
+}
+
+::view-transition-new(root) {
+  animation: vt-new 800ms var(--ease-in-out) both;
+}
+
+@keyframes vt-old {
+  to {
+    translate: 0 -6%;
+    filter: blur(3px) brightness(0.92);
+  }
+}
+
+@keyframes vt-new {
+  from {
+    clip-path: polygon(0 108%, 8% 104%, 16% 109%, 25% 103%, 33% 108%, 42% 104%, 50% 110%, 58% 103%, 67% 108%, 75% 104%, 84% 109%, 92% 103%, 100% 107%, 100% 120%, 0 120%);
+  }
+  to {
+    clip-path: polygon(0 -6%, 8% -10%, 16% -5%, 25% -11%, 33% -6%, 42% -10%, 50% -4%, 58% -11%, 67% -6%, 75% -10%, 84% -5%, 92% -11%, 100% -7%, 100% 120%, 0 120%);
   }
 }
 
@@ -281,4 +470,8 @@ em {
 
 .reduce-motion.js [data-reveal] {
   opacity: 1;
+}
+
+.reduce-motion .t-tilt-card {
+  transform: none !important;
 }

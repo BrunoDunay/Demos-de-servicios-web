@@ -2,36 +2,41 @@
 
 **URL:** https://demo-salud-marfil.vercel.app · **Código:** `frontend/projects/salud-marfil`
 
-## Concepto
+## Concepto (rediseño del 4 nov 2026, con las referencias de Bruno en `referencias/marfil`)
 
-"En este sitio, el odontograma se vuelve el menú." Clínica dental ficticia de la Dra. Renata Ibarra en Aguascalientes
-(Av. Universidad 1102, Bosques del Prado). Mensaje central: te explicamos todo en la pantalla y el plan con precios va por escrito.
+Clínica dental moderna como la publicidad dental de referencia: azul rey, azul noche y azul hielo; objetos 3D
+brillantes, vidrio esmerilado, títulos en fino con la palabra clave en negritas y palabras gigantes recortadas al
+fondo. Clínica ficticia de la Dra. Renata Ibarra en Aguascalientes.
 
 ## Identidad
 
-- **Logo:** un diente de un solo trazo con un brillo menta (la luz de la lámpara).
-- **Paleta (OKLCH):** marfil `oklch(97.4% 0.011 88)`, tinta azul noche `oklch(24% 0.035 258)`, acento menta `oklch(63% 0.1 172)`.
-  El amarillo "diente" solo aparece en el simulador.
-- **Tipografías:** Fraunces (títulos, con itálica suave) y Plus Jakarta Sans (texto).
+- **Logo:** diente de un trazo en un cuadro azul con destello; "marfil" en Outfit.
+- **Paleta (OKLCH):** hielo `oklch(96.6% 0.016 245)`, azul rey `oklch(50% 0.2 263)`, azul noche `oklch(25% 0.08 264)`, cielo `oklch(80% 0.09 238)`.
+- **Tipografías:** Outfit (títulos, fino + negritas) y Plus Jakarta Sans (texto).
 
-## Intro (~1.8 s)
+## Diente 3D
 
-Sobre azul noche se dibuja el diente del logo, se enciende la luz de la lámpara y la pantalla se abre en arco, como una sonrisa.
+`shared/tooth-model.ts` arma una muela con Three.js sin archivos (corona girada con cuatro cúspides y dos raíces
+curvas), con esmalte brillante y luz azul de contorno. `shared/tooth-stage.ts` la dibuja en un lienzo fijo y la lleva
+de un "lugar" a otro (`toothSlot`): intro → portada → centro del arco de tratamientos, mezclando según el scroll.
+Three.js se carga aparte (import dinámico, ~115 kB comprimido).
+
+## Movimiento
+
+- Intro: el diente gira y frena al centro, "marfil" letra por letra, contador a 100 y cortina en curva; el diente vuela a la portada.
+- Encabezado de vidrio con píldora que sigue al enlace (transitions.dev "Tabs sliding"). Botones magnéticos con gota de color.
+- Transición entre páginas: círculo azul desde donde se hizo clic (View Transitions).
+- transitions.dev: tilt con brillo (tarjetas de vidrio, equipo, plan, tarjeta de presentación), avatar group hover, texts reveal,
+  number pop-in, toggle con doble rebote, acordeón, success check y learn-more.
 
 ## Secciones
 
-1. **Portada:** foto en penumbra que la "lámpara" ilumina donde está el cursor (en celular la luz se pasea sola). Estado "Abierto ahora / Cerrado" con el horario real.
-2. **Tratamientos como odontograma:** arcadas de 32 dientes en SVG (numeración FDI). Al elegir un tratamiento se encienden los dientes donde se hace, del centro hacia atrás; tocar un diente dice su nombre y qué se le hace más seguido. Ficha con citas, duración y precio "desde".
-3. **Simulador de blanqueamiento:** guía de color tipo VITA (A3.5 → BL); arrastras la línea para comparar tu tono con el resultado (+2/3 tonos). Los dientes se tiñen con una máscara sacada de la foto.
-4. **Primera visita:** 4 pasos con una línea que se llena al bajar.
-5. **Lo que no se ve:** esterilización, rayos X digitales y años, con contadores.
-6. **Equipo:** 3 especialistas.
-7. **Precios:** lista con interruptor "a 12 meses" y Plan Familia.
-8. **Opiniones** tipo Google (4.9, 312 reseñas).
-9. **Agenda:** motivo → día (próximos 12 días hábiles) → hora (algunas "ocupadas", siempre las mismas) → datos; vista previa como burbuja de WhatsApp.
-10. **Visítanos:** mapa dibujado, horario con el día de hoy marcado y preguntas frecuentes.
-11. Pie y páginas legales (aviso de privacidad con datos sensibles de salud y NOM-004, términos con garantías).
-
-## Fotos
-
-Pexels (IDs en `scripts/media-salud.mjs`).
+1. Portada: título fino/negritas, avatares de pacientes, panel con arcos y foto en arco, tarjetas de vidrio y el diente 3D.
+2. Tratamientos en arco alrededor del diente (8 nodos); tarjeta de vidrio con mapa dental (FDI) desplegable.
+3. Simulador "Ajusta el brillo de tu sonrisa": control con sol chico y grande, guía de color en dientes.
+4. Primera visita en flechas de pasos azules + "Lo que no se ve" en tarjetas de vidrio.
+5. Equipo como tarjetas de app de citas + opiniones en dos filas que se deslizan.
+6. Precios con interruptor a 12 meses y Plan Familia.
+7. Agenda tipo app con vista previa en un teléfono.
+8. Visítanos: consultorio dentro de un espejo con forma de diente, horario y preguntas.
+9. Pie con tarjeta de presentación azul y "marfil" gigante.

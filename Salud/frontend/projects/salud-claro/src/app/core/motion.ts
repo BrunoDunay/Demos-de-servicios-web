@@ -3,6 +3,7 @@ import { Injectable, PLATFORM_ID, inject, signal } from '@angular/core';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
+import { MorphSVGPlugin } from 'gsap/MorphSVGPlugin';
 import Lenis from 'lenis';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
@@ -12,10 +13,10 @@ let registered = false;
 /** Registra los plugins de GSAP una sola vez (solo en el navegador). */
 export function useGsap() {
   if (!registered) {
-    gsap.registerPlugin(ScrollTrigger, SplitText);
+    gsap.registerPlugin(ScrollTrigger, SplitText, MorphSVGPlugin);
     registered = true;
   }
-  return { gsap, ScrollTrigger, SplitText };
+  return { gsap, ScrollTrigger, SplitText, MorphSVGPlugin };
 }
 
 // Las demos muestran el movimiento siempre (es lo que se presume); quien lo necesite lo apaga con el botón

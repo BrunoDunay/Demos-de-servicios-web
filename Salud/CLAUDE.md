@@ -28,12 +28,16 @@ npm run build          # compila las dos
 
 ## Reglas
 
-- Paletas propias: Marfil marfil/azul noche/menta; Claro verde niebla/verde bosque/ámbar. No repetirlas en otras demos.
+- Paletas propias: Marfil azul rey/azul noche/hielo; Claro papel crema/marino/salvia/durazno. No repetirlas en otras demos.
+- Las referencias de Bruno van en `Salud/referencias/` (fuera del repo), nunca en `public/`.
 - Datos de contacto ficticios, como texto (sin `tel:`); cédulas y COFEPRIS dicen "(demo)". WhatsApp sin número (`wa.me/?text=`).
 - Claro muestra la **Línea de la Vida (800 911 2000)**, que es real: no quitarla, es lo responsable en un sitio de psicología.
 - Convenciones de tacto (hover solo con mouse, `:active`, interruptor "Reducir movimiento"): igual que en `../Gimnasio/CLAUDE.md`.
 
 ## Estado (4 nov 2026)
 
-- Creadas y publicadas las dos demos. Falta: agregarlas al portafolio (`3-Negocio/Portafolio-web`) y, si Bruno lo pide, a los videos.
-- Pendiente de este giro: la nutrióloga (Básico) se puede sacar como variante de Claro o de Marfil.
+- Publicadas. Rediseño el mismo día con las referencias de Bruno (`referencias/marfil` y `referencias/claro`, solo locales):
+  Marfil pasó a azul clínico con diente 3D (Three.js) y Claro a collage editorial con dibujos a mano. Ver `docs/`.
+- Transiciones y hovers tomados de transitions.dev (las recetas CSS se adaptaron: el freno de movimiento usa el interruptor
+  "Reducir movimiento", no `prefers-reduced-motion`).
+- Falta: agregarlas al portafolio y a los videos. Pendiente del giro: la nutrióloga (Básico).

@@ -20,6 +20,9 @@ const APPS = {
     'sonrisa-bn': 14796031,
   },
   'salud-claro': {
+    'perfil': 10870128,
+    'retrato-bn': 18364541,
+    'ansiedad': 6382642,
     'bosque': 4500037,
     'claro': 28961234,
     'amanecer': 31359311,

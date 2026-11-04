@@ -1,58 +1,60 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, computed, inject, signal, viewChild } from '@angular/core';
+import { HEAD, spiral } from '../core/doodles';
 import { useGsap } from '../core/motion';
-import { Icon } from '../shared/icon';
 import { Reveal } from '../shared/reveal';
 
 const PATTERNS = [
-  { id: 'calma', label: 'Calma', note: 'Para bajar la ansiedad', steps: [{ t: 'Inhala', s: 4 }, { t: 'Sostén', s: 4 }, { t: 'Exhala', s: 6 }] },
-  { id: 'cuadrada', label: 'Cuadrada', note: 'Para enfocarte', steps: [{ t: 'Inhala', s: 4 }, { t: 'Sostén', s: 4 }, { t: 'Exhala', s: 4 }, { t: 'Sostén', s: 4 }] },
-  { id: 'dormir', label: '4-7-8', note: 'Para dormir', steps: [{ t: 'Inhala', s: 4 }, { t: 'Sostén', s: 7 }, { t: 'Exhala', s: 8 }] },
+  { id: 'calma', label: 'Calma', note: 'para bajar la ansiedad', steps: [{ t: 'Inhala', s: 4 }, { t: 'Sostén', s: 4 }, { t: 'Exhala', s: 6 }] },
+  { id: 'cuadrada', label: 'Cuadrada', note: 'para enfocarte', steps: [{ t: 'Inhala', s: 4 }, { t: 'Sostén', s: 4 }, { t: 'Exhala', s: 4 }, { t: 'Sostén', s: 4 }] },
+  { id: 'dormir', label: '4-7-8', note: 'para dormir', steps: [{ t: 'Inhala', s: 4 }, { t: 'Sostén', s: 7 }, { t: 'Exhala', s: 8 }] },
 ];
 
+const SPIRAL = spiral(124, 104, 58, 4, 160);
+
 /**
- * Respiración guiada de un minuto. El círculo crece al inhalar, se queda quieto al sostener y se encoge
- * al exhalar; el número cuenta los segundos. Es el ejercicio que Valeria enseña en la primera sesión.
- * Aquí el movimiento es el contenido, así que se anima aunque esté activado "Reducir movimiento" (más lento y sin brillo).
+ * Respiración guiada (referencia: cuadro de la cabeza con espiral). Una cabeza de perfil en papel; dentro,
+ * una espiral que se dibuja al inhalar y se recoge al exhalar, con la cuenta escrita a mano.
+ * Aquí el movimiento es el contenido: se anima aunque esté activado "Reducir movimiento".
  */
 @Component({
   selector: 'app-breathe',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Icon, Reveal],
+  imports: [Reveal],
   template: `
     <section class="section wrap" id="respira">
       <div class="page grid">
         <div class="copy">
-          <p class="eyebrow" data-reveal>Un minuto para ti</p>
-          <h2 class="h2" data-reveal [revealDelay]="100">Si llegaste con el pecho apretado, <em>empieza aquí</em>.</h2>
-          <p class="lead" data-reveal [revealDelay]="200">Sigue el círculo. Exhalar más largo de lo que inhalas le avisa a tu cuerpo que está a salvo.</p>
-          <div class="patterns" role="radiogroup" aria-label="Tipo de respiración" data-reveal [revealDelay]="260">
+          <p class="kicker" data-reveal>Un minuto para ti</p>
+          <h2 class="h2" data-reveal [revealDelay]="80">Si llegaste con el pecho apretado, <span class="peach">empieza aquí.</span></h2>
+          <p class="lead" data-reveal [revealDelay]="160">Sigue la espiral. Exhalar más largo de lo que inhalas le avisa a tu cuerpo que está a salvo.</p>
+          <div class="patterns" role="radiogroup" aria-label="Tipo de respiración" data-reveal [revealDelay]="220">
             @for (p of patterns; track p.id) {
               <button type="button" role="radio" [attr.aria-checked]="pattern().id === p.id" (click)="choose(p.id)">
-                <b>{{ p.label }}</b><span>{{ p.note }}</span>
+                <b>{{ p.label }}</b><span class="hand">{{ p.note }}</span>
               </button>
             }
           </div>
         </div>
 
-        <div class="lung" data-reveal [revealDelay]="120">
-          <div class="halo" #halo aria-hidden="true"></div>
-          <div class="orb" #orb aria-hidden="true"></div>
+        <div class="frame" data-reveal [revealDelay]="120">
+          <svg class="art" viewBox="0 0 240 230" aria-hidden="true">
+            <path class="head" [attr.d]="head" />
+            <path class="spiral" #sp [attr.d]="spiralPath" />
+          </svg>
           <div class="read" aria-live="polite">
             @if (running()) {
-              <p class="phase">{{ phase() }}</p>
+              <p class="phase hand">{{ phase() }}</p>
               <p class="count">{{ count() }}</p>
             } @else if (done()) {
-              <p class="phase">Bien hecho.</p>
-              <p class="small">¿Cómo te sientes ahora?</p>
+              <p class="phase hand">bien hecho.</p>
+              <p class="small">¿cómo te sientes ahora?</p>
             } @else {
-              <p class="phase">Listo cuando tú.</p>
+              <p class="phase hand">listo cuando tú</p>
               <p class="small">{{ cycles() }} respiraciones · 1 minuto</p>
             }
           </div>
           <div class="controls">
-            <button type="button" class="btn" (click)="running() ? stop() : start()">
-              @if (running()) { Detener } @else { <app-icon name="wind" [size]="18" /> {{ done() ? 'Otra vez' : 'Comenzar' }} }
-            </button>
+            <button type="button" class="btn peach" (click)="running() ? stop() : start()">{{ running() ? 'Detener' : done() ? 'Otra vez' : 'Comenzar' }}</button>
             @if (running()) {
               <p class="progress">{{ round() }} de {{ cycles() }}</p>
             }
@@ -62,35 +64,38 @@ const PATTERNS = [
     </section>
   `,
   styles: `
-    .wrap { background: var(--deep); color: var(--mist); }
-    .wrap .eyebrow { color: var(--amber); }
-    .wrap .h2 em { color: var(--amber); }
-    .wrap .lead { color: oklch(84% 0.02 150); }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(36px, 6vw, 100px); align-items: center; }
+    .wrap { background: var(--navy); color: var(--paper); }
+    .wrap .h2 { font-size: clamp(2.8rem, 5.6vw, 4.8rem); }
+    .wrap .kicker { color: var(--peach); }
+    .wrap .lead { color: oklch(86% 0.02 250); }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(36px, 6vw, 90px); align-items: center; }
     .copy { display: grid; gap: 18px; justify-items: start; }
-    .patterns { display: grid; gap: 8px; width: 100%; max-width: 420px; margin-top: 10px; }
-    .patterns button { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 18px; border-radius: var(--radius-s); text-align: left; box-shadow: inset 0 0 0 1.5px oklch(40% 0.03 165); transition: background-color 300ms ease, box-shadow 300ms ease, scale 160ms var(--ease-out); }
+    .patterns { display: grid; gap: 10px; width: 100%; max-width: 420px; margin-top: 8px; }
+    .patterns button { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 14px 18px; text-align: left; background: oklch(36% 0.07 255); box-shadow: inset 0 0 0 1.5px oklch(48% 0.06 255); clip-path: polygon(0 2%, 100% 0, 99% 100%, 1% 97%); transition: background-color 300ms ease, translate 400ms var(--ease-bounce), scale 160ms var(--ease-out); }
+    .patterns span { font-size: 1.3rem; color: oklch(82% 0.03 250); }
+    .patterns [aria-checked='true'] { background: var(--peach); color: var(--ink); translate: 6px 0; }
+    .patterns [aria-checked='true'] span { color: var(--ink-2); }
     .patterns button:active { scale: 0.98; }
-    .patterns span { font-size: 0.88rem; color: oklch(78% 0.02 150); }
-    .patterns [aria-checked='true'] { background: oklch(32% 0.03 165); box-shadow: inset 0 0 0 1.5px var(--amber); }
-    @media (hover: hover) and (pointer: fine) { .patterns button:not([aria-checked='true']):hover { box-shadow: inset 0 0 0 1.5px oklch(60% 0.03 160); } }
-    .lung { position: relative; display: grid; place-items: center; aspect-ratio: 1; width: min(100%, 480px); justify-self: center; }
-    .orb, .halo { position: absolute; left: 50%; top: 50%; width: 70%; aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; scale: 0.62; }
-    .orb { background: radial-gradient(circle at 38% 34%, oklch(90% 0.08 80), var(--amber) 42%, var(--amber-deep) 100%); box-shadow: 0 0 80px oklch(77% 0.12 72 / 0.35); }
-    .halo { width: 92%; border: 1.5px dashed oklch(55% 0.04 160); background: radial-gradient(circle, oklch(77% 0.12 72 / 0.08), transparent 70%); scale: 1; }
-    .read { position: relative; display: grid; justify-items: center; gap: 2px; text-align: center; color: var(--deep); pointer-events: none; }
-    .phase { font-family: var(--font-display); font-style: italic; font-size: clamp(1.25rem, 2.2vw, 1.6rem); line-height: 1.1; max-width: 7em; }
-    .count { font-size: 2.6rem; font-weight: 300; font-variant-numeric: tabular-nums; line-height: 1; }
-    .small { font-size: 0.8rem; font-weight: 500; max-width: 16ch; }
-    .controls { position: absolute; bottom: -8px; left: 50%; translate: -50% 0; display: grid; justify-items: center; gap: 8px; }
-    .controls .btn { background: var(--mist); color: var(--deep); min-width: 150px; }
-    @media (hover: hover) and (pointer: fine) { .controls .btn:hover { background: var(--amber); } }
-    .progress { font-size: 0.82rem; color: oklch(78% 0.02 150); font-variant-numeric: tabular-nums; }
-    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } .lung { margin-bottom: 30px; } }
+    @media (hover: hover) and (pointer: fine) { .patterns button:not([aria-checked='true']):hover { translate: 4px 0; } }
+    /* El cuadro de la referencia: papel crema con marco */
+    .frame { position: relative; display: grid; justify-items: center; padding: 30px 30px 150px; background: var(--paper); box-shadow: 0 0 0 10px var(--card), 0 0 0 12px var(--line-2), 0 40px 60px -20px oklch(0% 0 0 / 0.5); color: var(--ink); }
+    .art { width: min(100%, 340px); overflow: visible; }
+    .head { fill: var(--peach-soft); }
+    .spiral { fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; }
+    .read { position: absolute; left: 0; right: 0; bottom: 78px; display: grid; justify-items: center; text-align: center; }
+    .phase { font-size: 2rem; color: var(--peach-deep); }
+    .count { font-family: var(--font-display); font-stretch: 75%; font-size: 2.4rem; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+    .small { font-size: 0.86rem; color: var(--muted); }
+    .controls { position: absolute; bottom: 18px; left: 50%; translate: -50% 0; display: flex; align-items: center; gap: 12px; }
+    .controls .btn { min-width: 150px; }
+    .progress { font-size: 0.84rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
   `,
 })
 export class Breathe {
   protected readonly patterns = PATTERNS;
+  protected readonly head = HEAD;
+  protected readonly spiralPath = SPIRAL;
   protected readonly pattern = signal(PATTERNS[0]);
   protected readonly running = signal(false);
   protected readonly done = signal(false);
@@ -98,8 +103,7 @@ export class Breathe {
   protected readonly count = signal(0);
   protected readonly round = signal(1);
   protected readonly cycles = computed(() => Math.max(3, Math.round(60 / this.pattern().steps.reduce((a, s) => a + s.s, 0))));
-  private readonly orb = viewChild.required<ElementRef<HTMLElement>>('orb');
-  private readonly halo = viewChild.required<ElementRef<HTMLElement>>('halo');
+  private readonly sp = viewChild.required<ElementRef<SVGPathElement>>('sp');
   private tl?: gsap.core.Timeline;
   private ticker?: ReturnType<typeof setInterval>;
 
@@ -115,26 +119,26 @@ export class Breathe {
 
   protected start() {
     const { gsap } = useGsap();
-    const orb = this.orb().nativeElement;
-    const halo = this.halo().nativeElement;
+    const path = this.sp().nativeElement;
+    const len = path.getTotalLength();
+    // La espiral se dibuja desde afuera: al inhalar se completa, al exhalar se recoge hasta un tercio
+    gsap.set(path, { strokeDasharray: len, strokeDashoffset: len * 0.66 });
     this.done.set(false);
     this.running.set(true);
     this.round.set(1);
-    const steps = this.pattern().steps;
     const tl = gsap.timeline({ repeat: this.cycles() - 1, onRepeat: () => this.round.update((r) => r + 1), onComplete: () => this.finish() });
-    for (const st of steps) {
+    for (const st of this.pattern().steps) {
       tl.call(() => this.beat(st.t, st.s));
-      if (st.t === 'Inhala') tl.to(orb, { scale: 1, duration: st.s, ease: 'sine.inOut' }).to(halo, { rotate: '+=40', duration: st.s, ease: 'none' }, '<');
-      else if (st.t === 'Exhala') tl.to(orb, { scale: 0.62, duration: st.s, ease: 'sine.inOut' }).to(halo, { rotate: '+=40', duration: st.s, ease: 'none' }, '<');
-      else tl.to(orb, { scale: '+=0', duration: st.s, ease: 'none' });
+      if (st.t === 'Inhala') tl.to(path, { strokeDashoffset: 0, duration: st.s, ease: 'sine.inOut' });
+      else if (st.t === 'Exhala') tl.to(path, { strokeDashoffset: len * 0.66, duration: st.s, ease: 'sine.inOut' });
+      else tl.to({}, { duration: st.s });
     }
     this.tl = tl;
   }
 
-  /** Cuenta regresiva de la fase actual. */
   private beat(text: string, seconds: number) {
     clearInterval(this.ticker);
-    this.phase.set(text);
+    this.phase.set(text.toLowerCase());
     this.count.set(seconds);
     this.ticker = setInterval(() => this.count.update((c) => Math.max(1, c - 1)), 1000);
   }
@@ -143,13 +147,14 @@ export class Breathe {
     clearInterval(this.ticker);
     this.running.set(false);
     this.done.set(true);
+    useGsap().gsap.to(this.sp().nativeElement, { strokeDashoffset: 0, duration: 1.2, ease: 'sine.out' });
   }
 
   protected stop() {
     this.tl?.kill();
     clearInterval(this.ticker);
     this.running.set(false);
-    if (this.tl) useGsap().gsap.to(this.orb().nativeElement, { scale: 0.62, duration: 0.8, ease: 'sine.out' });
+    if (this.tl) useGsap().gsap.to(this.sp().nativeElement, { strokeDashoffset: 0, duration: 0.8, ease: 'sine.out' });
     this.tl = undefined;
   }
 }
