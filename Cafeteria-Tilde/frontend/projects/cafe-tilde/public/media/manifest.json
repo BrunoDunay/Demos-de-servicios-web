@@ -1,0 +1,124 @@
+{
+  "images": [
+    {
+      "name": "hero",
+      "width": 1400,
+      "height": 1750
+    },
+    {
+      "name": "latte",
+      "width": 1200,
+      "height": 1800
+    },
+    {
+      "name": "latte-oscuro",
+      "width": 1000,
+      "height": 1500
+    },
+    {
+      "name": "barista",
+      "width": 1000,
+      "height": 1500
+    },
+    {
+      "name": "interior",
+      "width": 1200,
+      "height": 1800
+    },
+    {
+      "name": "mesas",
+      "width": 1000,
+      "height": 1334
+    },
+    {
+      "name": "barra",
+      "width": 1000,
+      "height": 1500
+    },
+    {
+      "name": "chemex",
+      "width": 1000,
+      "height": 1505
+    },
+    {
+      "name": "conchas",
+      "width": 1200,
+      "height": 1680
+    },
+    {
+      "name": "conchas-torre",
+      "width": 1000,
+      "height": 1500
+    },
+    {
+      "name": "brioche",
+      "width": 1000,
+      "height": 1500
+    },
+    {
+      "name": "desayuno",
+      "width": 1200,
+      "height": 1800
+    },
+    {
+      "name": "mesa-brunch",
+      "width": 1200,
+      "height": 1500
+    },
+    {
+      "name": "pan-huevo",
+      "width": 1000,
+      "height": 1334
+    },
+    {
+      "name": "costal",
+      "width": 1000,
+      "height": 1500
+    },
+    {
+      "name": "tostador",
+      "width": 1200,
+      "height": 1778
+    },
+    {
+      "name": "cold-brew",
+      "width": 1000,
+      "height": 1778
+    },
+    {
+      "name": "matcha",
+      "width": 1000,
+      "height": 1334
+    },
+    {
+      "name": "mariana",
+      "width": 900,
+      "height": 1335
+    },
+    {
+      "name": "amigos",
+      "width": 1200,
+      "height": 800
+    },
+    {
+      "name": "rol",
+      "width": 1000,
+      "height": 1250
+    },
+    {
+      "name": "galletas",
+      "width": 1000,
+      "height": 1074
+    },
+    {
+      "name": "masa-madre",
+      "width": 1000,
+      "height": 756
+    },
+    {
+      "name": "horno",
+      "width": 1400,
+      "height": 933
+    }
+  ]
+}
