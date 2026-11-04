@@ -1,0 +1,284 @@
+@import '@fontsource-variable/newsreader/wght.css';
+@import '@fontsource-variable/newsreader/wght-italic.css';
+@import '@fontsource-variable/onest/wght.css';
+
+/* ===== Claro · tokens =====
+   Un claro en el bosque: papel verde niebla, tinta verde bosque y un solo acento cálido, ámbar,
+   como la luz que entra entre los árboles. Nada de blanco clínico. */
+:root {
+  --mist: oklch(96.4% 0.012 140);
+  --mist-2: oklch(93.2% 0.018 140);
+  --mist-3: oklch(89% 0.024 142);
+  --forest: oklch(26% 0.03 165);
+  --forest-2: oklch(38% 0.035 160);
+  --muted: oklch(52% 0.03 155);
+  --moss: oklch(50% 0.06 150);
+  --deep: oklch(21% 0.028 168);
+  --line: color-mix(in oklch, var(--forest) 13%, transparent);
+  --line-2: color-mix(in oklch, var(--forest) 25%, transparent);
+  --amber: oklch(77% 0.12 72);
+  --amber-deep: oklch(58% 0.12 62);
+  --amber-soft: oklch(94% 0.04 80);
+  --paper: oklch(98.6% 0.006 100);
+
+  --font-display: 'Newsreader Variable', 'Newsreader', Georgia, serif;
+  --font-body: 'Onest Variable', 'Onest', system-ui, sans-serif;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-calm: cubic-bezier(0.45, 0, 0.25, 1);
+
+  --radius-s: 12px;
+  --radius-m: 20px;
+  --radius-l: 32px;
+  --shadow-s: 0 1px 2px oklch(26% 0.03 165 / 0.06), 0 4px 14px oklch(26% 0.03 165 / 0.05);
+  --shadow-m: 0 2px 6px oklch(26% 0.03 165 / 0.06), 0 22px 44px -16px oklch(26% 0.03 165 / 0.22);
+
+  --page: 1240px;
+  --gutter: clamp(16px, 4.5vw, 56px);
+  --section: clamp(90px, 12vw, 180px);
+  --z-header: 50;
+  --z-intro: 200;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  overflow-x: clip;
+  background: var(--mist);
+  -webkit-tap-highlight-color: transparent;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+body {
+  margin: 0;
+  background: var(--mist);
+  color: var(--forest);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  font-weight: 400;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+img {
+  height: auto;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 380;
+  line-height: 1.04;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+em {
+  font-style: italic;
+}
+
+::selection {
+  background: var(--amber-soft);
+  color: var(--forest);
+}
+
+:focus-visible {
+  outline: 2px solid var(--amber-deep);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.page {
+  width: 100%;
+  max-width: var(--page);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+.section {
+  padding: var(--section) 0;
+}
+
+.eyebrow {
+  font-size: 0.82rem;
+  font-weight: 560;
+  letter-spacing: 0.04em;
+  color: var(--moss);
+}
+
+.eyebrow::before {
+  content: '— ';
+}
+
+.h2 {
+  font-size: clamp(2.4rem, 5.8vw, 4.6rem);
+}
+
+.h2 em {
+  color: var(--moss);
+}
+
+.lead {
+  font-size: clamp(1.05rem, 1.6vw, 1.22rem);
+  color: var(--forest-2);
+  max-width: 54ch;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 26px;
+  border-radius: 999px;
+  font-weight: 560;
+  font-size: 0.98rem;
+  background: var(--forest);
+  color: var(--mist);
+  transition: background-color 260ms ease, color 260ms ease, scale 160ms var(--ease-out);
+}
+
+.btn:active {
+  scale: 0.96;
+}
+
+.btn.amber {
+  background: var(--amber);
+  color: var(--deep);
+}
+
+.btn.ghost {
+  background: transparent;
+  color: inherit;
+  box-shadow: inset 0 0 0 1.5px currentColor;
+}
+
+.btn .icon {
+  transition: translate 300ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    background: var(--moss);
+  }
+  .btn.amber:hover {
+    background: var(--paper);
+  }
+  .btn.ghost:hover {
+    background: var(--forest);
+    color: var(--mist);
+    box-shadow: none;
+  }
+  .btn:hover .icon {
+    translate: 3px 0;
+  }
+}
+
+/* ===== Revelado al hacer scroll (shared/reveal.ts) ===== */
+.js [data-reveal] {
+  opacity: 0;
+}
+
+/* Aquí todo aparece como saliendo de la niebla: se desenfoca menos y sube poco */
+.js [data-reveal].is-in {
+  animation: reveal-mist 1400ms var(--ease-calm) var(--d, 0ms) both;
+}
+
+.js [data-reveal='photo'].is-in {
+  animation-name: reveal-photo;
+  animation-duration: 1600ms;
+}
+
+@keyframes reveal-mist {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    translate: none;
+    filter: blur(0);
+  }
+}
+
+@keyframes reveal-photo {
+  from {
+    opacity: 0;
+    filter: blur(14px) saturate(0.6);
+    scale: 1.05;
+  }
+  to {
+    opacity: 1;
+    filter: none;
+    scale: 1;
+  }
+}
+
+.reduce-motion {
+  scroll-behavior: auto;
+}
+
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 1ms !important;
+}
+
+.reduce-motion.js [data-reveal] {
+  opacity: 1;
+}

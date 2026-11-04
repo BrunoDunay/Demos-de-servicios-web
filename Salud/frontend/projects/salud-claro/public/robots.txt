@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://demo-salud-claro.vercel.app/sitemap.xml
