@@ -43,8 +43,8 @@ const TEETH = [...arch(ALL_TEETH.upper, 220, true), ...arch(ALL_TEETH.lower, 226
 
 /** Posiciones de los 8 nodos sobre el arco (ángulos de -72° a 72° alrededor del diente, centrado a la izquierda para dejar sitio a las etiquetas). */
 const NODES = TREATMENTS.map((_, i) => {
-  const a = ((-72 + (144 * i) / (TREATMENTS.length - 1)) * Math.PI) / 180;
-  return { x: 40 + 40 * Math.cos(a), y: 50 + 44 * Math.sin(a), a };
+  const a = ((-62 + (124 * i) / (TREATMENTS.length - 1)) * Math.PI) / 180;
+  return { x: 34 + 46 * Math.cos(a), y: 50 + 46 * Math.sin(a), a };
 });
 
 /**
@@ -144,7 +144,7 @@ const NODES = TREATMENTS.map((_, i) => {
     .ring path { fill: none; stroke-linecap: round; }
     .track { stroke: oklch(100% 0 0 / 0.12); stroke-width: 0.5; }
     .fill { stroke: var(--sky); stroke-width: 0.7; stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--p)); transition: stroke-dashoffset 700ms var(--ease-smooth-out); filter: drop-shadow(0 0 1.5px oklch(80% 0.09 238)); }
-    .slot { position: absolute; left: 40%; top: 50%; width: 44%; aspect-ratio: 1 / 1.2; translate: -50% -50%; }
+    .slot { position: absolute; left: 34%; top: 50%; width: 36%; aspect-ratio: 1 / 1.2; translate: -50% -50%; }
     .node { position: absolute; translate: -50% -50%; display: flex; align-items: center; gap: 12px; }
     .num { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; font-family: var(--font-display); font-size: 1.15rem; font-weight: 500; color: var(--white); background: oklch(35% 0.1 264 / 0.7); backdrop-filter: blur(8px); box-shadow: inset 0 0 0 1px oklch(100% 0 0 / 0.18), 0 8px 22px -8px oklch(0% 0 0 / 0.5); transition: background-color 300ms ease, color 300ms ease, scale 400ms var(--ease-bounce), box-shadow 300ms ease; }
     .label { position: absolute; left: calc(100% + 10px); white-space: nowrap; font-size: 0.95rem; font-weight: 600; color: oklch(85% 0.03 250); transition: color 300ms ease, translate 400ms var(--ease-smooth-out); }
@@ -213,9 +213,9 @@ export class Treatments {
   protected readonly arcPath = (() => {
     const p = (deg: number) => {
       const a = (deg * Math.PI) / 180;
-      return `${(40 + 40 * Math.cos(a)).toFixed(2)} ${(50 + 44 * Math.sin(a)).toFixed(2)}`;
+      return `${(34 + 46 * Math.cos(a)).toFixed(2)} ${(50 + 46 * Math.sin(a)).toFixed(2)}`;
     };
-    return `M ${p(-72)} A 40 44 0 0 1 ${p(72)}`;
+    return `M ${p(-62)} A 46 46 0 0 1 ${p(62)}`;
   })();
 
   protected select(i: number) {
