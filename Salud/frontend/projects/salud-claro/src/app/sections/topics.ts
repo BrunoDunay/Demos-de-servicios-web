@@ -84,15 +84,16 @@ import { Reveal } from '../shared/reveal';
     dd { margin: 0; font-weight: 650; text-align: right; }
     .sheet > .btn { justify-self: start; }
     @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
-    /* Microinteracciones: la etiqueta se columpia desde su agujero y el dibujo de la hoja se vuelve a trazar */
+    /* Microinteracciones: la etiqueta se columpia desde su agujero (con transición y no con animation, porque la
+       animación de entrada del revelado vive en la misma propiedad y al reemplazarla la etiqueta se ocultaba)
+       y el dibujo de la hoja se vuelve a trazar */
     .tags button { transform-origin: 10px 50%; }
     @media (hover: hover) and (pointer: fine) {
-      .tags button:not([aria-checked='true']):hover { animation: swing 900ms var(--ease-smooth-out); }
+      .tags button:not([aria-checked='true']):hover { transition: rotate 750ms cubic-bezier(0.3, 2.6, 0.45, 1), background-color 300ms ease, translate 450ms var(--ease-bounce); }
       .tags button:hover .hole { background: var(--peach-deep); }
       .sheet:hover .doodle path { animation: redraw 1.1s var(--ease-smooth-out) forwards; }
     }
     .hole { transition: background-color 250ms ease; }
-    @keyframes swing { 0% { rotate: var(--r); } 30% { rotate: 4deg; } 55% { rotate: -2.5deg; } 78% { rotate: 1deg; } 100% { rotate: 0deg; } }
     @keyframes redraw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
   `,
 })
