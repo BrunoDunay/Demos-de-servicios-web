@@ -24,7 +24,7 @@ interface Box {
 /**
  * Lienzo fijo del tamaño de la ventana (sin eventos de puntero) donde se dibuja el diente.
  * Three.js se carga aparte (import dinámico) para no pesar en la primera carga.
- * Solo dibuja cuando el diente está en pantalla.
+ * Solo dibuja cuando el lugar de tratamientos está en pantalla.
  */
 @Component({
   selector: 'app-tooth-stage',
@@ -82,33 +82,28 @@ export class ToothStageView {
         return { x: r.left + r.width / 2, y: r.top + r.height / 2, s: r.height };
       };
 
-      const target = (): Box | null => {
-        if (this.stage.mode() === 'intro') return { x: innerWidth / 2, y: innerHeight * 0.42, s: Math.min(innerWidth, innerHeight) * 0.42 };
-        const hero = rectBox(this.stage.slots.get('hero'));
-        const treat = rectBox(this.stage.slots.get('treat'));
-        if (hero && treat) {
-          // Al acercarse los tratamientos, el diente pasa de la portada al centro del arco
-          const p = Math.min(1, Math.max(0, (vh * 1.15 - (treat.y - treat.s / 2)) / (vh * 0.55)));
-          const e = p * p * (3 - 2 * p);
-          return { x: hero.x + (treat.x - hero.x) * e, y: hero.y + (treat.y - hero.y) * e, s: hero.s + (treat.s - hero.s) * e };
-        }
-        return hero ?? treat;
-      };
+      // El diente vive solo en el centro del menú de tratamientos (no viaja por la página)
+      const target = (): Box | null => (this.stage.mode() === 'intro' ? null : rectBox(this.stage.slots.get('treat')));
+      let placed = false;
 
       const tick = (_t: number, dt: number) => {
         const t = target();
         if (!t) {
+          placed = false;
           if (wasVisible) {
             scene.renderer.clear();
             wasVisible = false;
           }
           return;
         }
-        // En la intro el diente llega rápido a su lugar; en la página sigue al scroll casi sin retraso
-        const k = this.stage.mode() === 'intro' ? 0.08 : performance.now() < this.stage.flyUntil ? 0.075 : 0.35;
-        cur.x += (t.x - cur.x) * k;
-        cur.y += (t.y - cur.y) * k;
-        cur.s += (t.s - cur.s) * k;
+        if (!placed) {
+          Object.assign(cur, t);
+          placed = true;
+        }
+        // Sigue al scroll casi sin retraso
+        cur.x += (t.x - cur.x) * 0.35;
+        cur.y += (t.y - cur.y) * 0.35;
+        cur.s += (t.s - cur.s) * 0.35;
         const visible = cur.y + cur.s / 2 > -40 && cur.y - cur.s / 2 < vh + 40;
         if (!visible) {
           if (wasVisible) scene.renderer.clear();

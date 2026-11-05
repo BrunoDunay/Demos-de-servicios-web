@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { CLINIC, REVIEWS, TEAM } from '../core/content';
 import { Clinic } from '../core/clinic';
 import { Icon } from '../shared/icon';
@@ -8,7 +8,7 @@ import { Tilt } from '../shared/tilt';
 /**
  * Equipo como tarjetas de app de citas (referencia "Tracey Clifford"): foto arriba con el nombre encima,
  * botones redondos de vidrio y una fila de datos. Se inclinan en 3D con brillo al pasar el cursor.
- * Debajo, opiniones en dos filas que se deslizan en sentidos contrarios (se pausan con el cursor).
+ * Debajo, las opiniones en un mazo de tarjetas: al tocar la de arriba sale volando y queda la siguiente.
  */
 @Component({
   selector: 'app-team',
@@ -52,23 +52,34 @@ import { Tilt } from '../shared/tilt';
     </section>
 
     <section class="section reviews" id="opiniones">
-      <div class="page rhead">
-        <h2 class="h2" data-reveal>Lo que dicen <b>al salir</b>.</h2>
-        <p class="score" data-reveal [revealDelay]="100"><b>{{ rating }}</b><span>★★★★★<br />{{ count }} reseñas en Google</span></p>
-      </div>
-      @for (row of rows; track $index; let r = $index) {
-        <div class="marquee" [class.rev]="r === 1" aria-label="Opiniones de pacientes">
-          <ul>
-            @for (rv of row; track $index) {
-              <li [attr.aria-hidden]="$index >= reviews.length">
-                <p class="stars" aria-hidden="true">★★★★★</p>
-                <blockquote>“{{ rv.text }}”</blockquote>
-                <p class="by"><span class="avatar">{{ rv.name[0] }}</span><b>{{ rv.name }}</b><small>{{ rv.when }}</small></p>
-              </li>
-            }
-          </ul>
+      <div class="page rgrid">
+        <div class="rcopy">
+          <p class="pill" data-reveal>Opiniones</p>
+          <h2 class="h2" data-reveal [revealDelay]="80">Lo que dicen <b>al salir</b>.</h2>
+          <p class="score" data-reveal [revealDelay]="140"><b>{{ rating }}</b><span>★★★★★<br />{{ count }} reseñas en Google</span></p>
+          <div class="progress" data-reveal [revealDelay]="200">
+            <p class="counter"><b>{{ pad(index() + 1) }}</b> / {{ pad(reviews.length) }}</p>
+            <div class="dots" aria-hidden="true">
+              @for (r of reviews; track $index) {
+                <i [class.on]="$index === index()"></i>
+              }
+            </div>
+          </div>
+          <p class="hint" data-reveal [revealDelay]="240">Toca la tarjeta para leer la siguiente.</p>
         </div>
-      }
+
+        <div class="deck" data-reveal [revealDelay]="120" role="button" tabindex="0" aria-label="Ver la siguiente opinión" (click)="next()" (keydown.enter)="next()" (keydown.space)="$event.preventDefault(); next()">
+          @for (rv of reviews; track $index; let i = $index) {
+            <article [class]="'rv tone-' + (i % 3)" [class.top]="depth(i) === 0" [class.second]="depth(i) === 1" [class.out]="leaving() && depth(i) === 0" [style.--k]="depth(i)" [style.z-index]="reviews.length - depth(i)" [attr.aria-hidden]="depth(i) !== 0">
+              <span class="quote" aria-hidden="true">“</span>
+              <p class="stars" aria-hidden="true">★★★★★</p>
+              <blockquote>{{ rv.text }}</blockquote>
+              <p class="by"><span class="avatar">{{ rv.name[0] }}</span><span><b>{{ rv.name }}</b><small>{{ rv.when }} · Google</small></span><span class="num">{{ pad(i + 1) }}</span></p>
+            </article>
+          }
+        </div>
+        <p class="visually-hidden" aria-live="polite">{{ reviews[index()].name }}: {{ reviews[index()].text }}</p>
+      </div>
     </section>
   `,
   styles: `
@@ -98,25 +109,51 @@ import { Tilt } from '../shared/tilt';
     .text { margin: 0 8px; color: var(--ink-2); font-size: 0.94rem; }
     .license { margin: 0 8px; font-size: 0.76rem; color: var(--muted); }
     .reviews { padding-top: 0; overflow: hidden; }
-    .rhead { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 40px; }
+    .rgrid { display: grid; grid-template-columns: 1fr 1.15fr; gap: clamp(36px, 6vw, 90px); align-items: center; }
+    .rcopy { display: grid; gap: 20px; justify-items: start; }
     .score { display: flex; align-items: center; gap: 12px; }
     .score b { font-family: var(--font-display); font-size: 4rem; font-weight: 600; line-height: 1; color: var(--royal); }
     .score span { font-size: 0.86rem; color: var(--muted); line-height: 1.4; }
-    .marquee { overflow: hidden; padding: 8px 0; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
-    .marquee ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 18px; width: max-content; animation: slide 60s linear infinite; }
-    .marquee.rev ul { animation-direction: reverse; animation-duration: 70s; }
-    @media (hover: hover) and (pointer: fine) { .marquee:hover ul { animation-play-state: paused; } }
-    @keyframes slide { to { translate: calc(-50% - 9px) 0; } }
-    .marquee li { width: 360px; display: grid; gap: 12px; align-content: start; padding: 24px; border-radius: var(--radius-m); background: var(--white); box-shadow: var(--shadow-s); transition: translate 400ms var(--ease-bounce), box-shadow 300ms ease; }
-    @media (hover: hover) and (pointer: fine) { .marquee li:hover { translate: 0 -6px; box-shadow: var(--shadow-m); } }
-    .stars { color: var(--stain); letter-spacing: 2px; }
-    blockquote { margin: 0; font-size: 1rem; line-height: 1.5; }
-    .by { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; }
-    .by small { color: var(--muted); }
-    .avatar { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--royal); color: var(--white); font-weight: 700; }
+    .progress { display: flex; align-items: center; gap: 18px; }
+    .counter { font-family: var(--font-display); font-size: 1.1rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+    .counter b { color: var(--ink); font-weight: 600; }
+    .dots { display: flex; gap: 6px; }
+    .dots i { width: 8px; height: 8px; border-radius: 99px; background: var(--ice-3); transition: width 400ms var(--ease-smooth-out), background-color 300ms ease; }
+    .dots i.on { width: 26px; background: var(--royal); }
+    .hint { font-size: 0.9rem; color: var(--muted); }
+    /* Mazo: todas las tarjetas en la misma celda; --k es su lugar en la pila (0 = arriba). Se ven 3. */
+    .deck { display: grid; padding: 10px 40px 66px 10px; cursor: pointer; outline: none; -webkit-user-select: none; user-select: none; }
+    .deck:focus-visible .rv.top { box-shadow: 0 0 0 3px var(--royal), var(--shadow-m); }
+    .rv { grid-area: 1 / 1; position: relative; display: grid; align-content: start; gap: 16px; min-height: 330px; padding: clamp(26px, 3vw, 38px); border-radius: var(--radius-l); box-shadow: var(--shadow-m);
+      --d: min(var(--k), 3);
+      translate: calc(var(--d) * 14px) calc(var(--d) * 22px); rotate: calc(var(--d) * 2.5deg); scale: calc(1 - var(--d) * 0.04);
+      opacity: clamp(0, 3 - var(--k), 1);
+      transition: translate 650ms var(--ease-bounce), rotate 650ms var(--ease-bounce), scale 650ms var(--ease-bounce), opacity 300ms ease; }
+    .tone-0 { background: var(--white); }
+    .tone-1 { background: linear-gradient(150deg, var(--royal), var(--navy)); color: var(--white); }
+    .tone-2 { background: var(--ice-2); }
+    @media (hover: hover) and (pointer: fine) {
+      /* Al pasar el cursor la de arriba se levanta y la de atrás se asoma */
+      .deck:hover .rv.top { rotate: -1.5deg; translate: -4px -6px; }
+      .deck:hover .rv.second { translate: 24px 32px; rotate: 4.5deg; }
+    }
+    /* La de arriba sale volando hacia la derecha y la siguiente sube */
+    .rv.out { animation: fly 480ms cubic-bezier(0.55, 0, 0.75, 0.4) forwards; }
+    @keyframes fly { to { translate: 115% -14%; rotate: 22deg; opacity: 0; } }
+    .quote { position: absolute; right: 28px; top: -6px; font-family: var(--font-display); font-size: 9rem; font-weight: 700; line-height: 1; opacity: 0.12; }
+    .stars { color: var(--stain); letter-spacing: 3px; }
+    blockquote { margin: 0; font-family: var(--font-display); font-size: clamp(1.25rem, 2vw, 1.6rem); font-weight: 400; line-height: 1.32; letter-spacing: -0.01em; }
+    .by { display: flex; align-items: center; gap: 12px; margin-top: auto; padding-top: 10px; font-size: 0.92rem; }
+    .by > span:nth-child(2) { display: grid; line-height: 1.3; }
+    .by small { opacity: 0.65; }
+    .num { margin-left: auto; font-family: var(--font-display); font-weight: 600; opacity: 0.4; }
+    .avatar { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--royal); color: var(--white); font-weight: 700; }
+    .tone-1 .avatar { background: var(--white); color: var(--royal); }
     @media (max-width: 960px) {
       .cards { grid-template-columns: 1fr; max-width: 460px; }
-      .marquee li { width: 290px; }
+      .rgrid { grid-template-columns: 1fr; }
+      .deck { padding: 6px 30px 56px 4px; }
+      .rv { min-height: 300px; }
     }
   `,
 })
@@ -126,9 +163,32 @@ export class Team {
   protected readonly reviews = REVIEWS;
   protected readonly rating = CLINIC.rating;
   protected readonly count = CLINIC.reviews;
-  // Cada fila va duplicada para que el desplazamiento sea continuo
-  protected readonly rows = [
-    [...REVIEWS, ...REVIEWS],
-    [...REVIEWS.slice().reverse(), ...REVIEWS.slice().reverse()],
-  ];
+  protected readonly index = signal(0);
+  protected readonly leaving = signal(false);
+  private timer?: ReturnType<typeof setTimeout>;
+
+  /** Lugar de cada tarjeta en la pila: 0 es la de arriba. */
+  protected depth(i: number) {
+    const n = this.reviews.length;
+    return (i - this.index() + n) % n;
+  }
+
+  protected pad(n: number) {
+    return String(n).padStart(2, '0');
+  }
+
+  /** La tarjeta de arriba sale volando y pasa al fondo; después de la última vuelve la primera. */
+  protected next() {
+    if (this.leaving()) {
+      clearTimeout(this.timer);
+      this.advance();
+    }
+    this.leaving.set(true);
+    this.timer = setTimeout(() => this.advance(), 420);
+  }
+
+  private advance() {
+    this.leaving.set(false);
+    this.index.set((this.index() + 1) % this.reviews.length);
+  }
 }

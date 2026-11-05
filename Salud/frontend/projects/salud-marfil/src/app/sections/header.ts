@@ -4,7 +4,7 @@ import { Clinic, openStatus } from '../core/clinic';
 import { Motion } from '../core/motion';
 import { Icon } from '../shared/icon';
 import { Logo } from '../shared/logo';
-import { Magnetic } from '../shared/magnetic';
+
 
 const LINKS = [
   { id: 'tratamientos', label: 'Tratamientos' },
@@ -21,7 +21,7 @@ const LINKS = [
 @Component({
   selector: 'app-header',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, Logo, Icon, Magnetic],
+  imports: [RouterLink, Logo, Icon],
   host: { '[class.hidden]': 'hidden()', '[class.scrolled]': 'scrolled()' },
   template: `
     <div class="bar">
@@ -36,7 +36,7 @@ const LINKS = [
         @if (status(); as s) {
           <span class="status" [class.open]="s.open"><i></i>{{ s.open ? 'Abierto' : 'Cerrado' }}</span>
         }
-        <button type="button" class="btn cta" magnetic (click)="clinic.book()">Agendar cita</button>
+        <button type="button" class="btn cta" (click)="clinic.book()"><span class="t">Agendar cita</span><span class="ic"><app-icon name="calendar" [size]="15" [stroke]="2.4" /></span></button>
         <button type="button" class="menu-btn" (click)="toggle()" [attr.aria-expanded]="open()" aria-controls="menu" aria-label="Menú">
           <span></span><span></span>
         </button>
@@ -74,7 +74,16 @@ const LINKS = [
     .status i { width: 7px; height: 7px; border-radius: 50%; background: var(--closed); }
     .status.open i { background: var(--ok); box-shadow: 0 0 0 0 oklch(66% 0.15 155 / 0.5); animation: ping 2.2s var(--ease-out) infinite; }
     @keyframes ping { 70% { box-shadow: 0 0 0 7px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
-    .cta { min-height: 44px; padding: 0 20px; font-size: 0.9rem; }
+    /* Al pasar el cursor el botón se oscurece y desde la derecha crece un círculo blanco con el calendario */
+    .cta { flex: none; min-height: 44px; padding: 0 20px; gap: 0; font-size: 0.9rem; transition: background-color 300ms ease, padding 400ms var(--ease-smooth-out), scale 160ms var(--ease-out); }
+    .cta::before, .cta::after { display: none; }
+    .cta .ic { flex: none; display: grid; place-items: center; width: 0; height: 30px; margin-left: 0; border-radius: 50%; background: var(--white); color: var(--royal); scale: 0; overflow: hidden; transition: width 400ms var(--ease-smooth-out), margin-left 400ms var(--ease-smooth-out), scale 450ms var(--ease-bounce); }
+    @media (hover: hover) and (pointer: fine) {
+      .cta:hover { translate: none; background: var(--navy); padding-right: 7px; }
+      .cta:hover .ic { width: 30px; margin-left: 10px; scale: 1; }
+      .cta:hover .ic app-icon { animation: cal-flip 500ms var(--ease-bounce) 120ms; }
+    }
+    @keyframes cal-flip { 0% { rotate: -25deg; scale: 0.6; } 100% { rotate: 0deg; scale: 1; } }
     .menu-btn { display: none; position: relative; z-index: 2; width: 46px; height: 46px; border-radius: 50%; background: var(--navy); transition: scale 160ms var(--ease-out); }
     .menu-btn:active { scale: 0.92; }
     .menu-btn span { position: absolute; left: 14px; right: 14px; height: 2px; border-radius: 2px; background: var(--white); transition: translate 300ms var(--ease-out), rotate 300ms var(--ease-out); }

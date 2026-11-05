@@ -3,7 +3,7 @@ import { ALL_TEETH, TREATMENTS, Treatment, toothName } from '../core/content';
 import { Clinic, money } from '../core/clinic';
 import { ToothStage } from '../core/tooth-stage';
 import { Icon } from '../shared/icon';
-import { Arrow, Magnetic } from '../shared/magnetic';
+import { Arrow } from '../shared/arrow';
 import { Reveal } from '../shared/reveal';
 import { Tilt } from '../shared/tilt';
 import { ToothSlot } from '../shared/tooth-stage';
@@ -56,7 +56,7 @@ const NODES = TREATMENTS.map((_, i) => {
 @Component({
   selector: 'app-treatments',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Icon, Reveal, Tilt, ToothSlot, Arrow, Magnetic],
+  imports: [Icon, Reveal, Tilt, ToothSlot, Arrow],
   template: `
     <section class="section treat" id="tratamientos">
       <p class="giant word" aria-hidden="true">cuidado</p>
@@ -125,7 +125,7 @@ const NODES = TREATMENTS.map((_, i) => {
                 </div>
               </div>
 
-              <button type="button" class="btn on-dark t-learn" magnetic (click)="clinic.book(reasonFor(t))">Agendar valoración <app-arrow /></button>
+              <button type="button" class="btn on-dark t-learn" (click)="clinic.book(reasonFor(t))">Agendar valoración <app-arrow /></button>
             </article>
           </div>
         </div>

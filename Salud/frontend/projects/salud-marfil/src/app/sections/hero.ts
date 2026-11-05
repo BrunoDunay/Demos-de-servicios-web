@@ -2,8 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, afterNextRe
 import { CLINIC } from '../core/content';
 import { Clinic, openStatus } from '../core/clinic';
 import { Motion, hasFinePointer, prefersReducedMotion, useGsap } from '../core/motion';
-import { Arrow, Magnetic } from '../shared/magnetic';
-import { ToothSlot } from '../shared/tooth-stage';
+import { Arrow } from '../shared/arrow';
 
 const AVATARS = ['avatar-1', 'avatar-2', 'avatar-3', 'avatar-4'];
 
@@ -11,15 +10,14 @@ const AVATARS = ['avatar-1', 'avatar-2', 'avatar-3', 'avatar-4'];
  * Portada. Izquierda: título en fino con la palabra clave en negritas, botones magnéticos y una fila de
  * pacientes que se levantan al pasar el cursor (transitions.dev "Avatar group hover").
  * Derecha: panel azul hielo con arcos concéntricos, la foto dentro de un arco, tarjetas de vidrio que se
- * mueven con el cursor y el lugar donde aterriza el diente 3D. Al fondo, "sonrisa" gigante recortada.
+ * mueven con el cursor.
  */
 @Component({
   selector: 'app-hero',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Magnetic, Arrow, ToothSlot],
+  imports: [Arrow],
   template: `
     <section class="hero" #root>
-      <p class="giant word" aria-hidden="true">sonrisa</p>
       <div class="page grid">
         <div class="copy">
           <p class="pill">
@@ -32,8 +30,8 @@ const AVATARS = ['avatar-1', 'avatar-2', 'avatar-3', 'avatar-4'];
           <h1 class="title">Tu sonrisa, <b>tu mejor</b> carta de presentación.</h1>
           <p class="lead">Odontología general y estética con tecnología digital. Te explicamos todo en la pantalla y el plan con precios va por escrito.</p>
           <div class="actions">
-            <button type="button" class="btn t-learn" magnetic (click)="clinic.book()">Agenda tu valoración <app-arrow /></button>
-            <button type="button" class="btn ghost t-learn" magnetic (click)="clinic.go('tratamientos')">Ver tratamientos <app-arrow /></button>
+            <button type="button" class="btn t-learn" (click)="clinic.book()">Agenda tu valoración <app-arrow /></button>
+            <button type="button" class="btn ghost t-learn" (click)="clinic.go('tratamientos')">Ver tratamientos <app-arrow /></button>
           </div>
           <div class="proof">
             <div class="avatars" (pointerleave)="lift(-1)">
@@ -54,10 +52,9 @@ const AVATARS = ['avatar-1', 'avatar-2', 'avatar-3', 'avatar-4'];
               <path d="M100 400V180a100 100 0 0 1 200 0v220" />
             </svg>
             <figure class="arch">
-              <img src="media/hero-sonrisa.webp" srcset="media/hero-sonrisa-sm.webp 820w, media/hero-sonrisa.webp 1800w" sizes="(max-width: 900px) 80vw, 36vw" alt="Paciente sonriendo después de su blanqueamiento" width="1800" height="2700" fetchpriority="high" />
+              <img src="media/hero-doctora.webp" srcset="media/hero-doctora-sm.webp 820w, media/hero-doctora.webp 1800w" sizes="(max-width: 900px) 80vw, 36vw" alt="Dra. Renata Ibarra, odontóloga de Marfil, sonriendo en el consultorio" width="1800" height="2700" fetchpriority="high" />
             </figure>
           </div>
-          <div class="slot" toothSlot="hero"></div>
           <div class="chip c1" data-depth="1.2"><span class="ico">★</span><b>{{ rating }}</b><small>Google · {{ reviews }} reseñas</small></div>
           <div class="chip c2" data-depth="0.7"><span class="ico">$</span><b>Valoración $350</b><small>con radiografía panorámica</small></div>
           <div class="chip c3" data-depth="1.6"><span class="ico">✓</span><b>Urgencias hoy</b><small>lunes a sábado</small></div>
@@ -67,7 +64,6 @@ const AVATARS = ['avatar-1', 'avatar-2', 'avatar-3', 'avatar-4'];
   `,
   styles: `
     .hero { position: relative; padding: 130px 0 clamp(60px, 8vw, 100px); overflow: hidden; }
-    .word { left: 50%; bottom: -0.12em; translate: -50% 0; font-size: clamp(8rem, 26vw, 25rem); color: transparent; -webkit-text-stroke: 1.5px var(--ice-3); }
     .grid { position: relative; display: grid; grid-template-columns: 1fr 1fr; gap: clamp(28px, 4vw, 64px); align-items: center; }
     .copy { display: grid; justify-items: start; gap: 22px; }
     .pill i { width: 8px; height: 8px; border-radius: 50%; background: var(--closed); }
@@ -92,9 +88,8 @@ const AVATARS = ['avatar-1', 'avatar-2', 'avatar-3', 'avatar-4'];
     .arcs path:nth-child(3) { animation-delay: 0.3s; }
     @keyframes draw { to { stroke-dashoffset: 0; } }
     .arch { position: absolute; left: 25%; right: 25%; bottom: 0; top: 18%; margin: 0; border-radius: 999px 999px 0 0; overflow: hidden; }
-    .arch img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; transition: scale 1200ms var(--ease-smooth-out); }
+    .arch img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 12%; transition: scale 1200ms var(--ease-smooth-out); }
     @media (hover: hover) and (pointer: fine) { .visual:hover .arch img { scale: 1.04; } }
-    .slot { position: absolute; left: -6%; bottom: 4%; width: 36%; aspect-ratio: 1 / 1.25; }
     .chip { position: absolute; display: grid; grid-template-columns: auto 1fr; column-gap: 10px; align-items: center; padding: 12px 16px 12px 12px; border-radius: 18px; background: var(--glass); backdrop-filter: blur(16px) saturate(1.5); box-shadow: inset 0 0 0 1px oklch(100% 0 0 / 0.7), var(--shadow-m); font-size: 0.92rem; line-height: 1.2; will-change: transform; }
     .chip .ico { grid-row: span 2; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 11px; background: var(--royal); color: var(--white); font-weight: 700; }
     .chip small { color: var(--muted); font-size: 0.76rem; }
@@ -106,7 +101,6 @@ const AVATARS = ['avatar-1', 'avatar-2', 'avatar-3', 'avatar-4'];
       .hero { padding-top: 110px; }
       .visual { max-width: 520px; width: 100%; justify-self: center; }
       .c2 { display: none; }
-      .slot { left: -2%; width: 38%; }
     }
   `,
 })
@@ -152,16 +146,20 @@ export class Hero {
     const root = this.root().nativeElement;
     const { gsap, SplitText } = useGsap();
     const split = SplitText.create(root.querySelector('.title')!, { type: 'words', mask: 'words' });
+    // La máscara corta lo que baja de la línea (la "j" de "mejor"): se le da aire abajo sin mover el texto
+    split.masks.forEach((m) => {
+      (m as HTMLElement).style.paddingBottom = '0.2em';
+      (m as HTMLElement).style.marginBottom = '-0.2em';
+    });
     gsap.timeline()
       .from(split.words, { yPercent: 115, duration: 1.1, ease: 'expo.out', stagger: 0.06 }, 0.15)
       .from(root.querySelectorAll('.pill, .lead, .actions, .proof'), { y: 20, opacity: 0, filter: 'blur(4px)', duration: 0.9, ease: 'expo.out', stagger: 0.08 }, 0.35)
       .from(root.querySelector('.panel'), { clipPath: 'inset(30% 30% 0% 30% round 200px)', duration: 1.4, ease: 'expo.out' }, 0)
       .from(root.querySelector('.arch img'), { scale: 1.25, duration: 1.6, ease: 'expo.out' }, 0)
-      .from(root.querySelectorAll('.chip'), { y: 30, opacity: 0, scale: 0.9, duration: 0.9, ease: 'back.out(1.6)', stagger: 0.12 }, 0.6)
-      .from(root.querySelector('.word'), { yPercent: 40, opacity: 0, duration: 1.6, ease: 'expo.out' }, 0.2);
+      .from(root.querySelectorAll('.chip'), { y: 30, opacity: 0, scale: 0.9, duration: 0.9, ease: 'back.out(1.6)', stagger: 0.12 }, 0.6);
   }
 
-  /** Las tarjetas de vidrio se mueven con el cursor a distinta profundidad; con scroll, la palabra de fondo se desliza. */
+  /** Las tarjetas de vidrio se mueven con el cursor a distinta profundidad. */
   private parallax(destroyRef: DestroyRef) {
     if (prefersReducedMotion()) return;
     const { gsap } = useGsap();
@@ -180,11 +178,8 @@ export class Hero {
       });
     };
     if (hasFinePointer()) addEventListener('pointermove', move, { passive: true });
-    const tween = gsap.to(root.querySelector('.word'), { xPercent: -12, ease: 'none', scrollTrigger: { trigger: root, start: 'top top', end: 'bottom top', scrub: 0.6 } });
     destroyRef.onDestroy(() => {
       removeEventListener('pointermove', move);
-      tween.scrollTrigger?.kill();
-      tween.kill();
     });
   }
 }

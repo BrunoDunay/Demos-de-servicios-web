@@ -40,4 +40,7 @@ npm run build          # compila las dos
   Marfil pasó a azul clínico con diente 3D (Three.js) y Claro a collage editorial con dibujos a mano. Ver `docs/`.
 - Transiciones y hovers tomados de transitions.dev (las recetas CSS se adaptaron: el freno de movimiento usa el interruptor
   "Reducir movimiento", no `prefers-reduced-motion`).
-- Falta: agregarlas al portafolio y a los videos. Pendiente del giro: la nutrióloga (Básico).
+- Ya están en el portafolio y en el video de LinkedIn del portafolio. Pendiente del giro: la nutrióloga (Básico).
+- 4 nov 2026, ronda de cambios de Marfil (Bruno): doctora nueva en la portada, el diente 3D solo en tratamientos, sin
+  palabras gigantes en portada y pie, sin botones magnéticos, íconos 3D, mazo de reseñas, precios alineados y calendario
+  de mes. Detalle en `docs/marfil.md`.

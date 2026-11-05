@@ -6,7 +6,7 @@ import sharp from 'sharp';
 
 const APPS = {
   'salud-marfil': {
-    'hero-sonrisa': 20130737,
+    'hero-doctora': 15641079,
     'doctora': 4173251,
     'hero-paciente': 3881161,
     'consulta-sonrisa': 3845553,

@@ -3,15 +3,25 @@ import { FormsModule } from '@angular/forms';
 import { CLINIC, DAY_NAMES, HOURS, REASONS } from '../core/content';
 import { Clinic, fmtHour, whatsappLink } from '../core/clinic';
 import { Icon } from '../shared/icon';
-import { Arrow, Magnetic } from '../shared/magnetic';
+import { Arrow } from '../shared/arrow';
 import { Reveal } from '../shared/reveal';
 
 interface Day {
   key: string;
   date: Date;
   weekday: string;
-  label: string;
 }
+
+interface Cell {
+  day: Day;
+  off: boolean;
+  today: boolean;
+}
+
+/** Meses que se pueden ver hacia adelante (el actual cuenta como el primero). */
+const MAX_MONTHS = 3;
+
+const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
 
 const MONTHS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
 
@@ -23,13 +33,13 @@ function busy(key: string, hour: number) {
 }
 
 /**
- * Agenda en cuatro pasos (motivo, día, hora y datos). Arma el mensaje y lo muestra como burbuja de
+ * Agenda en cuatro pasos (motivo, día en un calendario de hasta 3 meses, hora y datos). Arma el mensaje y lo muestra como burbuja de
  * WhatsApp antes de abrir la app. Los días se calculan en el navegador (en el prerender no hay "hoy").
  */
 @Component({
   selector: 'app-agenda',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, Icon, Reveal, Arrow, Magnetic],
+  imports: [FormsModule, Icon, Reveal, Arrow],
   template: `
     <section class="section wrap" id="agenda">
       <p class="giant word" aria-hidden="true">agenda</p>
@@ -52,23 +62,39 @@ function busy(key: string, hour: number) {
 
             <div class="row">
               <p class="label">Elige el día</p>
-              <p class="month">{{ monthLabel() }}</p>
+              <div class="cal-nav">
+                <button type="button" aria-label="Mes anterior" [disabled]="!canPrev()" (click)="shiftMonth(-1)"><app-icon name="chevron-l" [size]="18" /></button>
+                <p class="month" aria-live="polite">{{ monthLabel() }}</p>
+                <button type="button" aria-label="Mes siguiente" [disabled]="!canNext()" (click)="shiftMonth(1)"><app-icon name="chevron" [size]="18" /></button>
+              </div>
             </div>
-            @if (days().length) {
-              <div class="days">
-                @for (d of days(); track d.key) {
-                  <button type="button" [attr.aria-pressed]="day()?.key === d.key" (click)="pickDay(d)">
-                    <small>{{ d.weekday }}</small><b>{{ d.date.getDate() }}</b>
-                  </button>
+            <div class="cal">
+              <div class="week" aria-hidden="true">
+                @for (w of weekLetters; track $index) {
+                  <span>{{ w }}</span>
                 }
               </div>
-            } @else {
-              <div class="days skeleton" aria-hidden="true">
-                @for (i of [1, 2, 3, 4, 5, 6, 7]; track i) {
-                  <span></span>
+              @if (cells().length) {
+                @for (m of [monthKey()]; track m) {
+                  <div class="grid-days" [class.back]="dir() < 0">
+                    @for (c of cells(); track $index) {
+                      @if (c) {
+                        <button type="button" [disabled]="c.off" [class.today]="c.today" [attr.aria-pressed]="day()?.key === c.day.key" [attr.aria-label]="c.day.weekday + ' ' + c.day.date.getDate()" (click)="pickDay(c.day)" [style.--i]="$index">{{ c.day.date.getDate() }}</button>
+                      } @else {
+                        <span></span>
+                      }
+                    }
+                  </div>
                 }
-              </div>
-            }
+              } @else {
+                <div class="grid-days skeleton" aria-hidden="true">
+                  @for (i of skeleton; track i) {
+                    <span></span>
+                  }
+                </div>
+              }
+            </div>
+            <p class="cal-legend"><span><i class="lg-today"></i>Hoy</span><span><i class="lg-off"></i>Domingo o sin lugares</span><span>Hasta {{ maxMonths }} meses adelante</span></p>
 
             <p class="label">Hora</p>
             @if (day()) {
@@ -108,7 +134,7 @@ function busy(key: string, hour: number) {
                   <span class="t-success-check" data-state="in"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17 19 7.5" /></svg></span>
                   Listo para enviar
                 </p>
-                <a class="btn t-learn" magnetic [href]="link()" target="_blank" rel="noopener">Enviar por WhatsApp <app-arrow /></a>
+                <a class="btn t-learn" [href]="link()" target="_blank" rel="noopener">Enviar por WhatsApp <app-arrow /></a>
               } @else {
                 <p class="missing">{{ missing() }}</p>
               }
@@ -127,7 +153,7 @@ function busy(key: string, hour: number) {
     .app { position: relative; display: grid; grid-template-columns: 1.45fr 1fr; gap: clamp(20px, 3vw, 40px); margin-top: 44px; padding: clamp(18px, 3vw, 34px); border-radius: var(--radius-xl); background: var(--white); box-shadow: var(--shadow-m); }
     .form { display: grid; gap: 14px; min-width: 0; }
     .label { font-weight: 700; font-size: 0.98rem; }
-    .row { display: flex; justify-content: space-between; align-items: baseline; margin-top: 8px; }
+    .row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; margin-top: 8px; }
     .month { font-size: 0.86rem; font-weight: 600; color: var(--royal); }
     /* transitions.dev "Tabs sliding": la píldora azul viaja al motivo elegido */
     .tabs { position: relative; display: flex; gap: 3px; padding: 4px; border-radius: 999px; background: var(--ice); overflow-x: auto; scrollbar-width: none; }
@@ -136,16 +162,34 @@ function busy(key: string, hour: number) {
     .tabs button[aria-checked='true'] { color: var(--white); }
     .tabs button:active { scale: 0.95; }
     .tabs-pill { position: absolute; top: 4px; bottom: 4px; left: 4px; width: 0; border-radius: 999px; background: var(--royal); box-shadow: var(--shadow-blue); transition: transform var(--duration-fast) var(--ease-smooth-out), width var(--duration-fast) var(--ease-smooth-out); }
-    .days { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 4px 2px 8px; margin: -4px -2px -8px; }
-    .days::-webkit-scrollbar { display: none; }
-    .days button { flex: none; display: grid; justify-items: center; gap: 2px; width: 58px; padding: 10px 0 12px; border-radius: 999px; background: var(--ice); transition: background-color 250ms ease, color 250ms ease, translate 400ms var(--ease-bounce), box-shadow 250ms ease; }
-    .days small { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.7; }
-    .days b { font-family: var(--font-display); font-size: 1.45rem; font-weight: 600; line-height: 1.1; }
-    .days button[aria-pressed='true'] { background: var(--royal); color: var(--white); translate: 0 -4px; box-shadow: var(--shadow-blue); }
-    @media (hover: hover) and (pointer: fine) { .days button:not([aria-pressed='true']):hover { background: var(--ice-2); translate: 0 -2px; } }
-    .days button:active { scale: 0.94; }
-    .skeleton span { flex: none; width: 58px; height: 70px; border-radius: 999px; background: var(--ice); animation: shimmer 1.4s ease-in-out infinite; }
+    /* Calendario del mes: lunes a domingo, con flechas para cambiar de mes */
+    .cal-nav { display: flex; align-items: center; gap: 6px; }
+    .cal-nav button { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--ice); color: var(--royal); transition: background-color 200ms ease, scale 160ms var(--ease-out), opacity 200ms ease; }
+    .cal-nav button:disabled { opacity: 0.35; cursor: default; }
+    .cal-nav button:active:not(:disabled) { scale: 0.9; }
+    @media (hover: hover) and (pointer: fine) { .cal-nav button:not(:disabled):hover { background: var(--royal); color: var(--white); } }
+    .cal-nav .month { min-width: 9.5em; text-align: center; }
+    .cal { padding: 12px; border-radius: 22px; background: var(--ice); overflow: hidden; }
+    .week, .grid-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+    .week span { padding-bottom: 6px; text-align: center; font-size: 0.72rem; font-weight: 700; color: var(--muted); }
+    .grid-days { animation: cal-in 420ms var(--ease-smooth-out) both; }
+    .grid-days.back { animation-name: cal-back; }
+    @keyframes cal-in { from { opacity: 0; translate: 24px 0; } }
+    @keyframes cal-back { from { opacity: 0; translate: -24px 0; } }
+    .grid-days button { position: relative; aspect-ratio: 1; max-height: 46px; border-radius: 14px; font-family: var(--font-display); font-size: 1.02rem; font-weight: 600; font-variant-numeric: tabular-nums; background: var(--white); transition: background-color 200ms ease, color 200ms ease, box-shadow 200ms ease, scale 300ms var(--ease-bounce); }
+    .grid-days button.today::after { content: ''; position: absolute; left: 50%; bottom: 5px; width: 5px; height: 5px; border-radius: 50%; translate: -50% 0; background: var(--royal); }
+    .grid-days button:disabled { background: transparent; color: var(--muted); opacity: 0.45; cursor: not-allowed; }
+    .grid-days button[aria-pressed='true'] { background: var(--royal); color: var(--white); box-shadow: var(--shadow-blue); scale: 1.06; }
+    .grid-days button[aria-pressed='true'].today::after { background: var(--white); }
+    @media (hover: hover) and (pointer: fine) { .grid-days button:not(:disabled):not([aria-pressed='true']):hover { box-shadow: inset 0 0 0 1.5px var(--royal); color: var(--royal); } }
+    .grid-days button:active:not(:disabled) { scale: 0.92; }
+    .skeleton span { aspect-ratio: 1; max-height: 46px; border-radius: 14px; background: var(--white); animation: shimmer 1.4s ease-in-out infinite; }
     @keyframes shimmer { 50% { opacity: 0.5; } }
+    .cal-legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 0.78rem; color: var(--muted); }
+    .cal-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .cal-legend i { width: 8px; height: 8px; border-radius: 50%; }
+    .lg-today { background: var(--royal); }
+    .lg-off { background: var(--ice-3); }
     .slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
     .slots button { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 8px; border-radius: 999px; font-size: 0.86rem; font-weight: 600; box-shadow: inset 0 0 0 1.5px var(--line); font-variant-numeric: tabular-nums; animation: t-text-in 400ms var(--ease-smooth-out) both; animation-delay: calc(var(--i) * 25ms); transition: background-color 200ms ease, color 200ms ease, box-shadow 200ms ease, scale 160ms var(--ease-out); }
     .slots button[aria-pressed='true'] { background: var(--navy); color: var(--white); box-shadow: none; }
@@ -197,7 +241,13 @@ export class Agenda {
   protected readonly clinic = inject(Clinic);
   protected readonly reasons = REASONS;
   protected readonly phone = CLINIC.phone;
-  protected readonly days = signal<Day[]>([]);
+  protected readonly today = signal<Date | null>(null);
+  /** Primer día del mes que se está viendo. */
+  protected readonly view = signal<Date | null>(null);
+  protected readonly dir = signal(1);
+  protected readonly maxMonths = MAX_MONTHS;
+  protected readonly weekLetters = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+  protected readonly skeleton = Array.from({ length: 35 }, (_, i) => i);
   protected readonly day = signal<Day | null>(null);
   protected readonly hour = signal<number | null>(null);
   protected readonly first = signal(true);
@@ -222,7 +272,7 @@ export class Agenda {
     if (!d) return [];
     const hours = HOURS[d.date.getDay()]!;
     const now = new Date();
-    const isToday = d.date.toDateString() === now.toDateString();
+    const isToday = sameDay(d.date, now);
     const out: { h: number; label: string; busy: boolean }[] = [];
     for (let h = hours[0]; h <= hours[1] - 1; h += 1) {
       const past = isToday && h <= now.getHours() + 1;
@@ -243,7 +293,7 @@ export class Agenda {
     const d = this.day();
     const h = this.hour();
     const who = this.nameSig().trim() || '(tu nombre)';
-    const when = d && h !== null ? `el ${d.weekday.toLowerCase()} ${d.date.getDate()} de ${MONTHS[d.date.getMonth()]} a las ${fmtHour(h)}` : 'el día y la hora que elijas';
+    const when = d && h !== null ? `${d.weekday === 'hoy' ? 'hoy' : 'el ' + d.weekday} ${d.date.getDate()} de ${MONTHS[d.date.getMonth()]} a las ${fmtHour(h)}` : 'el día y la hora que elijas';
     let text = `Hola, soy ${who}. Quiero agendar una cita en Marfil para: ${this.clinic.reason().toLowerCase()}, ${when}.`;
     text += this.first() ? '\nEs mi primera visita.' : '\nYa soy paciente.';
     if (this.notesSig().trim()) text += `\n${this.notesSig().trim()}`;
@@ -253,10 +303,41 @@ export class Agenda {
   protected readonly link = computed(() => whatsappLink(this.message()));
 
   protected readonly monthLabel = computed(() => {
-    const d = this.day() ?? this.days()[0];
-    if (!d) return '';
-    const t = d.date.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' });
+    const v = this.view();
+    if (!v) return '';
+    const t = v.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' }).replace(' de ', ' ');
     return t[0].toUpperCase() + t.slice(1);
+  });
+
+  protected readonly monthKey = computed(() => this.view()?.toISOString().slice(0, 7) ?? '');
+
+  /** Cuántos meses adelante está el mes que se ve. */
+  private readonly offset = computed(() => {
+    const v = this.view();
+    const t = this.today();
+    return v && t ? (v.getFullYear() - t.getFullYear()) * 12 + v.getMonth() - t.getMonth() : 0;
+  });
+  protected readonly canPrev = computed(() => this.offset() > 0);
+  protected readonly canNext = computed(() => this.offset() < MAX_MONTHS - 1);
+
+  /** Celdas del mes (null = hueco antes del día 1, la semana empieza en lunes). */
+  protected readonly cells = computed<(Cell | null)[]>(() => {
+    const v = this.view();
+    const now = this.today();
+    if (!v || !now) return [];
+    const out: (Cell | null)[] = Array.from({ length: (v.getDay() + 6) % 7 }, () => null);
+    const last = new Date(v.getFullYear(), v.getMonth() + 1, 0).getDate();
+    const start = new Date(now);
+    start.setHours(0, 0, 0, 0);
+    for (let n = 1; n <= last; n++) {
+      const date = new Date(v.getFullYear(), v.getMonth(), n);
+      const hours = HOURS[date.getDay()];
+      const isToday = sameDay(date, now);
+      const off = date < start || !hours || (isToday && now.getHours() >= hours[1] - 2);
+      const weekday = isToday ? 'hoy' : DAY_NAMES[date.getDay()].toLowerCase();
+      out.push({ day: { key: date.toISOString().slice(0, 10), date, weekday }, off, today: isToday });
+    }
+    return out;
   });
 
   private readonly tabs = viewChild<ElementRef<HTMLElement>>('tabs');
@@ -277,22 +358,17 @@ export class Agenda {
       });
     });
     afterNextRender(() => {
-      const list: Day[] = [];
-      const d = new Date();
-      d.setHours(0, 0, 0, 0);
-      while (list.length < 12) {
-        const hours = HOURS[d.getDay()];
-        const now = new Date();
-        const todayClosed = d.toDateString() === now.toDateString() && (!hours || now.getHours() >= hours[1] - 2);
-        if (hours && !todayClosed) {
-          const date = new Date(d);
-          const isToday = date.toDateString() === now.toDateString();
-          list.push({ key: date.toISOString().slice(0, 10), date, weekday: isToday ? 'Hoy' : DAY_NAMES[date.getDay()].slice(0, 3), label: MONTHS[date.getMonth()] });
-        }
-        d.setDate(d.getDate() + 1);
-      }
-      this.days.set(list);
+      const now = new Date();
+      this.today.set(now);
+      this.view.set(new Date(now.getFullYear(), now.getMonth(), 1));
     });
+  }
+
+  protected shiftMonth(step: number) {
+    const v = this.view();
+    if (!v) return;
+    this.dir.set(step);
+    this.view.set(new Date(v.getFullYear(), v.getMonth() + step, 1));
   }
 
   protected pickDay(d: Day) {

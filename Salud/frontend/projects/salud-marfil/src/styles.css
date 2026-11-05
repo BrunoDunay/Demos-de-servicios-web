@@ -237,22 +237,32 @@ p {
   box-shadow: var(--shadow-blue);
   overflow: hidden;
   isolation: isolate;
-  transition: scale 160ms var(--ease-out), box-shadow 300ms ease, color 300ms ease;
+  transition: scale 160ms var(--ease-out), translate 400ms var(--ease-bounce), box-shadow 300ms ease, color 300ms ease;
 }
 
-/* Al pasar el cursor, una gota de azul noche crece desde donde entró el mouse (--mx/--my los pone shared/magnetic.ts) */
+/* Al pasar el cursor, el color sube desde abajo con la orilla curva (como un líquido que llena el botón)
+   y un destello de luz cruza de izquierda a derecha. */
 .btn::before {
   content: '';
   position: absolute;
   z-index: -1;
-  left: var(--mx, 50%);
-  top: var(--my, 50%);
-  width: 0;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  translate: -50% -50%;
+  left: -20%;
+  right: -20%;
+  top: 100%;
+  height: 240%;
+  border-radius: 50% 50% 0 0 / 26% 26% 0 0;
   background: var(--navy);
-  transition: width 500ms var(--ease-smooth-out);
+  transition: translate 600ms var(--ease-smooth-out), border-radius 600ms var(--ease-smooth-out);
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(105deg, transparent 35%, oklch(100% 0 0 / 0.38) 50%, transparent 65%);
+  translate: -110% 0;
+  pointer-events: none;
 }
 
 .btn:active {
@@ -280,9 +290,21 @@ p {
   background: var(--sky);
 }
 
+.btn.on-dark::after {
+  background: linear-gradient(105deg, transparent 35%, oklch(100% 0 0 / 0.7) 50%, transparent 65%);
+}
+
 @media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    translate: 0 -2px;
+  }
   .btn:hover::before {
-    width: 250%;
+    translate: 0 -100%;
+    border-radius: 0;
+  }
+  .btn:hover::after {
+    translate: 110% 0;
+    transition: translate 750ms var(--ease-smooth-out) 120ms;
   }
   .btn.ghost:hover,
   .btn.light:hover {

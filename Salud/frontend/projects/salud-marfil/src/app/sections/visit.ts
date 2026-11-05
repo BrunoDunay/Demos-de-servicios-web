@@ -3,20 +3,23 @@ import { PROOF, STEPS } from '../core/content';
 import { prefersReducedMotion, useGsap } from '../core/motion';
 import { Icon } from '../shared/icon';
 import { Reveal } from '../shared/reveal';
+import { Icon3d } from '../shared/icon3d';
+import type { Icon3dName } from '../shared/icon3d-model';
 import { Tilt } from '../shared/tilt';
 
 const STEP_ICONS = ['search', 'file', 'tooth', 'calendar'];
-const PROOF_ICONS = ['flame', 'shield', 'heart'];
+const PROOF_ICONS: Icon3dName[] = ['flame', 'shield', 'heart'];
 
 /**
  * Tu primera visita como flechas de pasos (referencia "5 steps", en escala de azules): entran una tras otra
  * al bajar; al pasar el cursor o tocar una, se abre y muestra su detalle.
- * Debajo, "Lo que no se ve": tarjetas de vidrio azul noche con inclinación 3D y brillo (transitions.dev).
+ * Debajo, "Lo que no se ve": tarjetas de vidrio azul noche con inclinación 3D y brillo (transitions.dev)
+ * y un ícono 3D de esmalte en cada una (shared/icon3d.ts).
  */
 @Component({
   selector: 'app-visit',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Reveal, Icon, Tilt],
+  imports: [Reveal, Icon, Tilt, Icon3d],
   template: `
     <section class="section" id="primera-visita">
       <div class="page">
@@ -55,7 +58,7 @@ const PROOF_ICONS = ['flame', 'shield', 'heart'];
                 <p class="tag">Protocolo</p>
                 <p class="value">{{ p.value }}<small>{{ p.suffix }}</small></p>
                 <p class="label">{{ p.label }}</p>
-                <span class="orb"><app-icon [name]="proofIcons[i]" [size]="40" [stroke]="1.5" /></span>
+                <app-icon3d class="obj" [name]="proofIcons[i]" />
               </article>
             </div>
           }
@@ -67,15 +70,18 @@ const PROOF_ICONS = ['flame', 'shield', 'heart'];
     .head { display: grid; gap: 18px; max-width: 820px; }
     .h2 b { color: var(--royal); }
     .steps { list-style: none; margin: 50px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
-    li { --c: color-mix(in oklch, var(--royal), var(--sky) calc(var(--i) * 24%)); display: grid; gap: 22px; cursor: pointer; }
+    li { --c: color-mix(in oklch, var(--royal), var(--sky) calc(var(--i) * 24%)); display: grid; align-content: start; gap: 22px; cursor: pointer; }
     /* Flecha tipo chevron: un lado entra en la anterior y el otro apunta a la siguiente */
-    .chev { position: relative; display: flex; align-items: center; justify-content: space-between; height: 120px; margin-right: -26px; padding: 0 56px 0 52px; color: var(--white); background: var(--c); clip-path: polygon(0 0, calc(100% - 34px) 0, 100% 50%, calc(100% - 34px) 100%, 0 100%, 34px 50%); transition: filter 300ms ease, translate 500ms var(--ease-bounce); }
+    .chev { position: relative; display: flex; align-items: center; justify-content: space-between; height: 120px; margin-right: -26px; padding: 0 56px 0 52px; color: var(--white); background: var(--c); clip-path: polygon(0 0, calc(100% - 34px) 0, 100% 50%, calc(100% - 34px) 100%, 0 100%, 34px 50%); transition: filter 300ms ease; }
     li:first-child .chev { clip-path: polygon(0 0, calc(100% - 34px) 0, 100% 50%, calc(100% - 34px) 100%, 0 100%); padding-left: 28px; border-radius: 24px 0 0 24px; }
     .n { font-family: var(--font-display); font-size: 2.8rem; font-weight: 200; line-height: 1; }
     .ico { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: oklch(100% 0 0 / 0.18); transition: scale 400ms var(--ease-bounce), background-color 300ms ease; }
-    li.open .chev { translate: 0 -8px; filter: brightness(1.08) drop-shadow(0 16px 20px oklch(50% 0.2 263 / 0.35)); }
+    li.open .chev { filter: brightness(1.1); }
     li.open .ico { scale: 1.15; background: var(--white); color: var(--c); }
-    .info { padding-right: 26px; }
+    .info { position: relative; padding: 14px 26px 0 0; }
+    /* Una rayita bajo la flecha marca el paso abierto */
+    .info::before { content: ''; position: absolute; left: 0; top: 0; width: 48px; height: 3px; border-radius: 3px; background: var(--c); scale: 0 1; transform-origin: left; transition: scale 450ms var(--ease-smooth-out); }
+    li.open .info::before { scale: 1 1; }
     h3 { font-size: 1.6rem; font-weight: 600; }
     .time { margin-top: 2px; font-size: 0.86rem; font-weight: 650; color: var(--royal); }
     .text { margin-top: 8px; color: var(--ink-2); font-size: 0.96rem; opacity: 0.45; transition: opacity 400ms ease; }
@@ -89,7 +95,7 @@ const PROOF_ICONS = ['flame', 'shield', 'heart'];
     .value { margin-top: 18px; font-family: var(--font-display); font-size: clamp(3.4rem, 6vw, 4.6rem); font-weight: 600; line-height: 1; letter-spacing: -0.04em; }
     .value small { font-size: 0.45em; font-weight: 400; margin-left: 4px; }
     .label { max-width: 24ch; color: oklch(88% 0.03 250); }
-    .orb { position: absolute; right: 22px; top: 22px; display: grid; place-items: center; width: 84px; height: 84px; border-radius: 50%; color: var(--white); background: radial-gradient(circle at 35% 30%, oklch(90% 0.06 240), var(--royal-2) 45%, var(--navy) 100%); box-shadow: inset -6px -8px 18px oklch(20% 0.08 264 / 0.6), inset 4px 6px 12px oklch(100% 0 0 / 0.35), 0 18px 30px -10px oklch(0% 0 0 / 0.55); transform: translateZ(40px); }
+    .obj { position: absolute; right: 4px; top: 4px; width: 150px; height: 150px; transform: translateZ(50px); pointer-events: none; }
     @media (max-width: 960px) {
       .steps { grid-template-columns: 1fr; gap: 14px; }
       li { grid-template-columns: 110px 1fr; align-items: center; gap: 16px; }
@@ -97,6 +103,8 @@ const PROOF_ICONS = ['flame', 'shield', 'heart'];
       .n { font-size: 2rem; }
       .ico { width: 34px; height: 34px; }
       .text { opacity: 1; }
+      .info { padding-top: 0; }
+      .info::before { display: none; }
       .cards { grid-template-columns: 1fr; }
     }
   `,

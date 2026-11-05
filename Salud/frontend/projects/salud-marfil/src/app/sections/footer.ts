@@ -4,22 +4,22 @@ import { CLINIC } from '../core/content';
 import { Clinic } from '../core/clinic';
 import { Icon } from '../shared/icon';
 import { Logo } from '../shared/logo';
-import { Arrow, Magnetic } from '../shared/magnetic';
+import { Arrow } from '../shared/arrow';
 import { MotionToggle } from '../shared/motion-toggle';
 import { Tilt } from '../shared/tilt';
 
-/** Pie azul noche: la tarjeta de presentación de la clínica (se inclina en 3D) y "marfil" gigante recortado abajo. */
+/** Pie azul noche: la tarjeta de presentación de la clínica (se inclina en 3D) . */
 @Component({
   selector: 'app-footer',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, Logo, Icon, MotionToggle, Tilt, Arrow, Magnetic],
+  imports: [RouterLink, Logo, Icon, MotionToggle, Tilt, Arrow],
   template: `
     <footer>
       <div class="page">
         <div class="top">
           <div class="cta">
             <h2>¿Hace cuánto fue tu última <b>revisión</b>?</h2>
-            <button type="button" class="btn on-dark t-learn" magnetic (click)="clinic.book()">Agendar cita <app-arrow /></button>
+            <button type="button" class="btn on-dark t-learn" (click)="clinic.book()">Agendar cita <app-arrow /></button>
           </div>
           <div tilt="14" class="card-wrap">
             <div class="bizcard t-tilt-card">
@@ -62,11 +62,10 @@ import { Tilt } from '../shared/tilt';
           <p class="demo">Sitio demo con marca ficticia · Diseño y desarrollo: <a href="https://portafolio-web-chi-ten.vercel.app" target="_blank" rel="noopener">Bruno Dunay</a></p>
         </div>
       </div>
-      <p class="giant word" aria-hidden="true">marfil</p>
     </footer>
   `,
   styles: `
-    footer { position: relative; padding: clamp(70px, 9vw, 120px) 0 clamp(90px, 16vw, 230px); background: var(--night); color: oklch(84% 0.03 250); overflow: hidden; }
+    footer { position: relative; padding: clamp(70px, 9vw, 120px) 0 clamp(28px, 4vw, 44px); background: var(--night); color: oklch(84% 0.03 250); overflow: hidden; }
     .top { display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px; align-items: center; padding-bottom: 56px; border-bottom: 1px solid oklch(100% 0 0 / 0.1); }
     .cta { display: grid; gap: 26px; justify-items: start; }
     .cta h2 { font-size: clamp(2.4rem, 5.2vw, 4.2rem); color: var(--white); }
@@ -88,7 +87,6 @@ import { Tilt } from '../shared/tilt';
     .bottom { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; padding-top: 24px; border-top: 1px solid oklch(100% 0 0 / 0.1); font-size: 0.84rem; }
     .bottom a { text-decoration: underline; text-underline-offset: 3px; }
     .demo { flex-basis: 100%; color: oklch(62% 0.03 250); }
-    .word { left: 50%; bottom: -0.2em; translate: -50% 0; font-size: clamp(9rem, 32vw, 30rem); color: oklch(50% 0.2 263 / 0.18); }
     @media (max-width: 900px) { .top { grid-template-columns: 1fr; } .cols { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 520px) { .cols { grid-template-columns: 1fr; } }
   `,

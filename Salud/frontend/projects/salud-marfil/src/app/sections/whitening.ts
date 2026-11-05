@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, afterNextRender, computed, inject, signal, viewChild } from '@angular/core';
 import { Clinic } from '../core/clinic';
 import { prefersReducedMotion, useGsap } from '../core/motion';
-import { Arrow, Magnetic } from '../shared/magnetic';
+import { Arrow } from '../shared/arrow';
 import { Reveal } from '../shared/reveal';
 
 /** Guía de color dental (de más oscuro a más claro). */
@@ -16,7 +16,7 @@ const MAX_TINT = 0.62;
 @Component({
   selector: 'app-whitening',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Reveal, Arrow, Magnetic],
+  imports: [Reveal, Arrow],
   template: `
     <section class="section" id="simulador">
       <div class="page">
@@ -56,7 +56,7 @@ const MAX_TINT = 0.62;
 
         <div class="foot">
           <p class="fine">Simulación ilustrativa. El resultado real depende de tu tono natural y se confirma en la valoración.</p>
-          <button type="button" class="btn t-learn" magnetic (click)="clinic.book('Blanqueamiento')">Agendar blanqueamiento <app-arrow /></button>
+          <button type="button" class="btn t-learn" (click)="clinic.book('Blanqueamiento')">Agendar blanqueamiento <app-arrow /></button>
         </div>
       </div>
     </section>

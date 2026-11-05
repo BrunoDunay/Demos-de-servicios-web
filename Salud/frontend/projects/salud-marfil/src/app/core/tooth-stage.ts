@@ -1,9 +1,8 @@
 import { Injectable, signal } from '@angular/core';
 
 /**
- * Estado del diente 3D que viaja por la página. Las secciones marcan "lugares" (shared/tooth-slot.ts)
- * y el escenario (shared/tooth-stage.ts) dibuja el diente encima del lugar activo:
- * intro → portada → centro del menú de tratamientos, mezclando entre ellos según el scroll.
+ * Estado del diente 3D. La sección de tratamientos marca su lugar (toothSlot="treat") y el escenario
+ * (shared/tooth-stage.ts) lo dibuja ahí. Durante la intro no se dibuja.
  */
 @Injectable({ providedIn: 'root' })
 export class ToothStage {
@@ -13,12 +12,7 @@ export class ToothStage {
   readonly turn = signal(0);
   /** Golpe de giro rápido (al elegir un tratamiento). */
   spin = 0;
-  /** Hasta cuándo el diente vuela despacio a su lugar (al terminar la intro). */
-  flyUntil = 0;
-
   land() {
-    this.flyUntil = performance.now() + 1600;
-    this.spin = 0.8;
     this.mode.set('page');
   }
 

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { PLAN, TREATMENTS } from '../core/content';
 import { Clinic, money } from '../core/clinic';
 import { Icon } from '../shared/icon';
-import { Arrow, Magnetic } from '../shared/magnetic';
+import { Arrow } from '../shared/arrow';
 import { Reveal } from '../shared/reveal';
 import { Tilt } from '../shared/tilt';
 
@@ -13,7 +13,7 @@ import { Tilt } from '../shared/tilt';
 @Component({
   selector: 'app-prices',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Icon, Reveal, Tilt, Arrow, Magnetic],
+  imports: [Icon, Reveal, Tilt, Arrow],
   template: `
     <section class="section wrap" id="precios">
       <div class="page">
@@ -34,9 +34,8 @@ import { Tilt } from '../shared/tilt';
                 <span class="name">{{ t.name }}<small>{{ t.sessions }}</small></span>
                 @let p = priceOf(t.from);
                 <span class="price" [attr.aria-label]="p.label">
-                  @if (!p.monthly) { <small>desde</small> }
+                  <small>{{ p.monthly ? 'al mes · 12 MSI' : 'desde' }}</small>
                   <span class="digits">@for (c of p.chars; track $index + c + monthly()) {<i class="t-pop" [style.animation-delay.ms]="$index * 35">{{ c }}</i>}</span>
-                  @if (p.monthly) { <small>/mes</small> }
                 </span>
               </li>
             }
@@ -51,7 +50,7 @@ import { Tilt } from '../shared/tilt';
                   <li><span class="check"><app-icon name="check" [size]="14" [stroke]="3" /></span> {{ i }}</li>
                 }
               </ul>
-              <button type="button" class="btn on-dark t-learn" magnetic (click)="clinic.book('Revisión y limpieza')">Quiero el plan <app-arrow /></button>
+              <button type="button" class="btn on-dark t-learn" (click)="clinic.book('Revisión y limpieza')">Quiero el plan <app-arrow /></button>
               <p class="fine">Precios en pesos, IVA incluido. Factura disponible.</p>
             </aside>
           </div>
@@ -76,12 +75,13 @@ import { Tilt } from '../shared/tilt';
     @keyframes t-toggle-off { 0% { translate: 20px 0; } 55% { translate: -3px 0; } 80% { translate: 1px 0; } 100% { translate: 0 0; } }
     .grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: clamp(24px, 4vw, 60px); margin-top: 44px; align-items: start; }
     .list { list-style: none; margin: 0; padding: 0; }
-    .list li { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 14px; border-radius: 16px; transition: background-color 250ms ease, translate 400ms var(--ease-smooth-out); }
+    .list li { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 16px; padding: 18px 14px; border-radius: 16px; transition: background-color 250ms ease, translate 400ms var(--ease-smooth-out); }
     .list li + li { border-top: 1px solid var(--line); }
     @media (hover: hover) and (pointer: fine) { .list li:hover { background: var(--ice); translate: 6px 0; } }
     .name { display: grid; font-weight: 650; }
     .name small { font-size: 0.82rem; font-weight: 500; color: var(--muted); }
-    .price { display: flex; align-items: baseline; gap: 4px; font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--navy); }
+    /* "desde" arriba y la cifra abajo, todo pegado a la derecha: los precios quedan en una sola columna */
+    .price { display: grid; justify-items: end; line-height: 1.1; min-width: 7.5ch; font-family: var(--font-display); font-size: 1.6rem; font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--navy); }
     .price i { font-style: normal; }
     .digits { display: inline-flex; overflow: hidden; }
     .price small { font-family: var(--font-body); font-size: 0.76rem; font-weight: 600; color: var(--muted); }
@@ -94,7 +94,8 @@ import { Tilt } from '../shared/tilt';
     .check { display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--sky); color: var(--navy); flex: none; }
     .plan .btn { justify-self: start; }
     .fine { font-size: 0.78rem; color: oklch(80% 0.04 250); }
-    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } .list li { flex-wrap: wrap; } }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    @media (max-width: 520px) { .list li { grid-template-columns: 1fr; gap: 4px; } .price { justify-items: start; } }
   `,
 })
 export class Prices {
