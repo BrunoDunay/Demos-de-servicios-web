@@ -9,7 +9,7 @@ Personalidad: amable, optimista, con energía pero sin intimidar.
 
 ## Identidad
 
-- **Logo:** cuadro azul con una "b" (barra + aro, como un disco de pesas) y una chispa lima. En la palabra "brío" el acento de la í es la chispa.
+- **Logo** (rediseño 4 nov 2026, para no parecerse al de Marfil): solo la palabra "brío" en grueso, la chispa lima como acento de la í, un trazo lima de impulso debajo y la etiqueta "gym de barrio". Al pasar el cursor la palabra se inclina hacia adelante, el trazo se redibuja y la chispa gira. Favicon: la "b" (barra + aro) en azul con el trazo y la chispa lima, sin cuadro.
 - **Paleta:** fondo hueso `#F7F5F0`, tinta `#12131A`, azul eléctrico `#2F4BFF`, lima `#D9FF4A`.
 - **Tipografías:** Bricolage Grotesque (títulos) y DM Sans (texto).
 - **Movimiento:** juguetón y ligero (rebote suave, 200–300 ms).
