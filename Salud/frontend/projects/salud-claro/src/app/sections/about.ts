@@ -15,11 +15,11 @@ import { Tilt } from '../shared/tilt';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [Reveal, Tilt],
   template: `
-    <section class="section wrap" id="valeria">
+    <section class="section wrap" id="psicologa">
       <div class="page grid">
         <figure class="portrait" data-reveal="photo">
-          <div class="arch"><img src="media/valeria.webp" srcset="media/valeria-sm.webp 820w, media/valeria.webp 1800w" sizes="(max-width: 900px) 90vw, 40vw" alt="Valeria Ríos, psicóloga, durante una sesión" width="1800" height="1200" loading="lazy" /></div>
-          <figcaption class="hand">Valeria <svg viewBox="0 0 160 20" aria-hidden="true"><path d="M4 12 C 40 4, 90 18, 156 6" /></svg></figcaption>
+          <div class="arch"><img src="media/psicologa.webp" srcset="media/psicologa-sm.webp 820w, media/psicologa.webp 1800w" sizes="(max-width: 900px) 90vw, 40vw" alt="Lucía Arenas, psicóloga, durante una sesión" width="1800" height="1200" loading="lazy" /></div>
+          <figcaption class="hand">Lucía <svg viewBox="0 0 160 20" aria-hidden="true"><path pathLength="1" d="M4 12 C 40 4, 90 18, 156 6" /></svg></figcaption>
         </figure>
         <div class="copy">
           <p class="kicker" data-reveal>Sobre mí</p>
@@ -133,6 +133,16 @@ import { Tilt } from '../shared/tilt';
       .portrait { max-width: 420px; justify-self: center; }
       figcaption { right: 0; }
     }
+    /* Microinteracciones: la firma se vuelve a subrayar y las historias se enderezan al leerlas */
+    figcaption path { stroke-dasharray: 1; }
+    blockquote { transition: rotate 450ms var(--ease-bounce), translate 450ms var(--ease-bounce), box-shadow 400ms ease; }
+    @media (hover: hover) and (pointer: fine) {
+      .portrait:hover figcaption path { animation: redraw 900ms var(--ease-smooth-out); }
+      .portrait:hover figcaption { rotate: -5deg; }
+      blockquote:hover { rotate: 0deg; translate: 6px 0; box-shadow: var(--shadow-lift); }
+    }
+    figcaption { transition: rotate 500ms var(--ease-bounce); }
+    @keyframes redraw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
   `,
 })
 export class About {

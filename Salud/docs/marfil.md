@@ -28,6 +28,7 @@ Three.js se carga aparte (import dinámico, ~115 kB comprimido).
 - Encabezado de vidrio con píldora que sigue al enlace (transitions.dev "Tabs sliding"). "Agendar cita" se oscurece y le
   crece un círculo con el calendario. Logo: el diente se redibuja, un brillo cruza el cuadro y el destello parpadea.
 - Botones: el color sube desde abajo con orilla curva y cruza un destello. **Nada de botones magnéticos** (a Bruno no le gustan).
+- Al hacer clic en cualquier parte: pulso azul y unos dientitos que brincan y caen poco, distinto cada vez (`shared/tooth-burst.ts`).
 - Transición entre páginas: círculo azul desde donde se hizo clic (View Transitions).
 - transitions.dev: tilt con brillo (tarjetas de vidrio, equipo, plan, tarjeta de presentación), avatar group hover, texts reveal,
   number pop-in, toggle con doble rebote, acordeón, success check y learn-more.

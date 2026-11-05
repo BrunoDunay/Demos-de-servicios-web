@@ -3,7 +3,7 @@
 export const PRACTICE = {
   name: 'Claro',
   full: 'Claro · Psicología',
-  therapist: 'Valeria Ríos',
+  therapist: 'Lucía Arenas',
   phone: '(449) 207 64 19',
   email: 'hola@claropsicologia.mx',
   address: 'Av. Héroe de Nacozari Sur 1520, int. 3, Las Américas',

@@ -3,7 +3,7 @@ import { FIRST_SESSION, MYTHS, SERVICES } from '../core/content';
 import { CHAIRS, torn } from '../core/doodles';
 import { Practice, money } from '../core/practice';
 import { prefersReducedMotion, useGsap } from '../core/motion';
-import { Arrow } from '../shared/magnetic';
+import { Arrow } from '../shared/arrow';
 import { Reveal } from '../shared/reveal';
 
 /** Raya a mano para tachar un mito. */
@@ -121,6 +121,15 @@ const STRIKE = 'M4 30 C 40 18, 80 40, 120 22 S 190 30, 236 16 M10 46 C 60 34, 12
     @media (max-width: 1020px) { .services, .notes { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 900px) { .first { grid-template-columns: 1fr; } }
     @media (max-width: 560px) { .services, .notes { grid-template-columns: 1fr; } }
+    /* Microinteracciones: el número encerrado gira y se rellena al pasar por su paso */
+    .n { transition: rotate 500ms var(--ease-bounce), scale 500ms var(--ease-bounce), background-color 300ms ease; }
+    .steps b { transition: color 300ms ease; }
+    @media (hover: hover) and (pointer: fine) {
+      .steps li:hover .n { rotate: 8deg; scale: 1.1; background: var(--peach-soft); }
+      .steps li:hover b { color: var(--peach-deep); }
+      .note:not(.on):hover .tap { animation: nudge 700ms var(--ease-bounce); }
+    }
+    @keyframes nudge { 0%, 100% { rotate: 0deg; } 30% { rotate: -10deg; } 60% { rotate: 6deg; } }
   `,
 })
 export class Therapy {

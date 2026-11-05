@@ -27,7 +27,7 @@ export default class Home {
     inject(Title).setTitle('Claro · Psicóloga en Aguascalientes | Terapia individual, de pareja y en línea');
     inject(Meta).updateTag({
       name: 'description',
-      content: 'Psicoterapia con Valeria Ríos en Aguascalientes y en línea: ansiedad, duelo, autoestima, estrés, terapia de pareja y adolescentes. Primera sesión de valoración por $600.',
+      content: 'Psicoterapia con Lucía Arenas en Aguascalientes y en línea: ansiedad, duelo, autoestima, estrés, terapia de pareja y adolescentes. Primera sesión de valoración por $600.',
     });
   }
 }

@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, ElementRef, afterNextRe
 import { LEAF, scribble, spiral, torn } from '../core/doodles';
 import { Practice } from '../core/practice';
 import { Motion, hasFinePointer, prefersReducedMotion, useGsap } from '../core/motion';
-import { Arrow, Magnetic } from '../shared/magnetic';
+import { Arrow } from '../shared/arrow';
 
 const KNOT = scribble(120, 110, 95, 80, 36, 21);
 const CALM = spiral(120, 110, 82, 3.6, 140);
@@ -15,7 +15,7 @@ const CALM = spiral(120, 110, 82, 3.6, 140);
 @Component({
   selector: 'app-hero',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Arrow, Magnetic],
+  imports: [Arrow],
   template: `
     <section class="hero" #root>
       <div class="page grid">
@@ -24,12 +24,12 @@ const CALM = spiral(120, 110, 82, 3.6, 140);
           <h1 class="title"><span class="l1">Hablar</span><span class="l2">ayuda.</span></h1>
           <p class="note hand">
             empezar también
-            <svg class="arrow" viewBox="0 0 90 70" aria-hidden="true"><path d="M6 8 C 30 4, 64 14, 70 50 M58 40 L 70 52 L 80 38" /></svg>
+            <svg class="arrow" viewBox="0 0 90 70" aria-hidden="true"><path pathLength="1" d="M6 8 C 30 4, 64 14, 70 50 M58 40 L 70 52 L 80 38" /></svg>
           </p>
-          <p class="lead">Terapia para adultos, parejas y adolescentes con Valeria Ríos. Un espacio tranquilo, sin juicios, para entender lo que te pasa y salir con herramientas, no solo con desahogo.</p>
+          <p class="lead">Terapia para adultos, parejas y adolescentes con Lucía Arenas. Un espacio tranquilo, sin juicios, para entender lo que te pasa y salir con herramientas, no solo con desahogo.</p>
           <div class="actions">
-            <button type="button" class="btn t-learn" magnetic (click)="practice.book()">Agenda tu primera sesión <app-arrow /></button>
-            <button type="button" class="btn ghost" magnetic (click)="practice.go('respira')">Respira un minuto</button>
+            <button type="button" class="btn t-learn" (click)="practice.book()">Agenda tu primera sesión <app-arrow /></button>
+            <button type="button" class="btn ghost" (click)="practice.go('respira')">Respira un minuto</button>
           </div>
         </div>
 
@@ -93,6 +93,19 @@ const CALM = spiral(120, 110, 82, 3.6, 140);
       .collage { max-width: 520px; width: 100%; justify-self: center; }
       .note { margin-left: 22%; }
     }
+    /* Microinteracciones: la flecha se vuelve a dibujar, las cintas se despegan un poco y la nota levanta la esquina */
+    .arrow path { stroke-dasharray: 1; }
+    .t1, .t2 { transition: rotate 500ms var(--ease-bounce), scale 500ms var(--ease-bounce); }
+    .sticky { transition: rotate 500ms var(--ease-bounce), translate 500ms var(--ease-bounce), box-shadow 400ms ease; }
+    .sticky::after { content: ''; position: absolute; right: 0; bottom: 0; width: 0; height: 0; background: linear-gradient(135deg, var(--peach) 50%, transparent 50%); box-shadow: -2px -2px 4px oklch(27% 0.055 255 / 0.12); transition: width 400ms var(--ease-bounce), height 400ms var(--ease-bounce); }
+    @media (hover: hover) and (pointer: fine) {
+      .note:hover .arrow path { animation: redraw 900ms var(--ease-smooth-out); }
+      .photo:hover .t1 { rotate: -14deg; scale: 1.08; }
+      .photo:hover .t2 { rotate: 12deg; scale: 1.08; }
+      .sticky:hover { rotate: 2deg; translate: 0 -6px; box-shadow: var(--shadow-lift); }
+      .sticky:hover::after { width: 26px; height: 26px; }
+    }
+    @keyframes redraw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
   `,
 })
 export class Hero {

@@ -4,11 +4,14 @@ import { Motion } from './core/motion';
 import { Footer } from './sections/footer';
 import { Header } from './sections/header';
 import { Intro } from './shared/intro';
+import { ToothBurst } from './shared/tooth-burst';
 import { ToothStageView } from './shared/tooth-stage';
 
 @Component({
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // Dientitos que caen al hacer clic en cualquier parte (shared/tooth-burst.ts)
+  hostDirectives: [ToothBurst],
   imports: [RouterOutlet, Header, Footer, Intro, ToothStageView],
   template: `
     <app-intro />

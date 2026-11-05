@@ -3,15 +3,25 @@ import { FormsModule } from '@angular/forms';
 import { DAY_NAMES, HOURS, PRACTICE } from '../core/content';
 import { Practice, fmtHour, whatsappLink } from '../core/practice';
 import { Icon } from '../shared/icon';
-import { Arrow, Magnetic } from '../shared/magnetic';
+import { Arrow } from '../shared/arrow';
 import { Reveal } from '../shared/reveal';
 
 interface Day {
   key: string;
   date: Date;
   weekday: string;
-  label: string;
 }
+
+interface Cell {
+  day: Day;
+  off: boolean;
+  today: boolean;
+}
+
+/** Meses que se pueden ver hacia adelante (el actual cuenta como el primero). */
+const MAX_MONTHS = 3;
+
+const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
 
 const REASONS = ['Primera sesión de valoración', 'Terapia individual', 'Terapia de pareja', 'Adolescentes'];
 
@@ -25,13 +35,13 @@ function busy(key: string, hour: number) {
 }
 
 /**
- * Agenda en cinco pasos (tipo, lugar, día, hora y datos) en una hoja de cuaderno; la vista previa es una nota a mano. Arma el mensaje y lo muestra como burbuja de
+ * Agenda en cinco pasos (tipo, lugar, día en un calendario de hasta 3 meses, hora y datos) en una hoja de cuaderno; la vista previa es una nota a mano. Arma el mensaje y lo muestra como burbuja de
  * WhatsApp antes de abrir la app. Los días se calculan en el navegador (en el prerender no hay "hoy").
  */
 @Component({
   selector: 'app-agenda',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [FormsModule, Icon, Reveal, Arrow, Magnetic],
+  imports: [FormsModule, Icon, Reveal, Arrow],
   template: `
     <section class="section" id="agenda">
       <div class="page">
@@ -53,30 +63,54 @@ function busy(key: string, hour: number) {
 
             <p class="label hand">2. ¿dónde?</p>
             <div class="where">
-              <button type="button" [attr.aria-pressed]="online() === false" (click)="online.set(false)"><app-icon name="sofa" [size]="18" /> En el consultorio</button>
-              <button type="button" [attr.aria-pressed]="online()" (click)="online.set(true)"><app-icon name="video" [size]="18" /> En línea</button>
+              <button type="button" [attr.aria-pressed]="online() === false" (click)="online.set(false)"><app-icon name="sofa" [size]="18" /> En el consultorio<svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M4 13 C 6 15, 8 17, 10 19 C 13 13, 17 8, 21 4" /></svg></button>
+              <button type="button" [attr.aria-pressed]="online()" (click)="online.set(true)"><app-icon name="video" [size]="18" /> En línea<svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M4 13 C 6 15, 8 17, 10 19 C 13 13, 17 8, 21 4" /></svg></button>
             </div>
 
-            <p class="label hand">3. día <span class="month">{{ monthLabel() }}</span></p>
-            @if (days().length) {
-              <div class="days">
-                @for (d of days(); track d.key) {
-                  <button type="button" [attr.aria-pressed]="day()?.key === d.key" (click)="pickDay(d)"><small>{{ d.weekday }}</small><b>{{ d.date.getDate() }}</b></button>
+            <div class="cal-head">
+              <p class="label hand">3. día</p>
+              <div class="cal-nav">
+                <button type="button" aria-label="Mes anterior" [disabled]="!canPrev()" (click)="shiftMonth(-1)"><app-icon name="chevron-l" [size]="18" /></button>
+                <span class="month hand" aria-live="polite">{{ monthLabel() }}</span>
+                <button type="button" aria-label="Mes siguiente" [disabled]="!canNext()" (click)="shiftMonth(1)"><app-icon name="chevron" [size]="18" /></button>
+              </div>
+            </div>
+            <div class="cal">
+              <div class="week" aria-hidden="true">
+                @for (w of weekLetters; track $index) {
+                  <span>{{ w }}</span>
                 }
               </div>
-            } @else {
-              <div class="days skeleton" aria-hidden="true">
-                @for (i of [1, 2, 3, 4, 5, 6]; track i) {
-                  <span></span>
+              @if (cells().length) {
+                @for (m of [monthKey()]; track m) {
+                  <div class="grid-days" [class.back]="dir() < 0">
+                    @for (c of cells(); track $index) {
+                      @if (c) {
+                        <button type="button" [disabled]="c.off" [class.today]="c.today" [attr.aria-pressed]="day()?.key === c.day.key" [attr.aria-label]="c.day.weekday + ' ' + c.day.date.getDate()" (click)="pickDay(c.day)">
+                          <span>{{ c.day.date.getDate() }}</span>
+                          <svg class="loop" viewBox="0 0 40 40" aria-hidden="true"><path pathLength="1" d="M29 7 C 19 1, 5 7, 4 20 C 3 33, 16 38, 26 35 C 37 31, 39 17, 31 9 C 27 5, 22 4, 18 6" /></svg>
+                        </button>
+                      } @else {
+                        <span></span>
+                      }
+                    }
+                  </div>
                 }
-              </div>
-            }
+              } @else {
+                <div class="grid-days skeleton" aria-hidden="true">
+                  @for (i of skeleton; track i) {
+                    <span></span>
+                  }
+                </div>
+              }
+            </div>
+            <p class="cal-note hand">puedes apartar hasta {{ maxMonths }} meses adelante · los domingos descanso</p>
 
             <p class="label hand">4. hora</p>
             @if (day()) {
               <div class="slots">
                 @for (s of slots(); track s.h; let i = $index) {
-                  <button type="button" [disabled]="s.busy" [attr.aria-pressed]="hour() === s.h" (click)="hour.set(s.h)" [style.--i]="i">{{ s.label }}</button>
+                  <button type="button" [disabled]="s.busy" [attr.aria-pressed]="hour() === s.h" (click)="hour.set(s.h)" [style.--i]="i">{{ s.label }}<svg class="under" viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M2 6 C 18 2, 34 9, 50 5 S 80 2, 98 6" /></svg></button>
                 }
               </div>
             } @else {
@@ -90,8 +124,8 @@ function busy(key: string, hour: number) {
                 <input type="text" name="name" autocomplete="given-name" [(ngModel)]="name" placeholder="Solo tu nombre de pila está bien" />
               </label>
               <div class="seg" role="group" aria-label="¿Has ido a terapia antes?">
-                <button type="button" [attr.aria-pressed]="first()" (click)="first.set(true)">Es mi primera vez</button>
-                <button type="button" [attr.aria-pressed]="!first()" (click)="first.set(false)">Ya he ido</button>
+                <button type="button" [attr.aria-pressed]="first()" (click)="first.set(true)">Es mi primera vez<svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M4 13 C 6 15, 8 17, 10 19 C 13 13, 17 8, 21 4" /></svg></button>
+                <button type="button" [attr.aria-pressed]="!first()" (click)="first.set(false)">Ya he ido<svg class="tick" viewBox="0 0 24 24" aria-hidden="true"><path pathLength="1" d="M4 13 C 6 15, 8 17, 10 19 C 13 13, 17 8, 21 4" /></svg></button>
               </div>
               <label class="field wide">
                 <span>Si quieres, cuéntame en una línea qué te trae <small>(opcional)</small></span>
@@ -102,18 +136,18 @@ function busy(key: string, hour: number) {
 
           <aside class="letter" aria-label="Vista previa del mensaje">
             <span class="tape"></span>
-            <p class="to hand">para: Valeria</p>
+            <p class="to hand">para: Lucía</p>
             <p class="msg hand" [class.empty]="!ready()">{{ message() }}</p>
             @if (ready()) {
               <p class="ok">
                 <span class="t-success-check" data-state="in"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17 19 7.5" /></svg></span>
                 Listo para enviar
               </p>
-              <a class="btn t-learn" magnetic [href]="link()" target="_blank" rel="noopener">Enviar por WhatsApp <app-arrow /></a>
+              <a class="btn t-learn" [href]="link()" target="_blank" rel="noopener">Enviar por WhatsApp <app-arrow /></a>
             } @else {
               <p class="missing">{{ missing() }}</p>
             }
-            <p class="fine"><app-icon name="lock" [size]="14" /> Tu mensaje solo lo lee Valeria. Sitio demo: el botón abre WhatsApp para que elijas a quién enviarlo.</p>
+            <p class="fine"><app-icon name="lock" [size]="14" /> Tu mensaje solo lo lee Lucía. Sitio demo: el botón abre WhatsApp para que elijas a quién enviarlo.</p>
           </aside>
         </div>
       </div>
@@ -135,22 +169,53 @@ function busy(key: string, hour: number) {
     .tabs button:active { scale: 0.95; }
     .tabs-pill { position: absolute; top: 4px; bottom: 4px; left: 4px; width: 0; border-radius: 999px; background: var(--peach); transition: transform var(--duration-fast) var(--ease-smooth-out), width var(--duration-fast) var(--ease-smooth-out); }
     .where { display: flex; flex-wrap: wrap; gap: 10px; }
-    .where button, .seg button { display: inline-flex; align-items: center; gap: 8px; padding: 12px 16px; font-weight: 650; font-size: 0.92rem; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line-2); clip-path: polygon(1% 4%, 99% 0, 100% 96%, 0 100%); transition: background-color 250ms ease, translate 400ms var(--ease-bounce), scale 160ms var(--ease-out); }
+    .where button, .seg button { display: inline-flex; align-items: center; gap: 8px; padding: 12px 16px; font-weight: 650; font-size: 0.92rem; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line-2); clip-path: polygon(1% 4%, 99% 0, 100% 96%, 0 100%); transition: background-color 250ms ease, translate 400ms var(--ease-bounce), rotate 400ms var(--ease-bounce), scale 160ms var(--ease-out); }
     .where button[aria-pressed='true'], .seg button[aria-pressed='true'] { background: var(--sage-soft); box-shadow: inset 0 0 0 2px var(--sage-deep); translate: 0 -2px; }
     .where button:active, .seg button:active { scale: 0.96; }
-    .days { display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none; padding: 4px 2px 8px; margin: -4px -2px -8px; }
-    .days::-webkit-scrollbar { display: none; }
-    .days button { flex: none; display: grid; justify-items: center; width: 58px; padding: 8px 0 10px; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line-2); border-radius: 50% 45% 48% 52% / 40% 44% 50% 46%; transition: background-color 250ms ease, translate 400ms var(--ease-bounce), scale 160ms var(--ease-out); }
-    .days small { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: var(--muted); }
-    .days b { font-family: var(--font-display); font-stretch: 75%; font-size: 1.6rem; font-weight: 800; line-height: 1.1; }
-    .days button[aria-pressed='true'] { background: var(--peach); box-shadow: inset 0 0 0 2px var(--peach-deep); translate: 0 -4px; }
-    .days button:active { scale: 0.94; }
-    .skeleton span { flex: none; width: 58px; height: 64px; border-radius: 50%; background: var(--paper-2); animation: shimmer 1.4s ease-in-out infinite; }
+    /* Calendario del mes en la hoja: al pasar el cursor se dibuja un círculo a mano alrededor del día */
+    .cal-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+    .cal-nav { display: flex; align-items: center; gap: 6px; }
+    .cal-nav button { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--line-2); transition: background-color 200ms ease, rotate 400ms var(--ease-bounce), scale 160ms var(--ease-out), opacity 200ms ease; }
+    .cal-nav button:disabled { opacity: 0.3; cursor: default; }
+    .cal-nav button:active:not(:disabled) { scale: 0.9; }
+    @media (hover: hover) and (pointer: fine) { .cal-nav button:not(:disabled):hover { background: var(--peach-soft); rotate: -8deg; } }
+    .cal-nav .month { min-width: 8.5em; text-align: center; font-size: 1.45rem; color: var(--ink); }
+    .week, .grid-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+    .week span { padding-bottom: 4px; text-align: center; font-size: 0.74rem; font-weight: 700; letter-spacing: 0.08em; color: var(--muted); }
+    .grid-days { animation: cal-in 420ms var(--ease-smooth-out) both; }
+    .grid-days.back { animation-name: cal-back; }
+    @keyframes cal-in { from { opacity: 0; translate: 22px 0; rotate: 1deg; } }
+    @keyframes cal-back { from { opacity: 0; translate: -22px 0; rotate: -1deg; } }
+    .grid-days button { position: relative; display: grid; place-items: center; height: 46px; font-family: var(--font-display); font-stretch: 75%; font-size: 1.35rem; font-weight: 700; transition: color 200ms ease, scale 300ms var(--ease-bounce); }
+    .grid-days button > span { position: relative; z-index: 1; }
+    .grid-days button.today > span::after { content: 'hoy'; position: absolute; left: 50%; top: 82%; translate: -50% 0; font-family: var(--font-hand); font-size: 0.85rem; font-weight: 500; color: var(--peach-deep); }
+    .grid-days button:disabled { color: var(--muted); opacity: 0.4; cursor: not-allowed; }
+    .loop { position: absolute; left: 50%; top: 50%; width: 44px; height: 44px; translate: -50% -50%; overflow: visible; pointer-events: none; }
+    .loop path { fill: none; stroke: var(--peach-deep); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0; transition: stroke-dashoffset 420ms var(--ease-smooth-out), fill 300ms ease, opacity 0s 420ms; }
+    .grid-days button[aria-pressed='true'] .loop path { opacity: 1; transition-delay: 0s; stroke-dashoffset: 0; stroke-width: 2.6; fill: oklch(78% 0.095 52 / 0.45); }
+    .grid-days button[aria-pressed='true'] { scale: 1.08; }
+    @media (hover: hover) and (pointer: fine) { .grid-days button:not(:disabled):hover .loop path { stroke-dashoffset: 0; opacity: 1; transition-delay: 0s; } }
+    .grid-days button:active:not(:disabled) { scale: 0.92; }
+    .skeleton span { height: 46px; border-radius: 50%; background: var(--paper-2); animation: shimmer 1.4s ease-in-out infinite; }
     @keyframes shimmer { 50% { opacity: 0.5; } }
+    .cal-note { font-size: 1.2rem; color: var(--muted); }
+    /* Palomita a mano en "dónde" y "primera vez": se dibuja al elegir y se asoma al pasar el cursor */
+    .tick { width: 18px; height: 18px; margin-left: 2px; overflow: visible; }
+    .tick path { fill: none; stroke: var(--sage-deep); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0; transition: stroke-dashoffset 380ms var(--ease-smooth-out), opacity 0s 380ms; }
+    [aria-pressed='true'] > .tick path { stroke-dashoffset: 0; opacity: 1; transition-delay: 0s; }
+    @media (hover: hover) and (pointer: fine) {
+      .where button:hover, .seg button:hover { rotate: -1deg; }
+      .where button:not([aria-pressed='true']):hover .tick path, .seg button:not([aria-pressed='true']):hover .tick path { stroke-dashoffset: 0.55; opacity: 1; transition-delay: 0s; }
+    }
     .slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 8px; }
-    .slots button { padding: 9px 8px; font-weight: 650; font-size: 0.88rem; font-variant-numeric: tabular-nums; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line-2); animation: t-text-in 400ms var(--ease-smooth-out) both; animation-delay: calc(var(--i) * 25ms); transition: background-color 200ms ease, scale 160ms var(--ease-out); }
+    .slots button { position: relative; padding: 9px 8px; font-weight: 650; font-size: 0.88rem; font-variant-numeric: tabular-nums; background: var(--card); box-shadow: inset 0 0 0 1.5px var(--line-2); animation: t-text-in 400ms var(--ease-smooth-out) both; animation-delay: calc(var(--i) * 25ms); transition: background-color 200ms ease, scale 160ms var(--ease-out); }
     .slots button[aria-pressed='true'] { background: var(--ink); color: var(--paper); box-shadow: none; }
     .slots button:disabled { opacity: 0.35; text-decoration: line-through; cursor: not-allowed; }
+    /* Al pasar el cursor por una hora se dibuja una raya a mano debajo */
+    .under { position: absolute; left: 12%; right: 12%; bottom: 3px; width: 76%; height: 7px; overflow: visible; pointer-events: none; }
+    .under path { fill: none; stroke: var(--peach-deep); stroke-width: 2.2; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; opacity: 0; transition: stroke-dashoffset 380ms var(--ease-smooth-out), opacity 0s 380ms; }
+    .slots button[aria-pressed='true'] .under path { stroke: var(--peach); stroke-dashoffset: 0; opacity: 1; transition-delay: 0s; }
+    @media (hover: hover) and (pointer: fine) { .slots button:not(:disabled):hover .under path { stroke-dashoffset: 0; opacity: 1; transition-delay: 0s; } }
     .slots button:active:not(:disabled) { scale: 0.95; }
     .hint { font-size: 0.92rem; color: var(--muted); }
     .fields { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: end; }
@@ -192,7 +257,13 @@ export class Agenda {
   protected readonly online = signal(false);
   protected readonly reasons = REASONS;
   protected readonly phone = PRACTICE.phone;
-  protected readonly days = signal<Day[]>([]);
+  protected readonly today = signal<Date | null>(null);
+  /** Primer día del mes que se está viendo. */
+  protected readonly view = signal<Date | null>(null);
+  protected readonly dir = signal(1);
+  protected readonly maxMonths = MAX_MONTHS;
+  protected readonly weekLetters = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+  protected readonly skeleton = Array.from({ length: 35 }, (_, i) => i);
   protected readonly day = signal<Day | null>(null);
   protected readonly hour = signal<number | null>(null);
   protected readonly first = signal(true);
@@ -217,7 +288,7 @@ export class Agenda {
     if (!d) return [];
     const hours = HOURS[d.date.getDay()]!;
     const now = new Date();
-    const isToday = d.date.toDateString() === now.toDateString();
+    const isToday = sameDay(d.date, now);
     const out: { h: number; label: string; busy: boolean }[] = [];
     for (let h = hours[0]; h <= hours[1] - 1; h += 1) {
       const past = isToday && h <= now.getHours() + 1;
@@ -238,9 +309,9 @@ export class Agenda {
     const d = this.day();
     const h = this.hour();
     const who = this.nameSig().trim() || '(tu nombre)';
-    const when = d && h !== null ? `el ${d.weekday.toLowerCase()} ${d.date.getDate()} de ${MONTHS[d.date.getMonth()]} a las ${fmtHour(h)}` : 'el día y la hora que elijas';
+    const when = d && h !== null ? `${d.weekday === 'hoy' ? 'hoy' : 'el ' + d.weekday} ${d.date.getDate()} de ${MONTHS[d.date.getMonth()]} a las ${fmtHour(h)}` : 'el día y la hora que elijas';
     const where = this.online() ? 'en línea' : 'en el consultorio';
-    let text = `Hola, Valeria. Soy ${who} y me gustaría agendar: ${this.clinic.reason().toLowerCase()}, ${where}, ${when}.`;
+    let text = `Hola, Lucía. Soy ${who} y me gustaría agendar: ${this.clinic.reason().toLowerCase()}, ${where}, ${when}.`;
     text += this.first() ? '\nEs la primera vez que voy a terapia.' : '\nYa he ido a terapia antes.';
     if (this.notesSig().trim()) text += `\n${this.notesSig().trim()}`;
     return text;
@@ -248,9 +319,37 @@ export class Agenda {
 
   protected readonly link = computed(() => whatsappLink(this.message()));
 
-  protected readonly monthLabel = computed(() => {
-    const d = this.day() ?? this.days()[0];
-    return d ? d.date.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' }) : '';
+  protected readonly monthLabel = computed(() => this.view()?.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' }).replace(' de ', ' ') ?? '');
+
+  protected readonly monthKey = computed(() => this.view()?.toISOString().slice(0, 7) ?? '');
+
+  /** Cuántos meses adelante está el mes que se ve. */
+  private readonly offset = computed(() => {
+    const v = this.view();
+    const t = this.today();
+    return v && t ? (v.getFullYear() - t.getFullYear()) * 12 + v.getMonth() - t.getMonth() : 0;
+  });
+  protected readonly canPrev = computed(() => this.offset() > 0);
+  protected readonly canNext = computed(() => this.offset() < MAX_MONTHS - 1);
+
+  /** Celdas del mes (null = hueco antes del día 1, la semana empieza en lunes). */
+  protected readonly cells = computed<(Cell | null)[]>(() => {
+    const v = this.view();
+    const now = this.today();
+    if (!v || !now) return [];
+    const out: (Cell | null)[] = Array.from({ length: (v.getDay() + 6) % 7 }, () => null);
+    const last = new Date(v.getFullYear(), v.getMonth() + 1, 0).getDate();
+    const start = new Date(now);
+    start.setHours(0, 0, 0, 0);
+    for (let n = 1; n <= last; n++) {
+      const date = new Date(v.getFullYear(), v.getMonth(), n);
+      const hours = HOURS[date.getDay()];
+      const isToday = sameDay(date, now);
+      const off = date < start || !hours || (isToday && now.getHours() >= hours[1] - 2);
+      const weekday = isToday ? 'hoy' : DAY_NAMES[date.getDay()].toLowerCase();
+      out.push({ day: { key: date.toISOString().slice(0, 10), date, weekday }, off, today: isToday });
+    }
+    return out;
   });
 
   private readonly tabs = viewChild<ElementRef<HTMLElement>>('tabs');
@@ -270,22 +369,17 @@ export class Agenda {
       });
     });
     afterNextRender(() => {
-      const list: Day[] = [];
-      const d = new Date();
-      d.setHours(0, 0, 0, 0);
-      while (list.length < 12) {
-        const hours = HOURS[d.getDay()];
-        const now = new Date();
-        const todayClosed = d.toDateString() === now.toDateString() && (!hours || now.getHours() >= hours[1] - 2);
-        if (hours && !todayClosed) {
-          const date = new Date(d);
-          const isToday = date.toDateString() === now.toDateString();
-          list.push({ key: date.toISOString().slice(0, 10), date, weekday: isToday ? 'Hoy' : DAY_NAMES[date.getDay()].slice(0, 3), label: MONTHS[date.getMonth()] });
-        }
-        d.setDate(d.getDate() + 1);
-      }
-      this.days.set(list);
+      const now = new Date();
+      this.today.set(now);
+      this.view.set(new Date(now.getFullYear(), now.getMonth(), 1));
     });
+  }
+
+  protected shiftMonth(step: number) {
+    const v = this.view();
+    if (!v) return;
+    this.dir.set(step);
+    this.view.set(new Date(v.getFullYear(), v.getMonth() + step, 1));
   }
 
   protected pickDay(d: Day) {

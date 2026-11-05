@@ -3,41 +3,42 @@ import { RouterLink } from '@angular/router';
 import { Practice } from '../core/practice';
 import { Motion } from '../core/motion';
 import { Logo } from '../shared/logo';
-import { Magnetic } from '../shared/magnetic';
 
 const LINKS = [
   { id: 'temas', label: '¿Qué te trae?' },
   { id: 'respira', label: 'Respira' },
   { id: 'terapia', label: 'Terapia' },
-  { id: 'valeria', label: 'Sobre mí' },
+  { id: 'psicologa', label: 'Sobre mí' },
   { id: 'tarifas', label: 'Tarifas' },
 ];
 
-/** Raya a mano que se dibuja debajo del enlace al pasar el cursor. */
-const SQUIGGLE = 'M2 7 C 14 2, 26 11, 38 6 S 62 2, 74 7 S 92 10, 98 5';
+/** Óvalo a mano que encierra el enlace al pasar el cursor (como cuando circulas algo en un cuaderno). */
+const LOOP = 'M86 9 C 68 1, 22 2, 8 14 C -2 25, 24 37, 54 36 C 84 35, 101 25, 93 13 C 87 6, 71 3, 50 5';
+/** Cada enlace se circula con otro color. */
+const COLORS = ['var(--peach-deep)', 'var(--sage-deep)', 'var(--dusty)', 'var(--peach-deep)', 'var(--sage-deep)'];
 
 /**
- * Encabezado de papel: al pasar el cursor por un enlace se dibuja debajo una raya hecha a mano.
+ * Encabezado de papel: al pasar el cursor por un enlace se dibuja a mano un óvalo que lo encierra, cada uno de otro color.
  * Al bajar se esconde y al subir regresa. En celular, menú a pantalla completa que baja como hoja rasgada.
  */
 @Component({
   selector: 'app-header',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterLink, Logo, Magnetic],
+  imports: [RouterLink, Logo],
   host: { '[class.hidden]': 'hidden()', '[class.solid]': 'solid()' },
   template: `
     <div class="bar page">
       <a routerLink="/" class="brand" aria-label="Claro, inicio"><app-logo /></a>
       <nav aria-label="Secciones">
-        @for (l of links; track l.id) {
-          <button type="button" (click)="practice.go(l.id)">
+        @for (l of links; track l.id; let i = $index) {
+          <button type="button" (click)="practice.go(l.id)" [style.--c]="colors[i]">
             {{ l.label }}
-            <svg viewBox="0 0 100 12" preserveAspectRatio="none" aria-hidden="true"><path [attr.d]="squiggle" pathLength="1" /></svg>
+            <svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true"><path [attr.d]="loop" pathLength="1" /></svg>
           </button>
         }
       </nav>
       <div class="end">
-        <button type="button" class="btn cta" magnetic (click)="practice.book()">Agenda una sesión</button>
+        <button type="button" class="btn cta" (click)="practice.book()">Agenda una sesión</button>
         <button type="button" class="menu-btn" (click)="toggle()" [attr.aria-expanded]="open()" aria-controls="menu" aria-label="Menú">
           <span></span><span></span>
         </button>
@@ -63,13 +64,14 @@ const SQUIGGLE = 'M2 7 C 14 2, 26 11, 38 6 S 62 2, 74 7 S 92 10, 98 5';
     .brand { position: relative; z-index: 2; transition: scale 160ms var(--ease-out); }
     .brand:active { scale: 0.96; }
     nav { display: flex; gap: 6px; }
-    nav button { position: relative; padding: 10px 12px; font-size: 0.95rem; font-weight: 600; transition: color 250ms ease, scale 160ms var(--ease-out); }
+    nav button { position: relative; padding: 10px 12px; font-size: 0.95rem; font-weight: 600; transition: color 250ms ease, rotate 400ms var(--ease-bounce), scale 160ms var(--ease-out); }
     nav button:active { scale: 0.95; }
-    nav svg { position: absolute; left: 10px; right: 10px; bottom: 2px; width: calc(100% - 20px); height: 9px; overflow: visible; }
-    nav path { fill: none; stroke: var(--peach-deep); stroke-width: 2.4; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 450ms var(--ease-smooth-out); }
+    nav svg { position: absolute; left: 0; top: 2px; width: 100%; height: calc(100% - 4px); overflow: visible; pointer-events: none; }
+    nav path { fill: none; stroke: var(--c); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: -1; opacity: 0; transition: stroke-dashoffset 300ms ease-in, opacity 0s 300ms; }
     @media (hover: hover) and (pointer: fine) {
-      nav button:hover path { stroke-dashoffset: 0; }
-      nav button:hover { color: var(--peach-deep); }
+      /* Entra dibujándose y al salir se "borra" hacia el otro lado */
+      nav button:hover path { stroke-dashoffset: 0; opacity: 1; transition: stroke-dashoffset 520ms var(--ease-smooth-out), opacity 0s; }
+      nav button:hover { color: var(--c); rotate: -2deg; }
     }
     .end { display: flex; align-items: center; gap: 10px; }
     .cta { min-height: 46px; padding: 0 22px; font-size: 0.92rem; }
@@ -101,7 +103,8 @@ export class Header {
   protected readonly practice = inject(Practice);
   private readonly motion = inject(Motion);
   protected readonly links = LINKS;
-  protected readonly squiggle = SQUIGGLE;
+  protected readonly loop = LOOP;
+  protected readonly colors = COLORS;
   protected readonly open = signal(false);
   protected readonly closing = signal(false);
   protected readonly hidden = signal(false);

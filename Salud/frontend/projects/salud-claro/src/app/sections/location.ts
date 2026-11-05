@@ -117,6 +117,20 @@ import { Reveal } from '../shared/reveal';
     .crisis b { font-size: 1.1rem; }
     .ico { flex: none; display: grid; place-items: center; width: 54px; height: 54px; border-radius: 50%; background: var(--card); color: var(--peach-deep); }
     @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    /* Microinteracciones: el pin brinca y la ruta camina sobre el mapa; las horas se marcan con marcatexto */
+    @media (hover: hover) and (pointer: fine) {
+      .map:hover .pin { animation: hop 800ms var(--ease-bounce); }
+      .map:hover .route { animation: walk 1.2s linear infinite; }
+      .map:hover .here { animation: nudge 700ms var(--ease-bounce); }
+      .hours li:not(.today):hover { background-size: 100% 100%; }
+      .crisis:hover .ico { animation: float 1.6s var(--ease-calm) infinite alternate; }
+    }
+    .hours li:not(.today) { background: linear-gradient(transparent 55%, var(--sage-soft) 55%, var(--sage-soft) 90%, transparent 90%) no-repeat 0 0 / 0% 100%; transition: background-size 450ms var(--ease-smooth-out); }
+    .here { transform-box: fill-box; transform-origin: center; }
+    @keyframes hop { 0%, 100% { translate: 0 0; } 35% { translate: 0 -12px; } 60% { translate: 0 0; } 78% { translate: 0 -4px; } }
+    @keyframes walk { to { stroke-dashoffset: -26; } }
+    @keyframes nudge { 0%, 100% { rotate: 0deg; } 30% { rotate: -10deg; } 60% { rotate: 6deg; } }
+    @keyframes float { from { translate: 0 0; rotate: -8deg; } to { translate: 0 -4px; rotate: 8deg; } }
   `,
 })
 export class Location {

@@ -4,7 +4,7 @@ Dos demos del paquete **Profesional** con marcas ficticias, para salir a prospec
 de Aguascalientes en el CRM: unos 2,100 negocios, casi 9 de cada 10 sin web). Fichas de diseño: `docs/marfil.md` y `docs/claro.md`.
 
 - Marfil: https://demo-salud-marfil.vercel.app (Vercel `demo-salud-marfil`). Clínica dental de la Dra. Renata Ibarra.
-- Claro: https://demo-salud-claro.vercel.app (Vercel `demo-salud-claro`). Consultorio de la psicóloga Valeria Ríos.
+- Claro: https://demo-salud-claro.vercel.app (Vercel `demo-salud-claro`). Consultorio de la psicóloga Lucía Arenas.
 - Repo: `BrunoDunay/Demos-de-servicios-web` (todas las demos), carpeta `Salud/`. Push a `main` publica; cada proyecto
   de Vercel solo se vuelve a compilar si cambió su carpeta.
 - Vercel: `prj_jRbyjQ5aNorG0KxcoNB8DDtOPUpY` (Marfil) y `prj_0MOWmxcBjiGk6KSceBneLvfL8fzR` (Claro). Raíz `Salud/frontend`,
@@ -44,3 +44,6 @@ npm run build          # compila las dos
 - 4 nov 2026, ronda de cambios de Marfil (Bruno): doctora nueva en la portada, el diente 3D solo en tratamientos, sin
   palabras gigantes en portada y pie, sin botones magnéticos, íconos 3D, mazo de reseñas, precios alineados y calendario
   de mes. Detalle en `docs/marfil.md`.
+- 5 nov 2026, ronda de Claro: la psicóloga ahora es **Lucía Arenas** (antes Valeria Ríos), sin botones magnéticos, nuevo hover del
+  menú (óvalo a mano), calendario de mes, lápiz que sigue al cursor, más microinteracciones y tarjeta B (cita de papel; la A sigue
+  con `?tarjeta=a` hasta que Bruno elija). Marfil: dientitos al hacer clic.

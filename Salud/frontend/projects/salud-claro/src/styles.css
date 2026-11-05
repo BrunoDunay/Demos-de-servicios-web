@@ -245,21 +245,19 @@ p {
   color: var(--paper);
   overflow: hidden;
   isolation: isolate;
-  transition: scale 160ms var(--ease-out), color 300ms ease;
+  transition: scale 160ms var(--ease-out), rotate 450ms var(--ease-bounce), color 300ms ease;
 }
 
+/* Al pasar el cursor el botón se "colorea a lápiz": rayas diagonales de durazno lo llenan de izquierda a derecha
+   y se ladea un poco, como dibujado a mano. */
 .btn::before {
   content: '';
   position: absolute;
   z-index: -1;
-  left: var(--mx, 50%);
-  top: var(--my, 50%);
-  width: 0;
-  aspect-ratio: 1;
-  border-radius: 50%;
-  translate: -50% -50%;
-  background: var(--peach);
-  transition: width 550ms var(--ease-smooth-out);
+  inset: -2px;
+  background: repeating-linear-gradient(-58deg, var(--peach) 0 5px, color-mix(in oklch, var(--peach) 55%, transparent) 5px 8px);
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 560ms var(--ease-smooth-out);
 }
 
 .btn:active {
@@ -278,15 +276,18 @@ p {
 }
 
 .btn.peach::before {
-  background: var(--card);
+  background: repeating-linear-gradient(-58deg, var(--card) 0 5px, color-mix(in oklch, var(--card) 55%, transparent) 5px 8px);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .btn:hover {
     color: var(--ink);
   }
+  .btn:hover {
+    rotate: -1.5deg;
+  }
   .btn:hover::before {
-    width: 260%;
+    clip-path: inset(0 0 0 0);
   }
 }
 
@@ -474,4 +475,11 @@ p {
 
 .reduce-motion .t-tilt-card {
   transform: none !important;
+}
+
+/* Mientras se raya con el lápiz (shared/pencil.ts) no se selecciona texto */
+.scribbling,
+.scribbling * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
 }

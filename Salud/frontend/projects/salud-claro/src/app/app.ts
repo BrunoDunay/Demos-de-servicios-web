@@ -4,17 +4,19 @@ import { Motion } from './core/motion';
 import { Footer } from './sections/footer';
 import { Header } from './sections/header';
 import { Intro } from './shared/intro';
+import { Pencil } from './shared/pencil';
 
 @Component({
   selector: 'app-root',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [RouterOutlet, Header, Footer, Intro],
+  imports: [RouterOutlet, Header, Footer, Intro, Pencil],
   template: `
     <app-intro />
     <a class="skip" href="#contenido">Saltar al contenido</a>
     <app-header />
     <main id="contenido"><router-outlet /></main>
     <app-footer />
+    <app-pencil />
   `,
   styles: `
     .skip { position: fixed; left: 16px; top: -60px; z-index: 100; padding: 12px 18px; border-radius: 999px; background: var(--ink); color: var(--paper); transition: top 200ms ease; }

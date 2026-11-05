@@ -26,7 +26,7 @@ const APPS = {
     'bosque': 4500037,
     'claro': 28961234,
     'amanecer': 31359311,
-    'valeria': 7176288,
+    'psicologa': 7176288,
     'manos': 7176319,
     'escucha': 7176322,
     'sala': 7176026,

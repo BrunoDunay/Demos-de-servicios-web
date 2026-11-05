@@ -16,7 +16,7 @@ const DOCS: Record<string, LegalDoc> = {
     title: 'Aviso de privacidad',
     updated: 'Noviembre de 2026',
     intro:
-      'Valeria Ríos, psicóloga (en adelante, “Claro”), con domicilio en Av. Héroe de Nacozari Sur 1520, int. 3, Las Américas, Aguascalientes, Ags., es responsable del tratamiento de tus datos personales conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares.',
+      'Lucía Arenas, psicóloga (en adelante, “Claro”), con domicilio en Av. Héroe de Nacozari Sur 1520, int. 3, Las Américas, Aguascalientes, Ags., es responsable del tratamiento de tus datos personales conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares.',
     sections: [
       { h: 'Datos que recabamos', p: ['Nombre, teléfono, correo y datos de facturación.', 'Datos sensibles sobre tu salud emocional y tu historia personal, que compartes en sesión. Solo los tratamos con tu consentimiento expreso y por escrito.'] },
       { h: 'Para qué los usamos', p: ['Para darte atención psicológica, llevar tu expediente, agendar y confirmar sesiones y emitir facturas. No usamos tus datos con fines publicitarios.'] },

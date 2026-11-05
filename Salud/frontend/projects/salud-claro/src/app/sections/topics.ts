@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { TOPICS, Topic } from '../core/content';
 import { scribble } from '../core/doodles';
 import { Practice } from '../core/practice';
-import { Arrow, Magnetic } from '../shared/magnetic';
+import { Arrow } from '../shared/arrow';
 import { Reveal } from '../shared/reveal';
 
 /**
@@ -13,7 +13,7 @@ import { Reveal } from '../shared/reveal';
 @Component({
   selector: 'app-topics',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [Reveal, Arrow, Magnetic],
+  imports: [Reveal, Arrow],
   template: `
     <section class="section" id="temas">
       <div class="page">
@@ -49,7 +49,7 @@ import { Reveal } from '../shared/reveal';
                 </dl>
               </div>
             }
-            <button type="button" class="btn t-learn" magnetic (click)="practice.book(reason(t))">Quiero empezar <app-arrow /></button>
+            <button type="button" class="btn t-learn" (click)="practice.book(reason(t))">Quiero empezar <app-arrow /></button>
           </article>
         </div>
       </div>
@@ -84,6 +84,16 @@ import { Reveal } from '../shared/reveal';
     dd { margin: 0; font-weight: 650; text-align: right; }
     .sheet > .btn { justify-self: start; }
     @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    /* Microinteracciones: la etiqueta se columpia desde su agujero y el dibujo de la hoja se vuelve a trazar */
+    .tags button { transform-origin: 10px 50%; }
+    @media (hover: hover) and (pointer: fine) {
+      .tags button:not([aria-checked='true']):hover { animation: swing 900ms var(--ease-smooth-out); }
+      .tags button:hover .hole { background: var(--peach-deep); }
+      .sheet:hover .doodle path { animation: redraw 1.1s var(--ease-smooth-out) forwards; }
+    }
+    .hole { transition: background-color 250ms ease; }
+    @keyframes swing { 0% { rotate: var(--r); } 30% { rotate: 4deg; } 55% { rotate: -2.5deg; } 78% { rotate: 1deg; } 100% { rotate: 0deg; } }
+    @keyframes redraw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
   `,
 })
 export class Topics {
