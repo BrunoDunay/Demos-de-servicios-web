@@ -61,9 +61,9 @@ void main() {
     // Barrido diagonal con borde muy difuso y un brillo suave en el frente.
     float d = uv.x * 0.85 + (1.0 - uv.y) * 0.15;
     float edge = e * 1.5 - 0.25;
-    float m = smoothstep(edge + 0.25, edge - 0.25, d);
+    float m = 1.0 - smoothstep(edge - 0.25, edge + 0.25, d);
     col = mix(A(uv), B(uv), m);
-    col += vec3(1.0, 0.96, 0.94) * exp(-pow((d - edge) * 7.0, 2.0)) * arc * 0.12;
+    col += vec3(1.0, 0.96, 0.94) * exp(-(d - edge) * (d - edge) * 49.0) * arc * 0.12;
   } else if (mode == 1) {
     // Deslizamiento: la nueva cubre a la actual desde la derecha; la actual se aleja más lento y se oscurece.
     float x = 1.0 - e;
@@ -87,7 +87,7 @@ void main() {
     vec2 d = (uv - 0.5) * vec2(aspect, 1.0);
     float r = length(d);
     float R = e * (length(vec2(aspect, 1.0)) * 0.6 + 0.25);
-    col = mix(A(uv), B(uv), smoothstep(R, R - 0.25, r));
+    col = mix(A(uv), B(uv), 1.0 - smoothstep(R - 0.25, R, r));
   } else if (mode == 4) {
     // Acercamiento con desenfoque: la actual crece y se desenfoca; la nueva llega desde un poco más grande.
     vec2 ua = (uv - 0.5) / (1.0 + e * 0.12) + 0.5;
@@ -96,7 +96,7 @@ void main() {
   } else if (mode == 5) {
     // Se abre desde el centro, con borde difuso.
     float d = abs(uv.x - 0.5) * 2.0;
-    col = mix(A(uv), B(uv), smoothstep(e * 1.3, e * 1.3 - 0.3, d));
+    col = mix(A(uv), B(uv), 1.0 - smoothstep(e * 1.3 - 0.3, e * 1.3, d));
   } else if (mode == 6) {
     // Cortina: la nueva sube desde abajo con un poco de paralaje y la actual se desvanece.
     float edge = e * 1.2 - 0.1;

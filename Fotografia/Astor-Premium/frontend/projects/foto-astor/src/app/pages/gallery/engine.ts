@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
@@ -146,11 +145,12 @@ void main() {
   vec2 uv = vUv.xy / vUv.w;
   vec3 sum = vec3(0.0);
   float tot = 0.0;
-  for (int i = -3; i <= 3; i++) {
-    for (int j = -3; j <= 3; j++) {
-      vec2 o = vec2(float(i) * 0.0032, float(j) * 0.0055);
-      float w = exp(-float(i * i + j * j) / 6.0);
-      sum += texture2D(tDiffuse, uv + o).rgb * w;
+  // Nueve muestras bastan: la textura es chica y lleva mipmaps, así que cada muestra ya viene suavizada.
+  for (int i = -1; i <= 1; i++) {
+    for (int j = -1; j <= 1; j++) {
+      vec2 o = vec2(float(i) * 0.0036, float(j) * 0.0058);
+      float w = exp(-float(i * i + j * j) / 1.6);
+      sum += texture2D(tDiffuse, uv + o, 3.0).rgb * w;
       tot += w;
     }
   }
@@ -172,9 +172,15 @@ const GRADE = {
     void main() {
       vec3 c = texture2D(tDiffuse, vUv).rgb;
       vec2 d = (vUv - 0.5) * vec2(aspect, 1.0);
+      // Las sombras no llegan a negro puro: se quedan en el azul noche de la marca.
+      c += vec3(0.0012, 0.002, 0.0048) * (1.0 - smoothstep(0.0, 0.2, dot(c, vec3(0.3333))));
       c *= mix(1.0, 0.6, smoothstep(0.45, 1.1, length(d)));
       c *= 1.0 - dip;
-      gl_FragColor = vec4(c, 1.0);
+      // Salida a pantalla (sRGB) y, ya en 8 bits, un tramado de un solo nivel (invisible, no es grano): evita las
+      // bandas en los degradados oscuros. Todo en este mismo paso para no recorrer la pantalla tres veces.
+      gl_FragColor = linearToOutputTexel(vec4(max(c, 0.0), 1.0));
+      float n = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))));
+      gl_FragColor.rgb += (n - 0.5) / 255.0;
     }
   `,
 };
@@ -261,27 +267,147 @@ function goboTexture() {
   return t;
 }
 
+/** Luz sobre el muro: el abanico de cada luminaria desde arriba y el baño rasante de la línea de luz del zoclo. */
+function wallLightTexture() {
+  const c = document.createElement('canvas');
+  c.width = 256;
+  c.height = 512;
+  const g = c.getContext('2d')!;
+  g.fillStyle = '#000';
+  g.fillRect(0, 0, 256, 512);
+  const graze = g.createLinearGradient(0, 512, 0, 350);
+  graze.addColorStop(0, 'rgba(255,206,170,0.42)');
+  graze.addColorStop(0.35, 'rgba(255,206,170,0.12)');
+  graze.addColorStop(1, 'rgba(255,206,170,0)');
+  g.fillStyle = graze;
+  g.fillRect(0, 0, 256, 512);
+  g.globalCompositeOperation = 'lighter';
+  g.translate(128, 26);
+  g.scale(1, 2.9);
+  const fan = g.createRadialGradient(0, 0, 3, 0, 0, 122);
+  fan.addColorStop(0, 'rgba(255,238,224,0.5)');
+  fan.addColorStop(0.3, 'rgba(255,238,224,0.2)');
+  fan.addColorStop(0.7, 'rgba(255,238,224,0.05)');
+  fan.addColorStop(1, 'rgba(255,238,224,0)');
+  g.fillStyle = fan;
+  g.fillRect(-128, 0, 256, 180);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = THREE.RepeatWrapping;
+  t.anisotropy = 8;
+  return t;
+}
+
+/** Juntas del concreto pulido: una retícula muy tenue cada 4 m (da escala y profundidad al piso). */
+function jointsTexture() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 512;
+  const g = c.getContext('2d')!;
+  g.fillStyle = '#fff';
+  g.fillRect(0, 0, 512, 512);
+  g.fillStyle = 'rgba(0,0,0,0.55)';
+  g.fillRect(0, 0, 512, 2);
+  g.fillRect(0, 0, 2, 512);
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  t.anisotropy = 8;
+  return t;
+}
+
+/** Mancha suave: sirve de sombra de contacto (negra) y de resplandor detrás de las pantallas (de color). */
+function softTexture(kind: 'round' | 'panel') {
+  const c = document.createElement('canvas');
+  c.width = c.height = 256;
+  const g = c.getContext('2d')!;
+  if (kind === 'round') {
+    const r = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+    r.addColorStop(0, 'rgba(255,255,255,1)');
+    r.addColorStop(0.45, 'rgba(255,255,255,0.45)');
+    r.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = r;
+    g.fillRect(0, 0, 256, 256);
+  } else {
+    g.filter = 'blur(26px)';
+    g.fillStyle = '#fff';
+    g.fillRect(58, 58, 140, 140);
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
+// Haz de luz en el aire (como con un poco de bruma): más denso al centro del cono y cerca de la luminaria.
+const BEAM = {
+  vertexShader: /* glsl */ `
+    varying vec3 vN; varying vec3 vV; varying float vH;
+    void main() {
+      vec4 mv = modelViewMatrix * vec4(position, 1.0);
+      vN = normalize(normalMatrix * normal);
+      vV = normalize(-mv.xyz);
+      vH = uv.y;
+      gl_Position = projectionMatrix * mv;
+    }`,
+  fragmentShader: /* glsl */ `
+    uniform vec3 color; uniform float power;
+    varying vec3 vN; varying vec3 vV; varying float vH;
+    void main() {
+      float core = pow(abs(dot(normalize(vN), normalize(vV))), 2.4);
+      float fall = mix(0.1, 1.0, pow(clamp(vH, 0.0, 1.0), 1.6));
+      gl_FragColor = vec4(color * core * fall * power, 1.0);
+    }`,
+};
+
+// Techo de fibra óptica: puntos de luz que titilan muy despacio (el cielo de Astor).
+const STARS = {
+  vertexShader: /* glsl */ `
+    attribute float size; attribute float phase;
+    uniform float time; uniform float scale; uniform float density;
+    varying float vA;
+    void main() {
+      vec4 mv = modelViewMatrix * vec4(position, 1.0);
+      float d = -mv.z;
+      float px = size * scale / max(d, 0.1);
+      float tw = 0.72 + 0.28 * sin(time * (0.35 + fract(phase * 7.3) * 0.5) + phase * 6.2831);
+      vA = tw * clamp(px / 1.6, 0.0, 1.0) * exp(-d * d * density * density);
+      gl_PointSize = max(px, 1.6);
+      gl_Position = projectionMatrix * mv;
+    }`,
+  fragmentShader: /* glsl */ `
+    uniform vec3 color; varying float vA;
+    void main() {
+      float r = length(gl_PointCoord - 0.5) * 2.0;
+      float a = 1.0 - smoothstep(0.0, 1.0, r);
+      gl_FragColor = vec4(color * a * a * vA, 1.0);
+    }`,
+};
+
 export async function createGallery(canvas: HTMLCanvasElement, hooks: GalleryHooks, opts: { reduced: boolean }): Promise<GalleryApi> {
   const narrow = innerWidth < 760;
   const lowPower = narrow || (navigator.hardwareConcurrency ?? 8) <= 4;
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance', stencil: false });
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, lowPower ? 1.5 : 2));
+  // La sala se dibuja dos veces (vista y reflejo) con muchas luces: más de 1.5 no se nota y sí cuesta.
+  const basePr = Math.min(devicePixelRatio || 1, lowPower ? 1.25 : 1.5);
+  renderer.setPixelRatio(basePr);
   renderer.toneMapping = THREE.NoToneMapping;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x05060a);
-  scene.fog = new THREE.FogExp2(0x05060a, 0.022);
+  const FOG = 0.021;
+  scene.background = new THREE.Color(0x05070c);
+  scene.fog = new THREE.FogExp2(0x05070c, FOG);
   const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 140);
 
   const disposables: { dispose(): void }[] = [];
   const track = <T extends { dispose(): void }>(d: T) => (disposables.push(d), d);
 
   // ===== Sala: piso de concreto pulido, muros de yeso oscuro y techo en penumbra =====
-  scene.add(new THREE.HemisphereLight(0x8a93b0, 0x0a0b10, 0.12));
+  scene.add(new THREE.HemisphereLight(0x8a93b0, 0x0a0b10, 0.2));
   const spots = track(softNoise());
   spots.repeat.set(2, 6);
-  const floorMat = track(new THREE.MeshStandardMaterial({ color: 0x15171c, roughness: 0.62, metalness: 0, roughnessMap: spots }));
+  const joints = track(jointsTexture());
+  joints.repeat.set(10, 32.5);
+  const floorMat = track(new THREE.MeshStandardMaterial({ color: 0x15171c, roughness: 0.62, metalness: 0, roughnessMap: spots, map: joints }));
   const floor = new THREE.Mesh(track(new THREE.PlaneGeometry(40, 130)), floorMat);
   floor.rotation.x = -Math.PI / 2;
   floor.position.set(0, 0, -24);
@@ -289,8 +415,10 @@ export async function createGallery(canvas: HTMLCanvasElement, hooks: GalleryHoo
 
   const reflector = new Reflector(track(new THREE.PlaneGeometry(40, 130)), {
     clipBias: 0.003,
-    textureWidth: Math.round((innerWidth * renderer.getPixelRatio()) / (lowPower ? 2.5 : 1.6)),
-    textureHeight: Math.round((innerHeight * renderer.getPixelRatio()) / (lowPower ? 2.5 : 1.6)),
+    // El reflejo siempre se ve desenfocado: con la mitad de la pantalla sobra, y sin antialiasing.
+    textureWidth: Math.round(innerWidth / (lowPower ? 1.7 : 2)),
+    textureHeight: Math.round(innerHeight / (lowPower ? 1.7 : 2)),
+    multisample: 0,
     color: 0xffffff,
     shader: {
       name: 'AstorFloor',
@@ -298,7 +426,7 @@ export async function createGallery(canvas: HTMLCanvasElement, hooks: GalleryHoo
         color: { value: null },
         tDiffuse: { value: null },
         textureMatrix: { value: null },
-        strength: { value: 0.5 },
+        strength: { value: 0.6 },
         camPos: { value: new THREE.Vector3() },
       },
       vertexShader: REFLECT_VERT,
@@ -311,9 +439,19 @@ export async function createGallery(canvas: HTMLCanvasElement, hooks: GalleryHoo
   reflMat.transparent = true;
   reflMat.blending = THREE.AdditiveBlending;
   reflMat.depthWrite = false;
+  // Con mipmaps, cada muestra del desenfoque ya viene suavizada: las líneas de luz se reflejan sin partirse en tiras.
+  const reflTex = reflector.getRenderTarget().texture;
+  reflTex.generateMipmaps = true;
+  reflTex.minFilter = THREE.LinearMipmapLinearFilter;
+  reflector.renderOrder = 1;
   scene.add(reflector);
 
-  const wallMat = track(new THREE.MeshStandardMaterial({ color: 0x272c38, roughness: 0.92 }));
+  const wallLight = track(wallLightTexture());
+  wallLight.repeat.set(40, 1);
+  const wallMat = track(new THREE.MeshStandardMaterial({ color: 0x272c38, roughness: 0.92, emissive: 0xffffff, emissiveMap: wallLight, emissiveIntensity: 0.3 }));
+  const endLight = track(wallLightTexture());
+  endLight.repeat.set(5, 1);
+  const endMat = track(new THREE.MeshStandardMaterial({ color: 0x272c38, roughness: 0.92, emissive: 0xffffff, emissiveMap: endLight, emissiveIntensity: 0.3 }));
   const darkMat = track(new THREE.MeshStandardMaterial({ color: 0x0c0d11, roughness: 0.5, metalness: 0.25 }));
   const wallGeo = track(new THREE.PlaneGeometry(130, 6.6));
   for (const side of [-1, 1]) {
@@ -327,14 +465,14 @@ export async function createGallery(canvas: HTMLCanvasElement, hooks: GalleryHoo
     scene.add(base);
   }
   const endGeo = track(new THREE.PlaneGeometry(16, 6.6));
-  const back = new THREE.Mesh(endGeo, wallMat);
+  const back = new THREE.Mesh(endGeo, endMat);
   back.position.set(0, 3.3, -62);
   scene.add(back);
-  const front = new THREE.Mesh(endGeo, wallMat);
+  const front = new THREE.Mesh(endGeo, endMat);
   front.rotation.y = Math.PI;
   front.position.set(0, 3.3, 19);
   scene.add(front);
-  const ceiling = new THREE.Mesh(track(new THREE.PlaneGeometry(16, 130)), track(new THREE.MeshBasicMaterial({ color: 0x030306 })));
+  const ceiling = new THREE.Mesh(track(new THREE.PlaneGeometry(16, 130)), track(new THREE.MeshStandardMaterial({ color: 0x0a0b10, roughness: 0.95 })));
   ceiling.rotation.x = Math.PI / 2;
   ceiling.position.set(0, 6.6, -24);
   scene.add(ceiling);
@@ -348,6 +486,131 @@ export async function createGallery(canvas: HTMLCanvasElement, hooks: GalleryHoo
     s.position.set(side * 6.6, 6.3, z);
     s.target.position.set(side * 8, 1.4, z);
     scene.add(s, s.target);
+  }
+
+
+  // ===== Arquitectura de luz =====
+  // Línea de luz cálida al pie de cada muro (se refleja en el piso y marca la perspectiva de la sala).
+  const ledMat = track(new THREE.MeshBasicMaterial({ color: new THREE.Color(1.7, 1.22, 0.9) }));
+  for (const side of [-1, 1]) {
+    const led = new THREE.Mesh(track(new THREE.BoxGeometry(0.02, 0.018, 130)), ledMat);
+    led.position.set(side * 7.955, 0.132, -24);
+    scene.add(led);
+  }
+  // Umbrales entre salas: dos machones y un dintel, con un filo de luz por dentro. Enmarcan lo que viene.
+  const PORTALS = [-21, -34.2, -46.55];
+  const finGeo = track(new THREE.BoxGeometry(1.6, 6.6, 0.4));
+  const lintelGeo = track(new THREE.BoxGeometry(12.8, 1.3, 0.4));
+  const jambLed = track(new THREE.BoxGeometry(0.025, 5.3, 0.025));
+  const headLed = track(new THREE.BoxGeometry(12.8, 0.025, 0.025));
+  const frameLed = track(new THREE.MeshBasicMaterial({ color: new THREE.Color(1.2, 0.9, 0.7) }));
+  const portalMat = track(new THREE.MeshStandardMaterial({ color: 0x1b1f29, roughness: 0.9 }));
+  for (const z of PORTALS) {
+    for (const side of [-1, 1]) {
+      const fin = new THREE.Mesh(finGeo, portalMat);
+      fin.position.set(side * 7.2, 3.3, z);
+      scene.add(fin);
+      const l = new THREE.Mesh(jambLed, frameLed);
+      l.position.set(side * 6.39, 2.65, z);
+      scene.add(l);
+    }
+    const lintel = new THREE.Mesh(lintelGeo, portalMat);
+    lintel.position.set(0, 5.95, z);
+    scene.add(lintel);
+    const head = new THREE.Mesh(headLed, frameLed);
+    head.position.set(0, 5.29, z);
+    scene.add(head);
+  }
+  // Techo de fibra óptica: el cielo de Astor sobre toda la galería (y reflejado en el piso pulido).
+  const STAR_COUNT = lowPower ? 900 : 1700;
+  const starPos = new Float32Array(STAR_COUNT * 3);
+  const starSize = new Float32Array(STAR_COUNT);
+  const starPhase = new Float32Array(STAR_COUNT);
+  for (let i = 0; i < STAR_COUNT; i++) {
+    starPos[i * 3] = (Math.random() * 2 - 1) * 7.7;
+    starPos[i * 3 + 1] = 6.56;
+    starPos[i * 3 + 2] = 18.5 - Math.random() * 80;
+    const r = Math.random();
+    starSize[i] = r > 0.985 ? 0.2 : r > 0.9 ? 0.11 : 0.045 + Math.random() * 0.04;
+    starPhase[i] = Math.random();
+  }
+  const starGeo = track(new THREE.BufferGeometry());
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+  starGeo.setAttribute('size', new THREE.BufferAttribute(starSize, 1));
+  starGeo.setAttribute('phase', new THREE.BufferAttribute(starPhase, 1));
+  const starMat = track(
+    new THREE.ShaderMaterial({
+      uniforms: { time: { value: 0 }, scale: { value: 800 }, density: { value: FOG }, color: { value: new THREE.Color(1.5, 1.38, 1.25) } },
+      vertexShader: STARS.vertexShader,
+      fragmentShader: STARS.fragmentShader,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    }),
+  );
+  const stars = new THREE.Points(starGeo, starMat);
+  stars.frustumCulled = false;
+  scene.add(stars);
+  // Órbitas: aros de luz suspendidos (el del logo), con su luna. Uno recibe en la entrada, otro rodea la caja y
+  // el último corona el panorama.
+  const orbitMat = track(new THREE.MeshBasicMaterial({ color: new THREE.Color(2.1, 1.75, 1.45) }));
+  const cableMat = track(new THREE.MeshBasicMaterial({ color: 0x14161c }));
+  const ORBITS: [number, number, number, number, number, number][] = [
+    [0, 5.2, 8.4, 2.7, 0.1, 0.13],
+    [0, 4.45, -29, 4.3, -0.07, 0.09],
+    [0, 5.0, -53.4, 2.3, 0.08, -0.12],
+  ];
+  const moons: THREE.Object3D[] = [];
+  for (const [x, y, z, R, tx, tz] of ORBITS) {
+    const g = new THREE.Group();
+    g.position.set(x, y, z);
+    g.rotation.set(tx, 0, tz);
+    const ring = new THREE.Mesh(track(new THREE.TorusGeometry(R, 0.022, 10, 220)), orbitMat);
+    ring.rotation.x = Math.PI / 2;
+    const pivot = new THREE.Group();
+    const moon = new THREE.Mesh(track(new THREE.SphereGeometry(0.1, 24, 16)), orbitMat);
+    moon.position.set(R, 0, 0);
+    pivot.add(moon);
+    pivot.userData['spin'] = 0.05;
+    moons.push(pivot);
+    g.add(ring, pivot);
+    scene.add(g);
+    for (let i = 0; i < 3; i++) {
+      const a = (i / 3) * Math.PI * 2 + 0.4;
+      const px = x + Math.cos(a) * R;
+      const pz = z + Math.sin(a) * R;
+      const len = 6.6 - y;
+      const cable = new THREE.Mesh(track(new THREE.CylinderGeometry(0.006, 0.006, len, 5)), cableMat);
+      cable.position.set(px, y + len / 2, pz);
+      scene.add(cable);
+    }
+  }
+  const orbitGlow = new THREE.PointLight(0xffe2c8, 9, 13, 1.7);
+  orbitGlow.position.set(0, 4.6, 8.4);
+  scene.add(orbitGlow);
+  // Haces de luz que bajan a los gobos y a las bancas.
+  const beamMat = track(
+    new THREE.ShaderMaterial({
+      uniforms: { color: { value: new THREE.Color(1, 0.9, 0.8) }, power: { value: 0.085 } },
+      vertexShader: BEAM.vertexShader,
+      fragmentShader: BEAM.fragmentShader,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    }),
+  );
+  const beamGeo = track(new THREE.CylinderGeometry(0.06, 1.75, 6.5, 48, 1, true));
+  for (const [x, z] of [
+    [0, 10.5],
+    [0, -46.4],
+    [3.2, -20.6],
+    [-4.4, -12.4],
+    [5.9, -41.5],
+  ]) {
+    const b = new THREE.Mesh(beamGeo, beamMat);
+    b.position.set(x, 3.3, z);
+    b.renderOrder = 4;
+    scene.add(b);
   }
 
   // Rotulación en vinil: el logo a la entrada y al fondo, y el nombre de cada sala en su muro.
@@ -374,6 +637,7 @@ export async function createGallery(canvas: HTMLCanvasElement, hooks: GalleryHoo
     m.rotation.x = -Math.PI / 2;
     m.position.copy(p);
     m.userData['spin'] = i % 2 ? -0.03 : 0.04;
+    m.renderOrder = 3;
     scene.add(m);
     return m;
   });
@@ -519,6 +783,44 @@ export async function createGallery(canvas: HTMLCanvasElement, hooks: GalleryHoo
     finish(s, new THREE.Vector3(0, 2, -59));
   }
 
+
+  // Resplandor detrás de cada pantalla (la luz que se escapa por las orillas y tiñe el aire y el muro).
+  const panelTex = track(softTexture('panel'));
+  const roundTex = track(softTexture('round'));
+  const unit = track(new THREE.PlaneGeometry(1, 1));
+  const glows: { mat: THREE.MeshBasicMaterial; screen: Screen; power: number }[] = [];
+  const addGlow = (s: Screen, w: number, h: number, power: number, parent: THREE.Object3D, x: number, y: number, z: number, ry = 0) => {
+    const mat = track(new THREE.MeshBasicMaterial({ map: panelTex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide, color: 0x000000 }));
+    const m = new THREE.Mesh(unit, mat);
+    m.scale.set(w * 1.83, h * 1.83, 1);
+    m.position.set(x, y, z);
+    m.rotation.y = ry;
+    m.renderOrder = 2;
+    parent.add(m);
+    glows.push({ mat, screen: s, power });
+  };
+  addGlow(screens[0], 10, 4.2, 0.2, scene, 0, 2.45, -0.4);
+  totemSpots.forEach(([x, z, ry], i) => {
+    const g = new THREE.Group();
+    g.position.set(x, 0, z);
+    g.rotation.y = ry;
+    scene.add(g);
+    addGlow(screens[1 + i], 2, 3.4, 0.2, g, 0, 1.82, -0.1);
+  });
+  for (const z of [-44.6, -41.2, -37.8]) addGlow(screens[8], 3, 1.7, 0.16, scene, 7.975, 2.05, z, -Math.PI / 2);
+  // Sombras de contacto: una mancha oscura bajo cada persona y cada tótem, para que pisen el piso reflejante.
+  const shadeMat = track(new THREE.MeshBasicMaterial({ map: roundTex, color: 0x000000, transparent: true, opacity: 0.8, depthWrite: false }));
+  const addShade = (x: number, z: number, w: number, d: number, ry = 0) => {
+    const m = new THREE.Mesh(unit, shadeMat);
+    m.rotation.set(-Math.PI / 2, 0, ry);
+    m.scale.set(w, d, 1);
+    m.position.set(x, 0.006, z);
+    m.renderOrder = 2;
+    scene.add(m);
+  };
+  for (const s of SILHOUETTES) addShade(s.x, s.z, 1.5, 1.1);
+  for (const [x, z, ry] of totemSpots) addShade(x, z, 3.4, 1.3, ry);
+
   // Luz que cada instalación echa al cuarto (toma el color de lo que muestra).
   const lightSpots: [Screen, THREE.Vector3, number][] = [
     [screens[0], new THREE.Vector3(0, 2.2, 2.2), 26],
@@ -568,11 +870,10 @@ export async function createGallery(canvas: HTMLCanvasElement, hooks: GalleryHoo
   const target = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: lowPower ? 2 : 4 });
   const composer = new EffectComposer(renderer, target);
   composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), lowPower ? 0.18 : 0.24, 0.6, 0.86);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), lowPower ? 0.22 : 0.32, 0.78, 0.86);
   composer.addPass(bloom);
   const grade = new ShaderPass(GRADE);
   composer.addPass(grade);
-  composer.addPass(new OutputPass());
 
   // ===== Recorrido =====
   let portraitK = 1;
@@ -608,11 +909,10 @@ export async function createGallery(canvas: HTMLCanvasElement, hooks: GalleryHoo
       pos.lerpVectors(pa, pb, e);
       look.lerpVectors(la, lb, e);
       maxK = (a.pk ?? 1.6) + ((b.pk ?? 1.6) - (a.pk ?? 1.6)) * e;
-      dip = 0;
       return a.room;
     }
-    // Otra sala: se acerca un poco, funde a negro, y aparece en la nueva sala terminando de acercarse.
-    dip = opts.reduced ? 0 : 1 - smoothstep(0.04, 0.2, Math.abs(f - 0.5));
+    // Otra sala: se acerca un poco y, pasada la mitad, aparece en la nueva sala terminando de acercarse.
+    // El fundido a negro que tapa el salto corre por tiempo (ver `frame`), no por posición del scroll.
     if (f < 0.5) {
       const k = glide(f * 2);
       tmp.subVectors(la, pa).normalize();
@@ -629,6 +929,15 @@ export async function createGallery(canvas: HTMLCanvasElement, hooks: GalleryHoo
     return b.room;
   }
 
+  // Cortes entre salas: a la mitad de esos tramos la cámara salta de una sala a otra. Cada corte separa dos
+  // "regiones" del recorrido; la vista solo cambia de región con la pantalla en negro, y el negro dura medio
+  // segundo aunque el scroll se quede parado justo en el corte.
+  const CUTS = STOPS.slice(1)
+    .map((b, i) => (STOPS[i].room !== b.room || b.cut ? (i + 0.5) / (STOPS.length - 1) : -1))
+    .filter((q) => q >= 0);
+  const regionAt = (q: number) => CUTS.filter((c) => q >= c).length;
+  let shownRegion = 0;
+
   function resize() {
     const w = canvas.clientWidth || innerWidth;
     const h = canvas.clientHeight || innerHeight;
@@ -642,6 +951,7 @@ export async function createGallery(canvas: HTMLCanvasElement, hooks: GalleryHoo
     portraitK = portrait ? 1 + Math.min(1, (0.85 - camera.aspect) / 0.4) * 0.6 : 1;
     camera.updateProjectionMatrix();
     grade.uniforms['aspect'].value = camera.aspect;
+    starMat.uniforms['scale'].value = (h * renderer.getPixelRatio()) / (2 * Math.tan((camera.fov * Math.PI) / 360));
   }
   resize();
 
@@ -700,6 +1010,11 @@ export async function createGallery(canvas: HTMLCanvasElement, hooks: GalleryHoo
   let lastRoom = -1;
   let wasEnd = false;
   let pendingPointer: { x: number; y: number } | null = null;
+  let quality = 1;
+  let settle = 150; // cuadros de gracia al entrar (carga de fotos y compilación de shaders)
+  let slowSum = 0;
+  let slowN = 0;
+  let fpsT = performance.now();
 
   const frame = () => {
     raf = requestAnimationFrame(frame);
@@ -713,7 +1028,18 @@ export async function createGallery(canvas: HTMLCanvasElement, hooks: GalleryHoo
       vel += ((goal - smooth) * k - vel * 2 * Math.sqrt(k)) * dt;
       smooth += vel * dt;
     }
-    const room = pathAt(smooth);
+    const region = regionAt(smooth);
+    if (opts.reduced) {
+      shownRegion = region;
+      dip = 0;
+    } else if (region !== shownRegion) {
+      dip = Math.min(1, dip + dt / 0.2);
+      if (dip >= 1) shownRegion = region;
+    } else dip = Math.max(0, dip - dt / 0.38);
+    // Mientras funde, la cámara espera en la orilla de la región que todavía se ve.
+    const lo = shownRegion > 0 ? CUTS[shownRegion - 1] : 0;
+    const hi = shownRegion < CUTS.length ? CUTS[shownRegion] - 1e-4 : 1;
+    const room = pathAt(Math.min(hi, Math.max(lo, smooth)));
     if (room !== lastRoom) {
       lastRoom = room;
       hooks.onRoom(room);
@@ -752,8 +1078,14 @@ export async function createGallery(canvas: HTMLCanvasElement, hooks: GalleryHoo
     }
     for (const m of sils) m.rotation.y = Math.atan2(camera.position.x - m.position.x, camera.position.z - m.position.z);
     (reflMat.uniforms['camPos'].value as THREE.Vector3).copy(camera.position);
-    grade.uniforms['dip'].value = dip;
+    grade.uniforms['dip'].value = dip * dip * (3 - 2 * dip);
     for (const g of gobos) g.rotation.z += (g.userData['spin'] as number) * dt;
+    for (const g of glows) {
+      const c = g.screen.color;
+      g.mat.color.copy(c).multiplyScalar(g.screen.ready ? g.power * (0.6 + (c.r + c.g + c.b) / 3) : 0);
+    }
+    starMat.uniforms['time'].value = opts.reduced ? 0 : now;
+    if (!opts.reduced) for (const m of moons) m.rotation.y += (m.userData['spin'] as number) * dt;
 
     if (pendingPointer) {
       const h = hit(pendingPointer.x, pendingPointer.y);
@@ -767,6 +1099,26 @@ export async function createGallery(canvas: HTMLCanvasElement, hooks: GalleryHoo
       }
     }
     composer.render(dt);
+
+    // Calidad adaptable: si el equipo no sostiene ~40 cuadros por segundo, baja la resolución por escalones
+    // (nunca la sube de regreso, para que no ande brincando).
+    const t = performance.now();
+    const real = (t - fpsT) / 1000;
+    fpsT = t;
+    if (settle > 0) settle--;
+    else if (real < 0.25) {
+      slowSum += real;
+      if (++slowN === 45) {
+        if (slowSum / slowN > 1 / 40 && quality > 0.56) {
+          quality = Math.max(0.55, quality * 0.8);
+          renderer.setPixelRatio(basePr * quality);
+          composer.setPixelRatio(basePr * quality);
+          resize();
+          settle = 60;
+        }
+        slowSum = slowN = 0;
+      }
+    }
   };
   raf = requestAnimationFrame(frame);
 
@@ -797,7 +1149,10 @@ export async function createGallery(canvas: HTMLCanvasElement, hooks: GalleryHoo
     resize,
     setVisible(v) {
       visible = v;
-      if (v) clock.getDelta();
+      if (v) {
+        clock.getDelta();
+        settle = Math.max(settle, 30);
+      }
     },
     destroy() {
       cancelAnimationFrame(raf);
