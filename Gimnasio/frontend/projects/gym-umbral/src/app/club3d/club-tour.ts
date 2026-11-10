@@ -199,6 +199,23 @@ export class ClubTour {
           tl.to(prev, { scale: 1.06, duration: IN }, at);
         });
 
+        // Solo se dibujan la escena de arriba y la que viene: las que ya quedaron tapadas se ocultan,
+        // si no, cada foto vista sigue como una capa más (con recorte y filtro) y la sección se arrastra.
+        const imgs = scenes.map((fig) => fig.querySelector('img')!);
+        let top = -1;
+        const cull = () => {
+          const now = Math.min(scenes.length - 1, Math.max(0, Math.floor(tl.time() + 1e-4)));
+          if (now === top) return;
+          top = now;
+          scenes.forEach((fig, i) => {
+            const on = i === now || i === now + 1;
+            fig.style.visibility = on ? '' : 'hidden';
+            imgs[i].style.willChange = on ? '' : 'auto';
+          });
+        };
+        tl.eventCallback('onUpdate', cull);
+        cull();
+
         this.trigger = ScrollTrigger.create({
           trigger: root,
           start: 'top top',
