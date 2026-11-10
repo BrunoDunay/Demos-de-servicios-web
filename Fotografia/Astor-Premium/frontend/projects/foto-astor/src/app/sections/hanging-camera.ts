@@ -1109,8 +1109,13 @@ function build(
   ];
   const loc = new V();
   const out = new V();
-  /** Si el punto (en el mundo) está dentro de la cámara, deja en `out` el empujón que lo saca. */
-  const escape = (p: T.Vector3) => {
+  const SOFT = 0.05;
+  /**
+   * Si el punto (en el mundo) está dentro de la cámara, deja en `out` el empujón que lo saca. El empujón es
+   * continuo: mezcla las salidas posibles (hacia su lado, arriba, adelante, atrás) según qué tan cerca queda cada
+   * una, así el punto no brinca de golpe cuando cambia la cara más cercana. `sx` es el lado de la tira (-1 o 1).
+   */
+  const escape = (p: T.Vector3, sx: number) => {
     tmp.subVectors(p, cam.position);
     loc.set(tmp.dot(xAxis), tmp.dot(yAxis), tmp.dot(zAxis));
     let hit = false;
@@ -1122,14 +1127,16 @@ function build(
       const z0 = loc.z - (b.min.z - PAD);
       const z1 = b.max.z + PAD - loc.z;
       if (x0 <= 0 || x1 <= 0 || y0 <= 0 || y1 <= 0 || z0 <= 0 || z1 <= 0) continue;
-      let m = Math.min(x0, x1, y1, z0, z1);
-      if (b.down) m = Math.min(m, y0);
-      if (m === x0) loc.x -= x0;
-      else if (m === x1) loc.x += x1;
-      else if (m === y1) loc.y += y1;
-      else if (m === z0) loc.z -= z0;
-      else if (m === z1) loc.z += z1;
-      else loc.y -= y0;
+      const px = sx < 0 ? x0 : x1;
+      const m = Math.min(px, y1, z0, z1);
+      const wx = Math.exp(-(px - m) / SOFT);
+      const wy = Math.exp(-(y1 - m) / SOFT);
+      const wb = Math.exp(-(z0 - m) / SOFT);
+      const wf = Math.exp(-(z1 - m) / SOFT);
+      const sum = wx + wy + wb + wf;
+      loc.x += (sx * px * wx) / sum;
+      loc.y += (y1 * wy) / sum;
+      loc.z += (z1 * wf - z0 * wb) / sum;
       hit = true;
     }
     if (!hit) return false;
@@ -1138,20 +1145,35 @@ function build(
   };
   const mid = new V();
   const shown = ropes.map((rope) => rope.map((q) => q.p.clone()));
-  /** Puntos de la cinta tal como se dibujan: los de la simulación, sacados del cuerpo de la cámara. */
+  const goal = ropes.map((rope) => rope.map(() => new V())); // cuánto hay que apartar cada punto
+  const offs = ropes.map((rope) => rope.map(() => new V())); // lo que se aparta en pantalla (sigue a `goal` con suavidad)
+  let wrapT = 0;
+  /** Puntos de la cinta tal como se dibujan: los de la simulación, apartados del cuerpo de la cámara. */
   const wrap = () => {
+    const now = performance.now();
+    const k = wrapT ? 1 - Math.exp(-Math.min(0.1, (now - wrapT) / 1000) * 16) : 1;
+    wrapT = now;
     ropes.forEach((rope, r) => {
       const pts = shown[r];
+      const sx = r === 0 ? -1 : 1;
       for (let i = 0; i <= SEG; i++) pts[i].copy(rope[i].p);
       for (let pass = 0; pass < 2; pass++) {
-        for (let i = 1; i < SEG; i++) if (escape(pts[i])) pts[i].add(out);
+        for (let i = 1; i < SEG; i++) if (escape(pts[i], sx)) pts[i].add(out);
         // También el punto medio de cada tramo, para que una esquina no se cuele entre dos puntos.
         for (let i = 1; i < SEG; i++) {
           mid.addVectors(pts[i], pts[i + 1]).multiplyScalar(0.5);
-          if (!escape(mid)) continue;
+          if (!escape(mid, sx)) continue;
           pts[i].add(out);
           if (i + 1 < SEG) pts[i + 1].add(out);
         }
+      }
+      const g = goal[r];
+      for (let i = 0; i <= SEG; i++) g[i].subVectors(pts[i], rope[i].p);
+      // El desvío se reparte con los puntos vecinos (la tela no hace esquinas) y llega poco a poco.
+      for (let i = 1; i < SEG; i++) {
+        tmp.copy(g[i]).multiplyScalar(0.6).addScaledVector(g[i - 1], 0.2).addScaledVector(g[i + 1], 0.2);
+        offs[r][i].lerp(tmp, k);
+        pts[i].copy(rope[i].p).add(offs[r][i]);
       }
     });
   };
@@ -1244,6 +1266,25 @@ function build(
 
   // ===== Correa (cinta plana) =====
   const strapW = 0.26;
+  const SUB = 4; // tramos dibujados por cada tramo de la simulación: la cinta se ve como curva, no como eslabones
+  const curveAt = (pts: T.Vector3[], u: number, to: T.Vector3) => {
+    const i = Math.min(SEG - 1, Math.floor(u));
+    const t = u - i;
+    const p0 = pts[Math.max(0, i - 1)];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[Math.min(SEG, i + 2)];
+    const t2 = t * t;
+    const t3 = t2 * t;
+    const a = -0.5 * t3 + t2 - 0.5 * t;
+    const b = 1.5 * t3 - 2.5 * t2 + 1;
+    const c = -1.5 * t3 + 2 * t2 + 0.5 * t;
+    const d = 0.5 * t3 - 0.5 * t2;
+    return to.set(a * p0.x + b * p1.x + c * p2.x + d * p3.x, a * p0.y + b * p1.y + c * p2.y + d * p3.y, a * p0.z + b * p1.z + c * p2.z + d * p3.z);
+  };
+  const cA = new V();
+  const cB = new V();
+  const cP = new V();
   const strapGeo = (n: number) => {
     const g = new THREE.BufferGeometry();
     g.setAttribute('position', new THREE.BufferAttribute(new Float32Array((n + 1) * 2 * 3), 3));
@@ -1258,7 +1299,7 @@ function build(
     return track(g);
   };
   const strapMeshes = ropes.map(() => {
-    const m = new THREE.Mesh(strapGeo(SEG), strapMat);
+    const m = new THREE.Mesh(strapGeo(SEG * SUB), strapMat);
     m.castShadow = true;
     m.frustumCulled = false;
     scene.add(m);
@@ -1303,15 +1344,17 @@ function build(
     wrap();
     shown.forEach((rope, r) => {
       const pos = strapMeshes[r].geometry.getAttribute('position') as T.BufferAttribute;
-      for (let i = 0; i <= SEG; i++) {
-        const a = rope[Math.max(0, i - 1)];
-        const b = rope[Math.min(SEG, i + 1)];
-        tangent.subVectors(b, a).normalize();
+      const N = SEG * SUB;
+      for (let i = 0; i <= N; i++) {
+        const u = i / SUB;
+        curveAt(rope, Math.max(0, u - 0.25), cA);
+        curveAt(rope, Math.min(SEG, u + 0.25), cB);
+        tangent.subVectors(cB, cA).normalize();
         // Cerca del gancho la cinta mira al frente; cerca de la argolla gira con la cámara (de canto, como pasa por la argolla).
-        const t = i / SEG;
+        const t = i / N;
         fwd.copy(facing).lerp(xAxis, t * t * 0.9).normalize();
         side.crossVectors(tangent, fwd).normalize().multiplyScalar(strapW / 2);
-        const p = rope[i];
+        const p = curveAt(rope, Math.min(SEG, u), cP);
         pos.setXYZ(i * 2, p.x - side.x, p.y - side.y, p.z - side.z);
         pos.setXYZ(i * 2 + 1, p.x + side.x, p.y + side.y, p.z + side.z);
       }
